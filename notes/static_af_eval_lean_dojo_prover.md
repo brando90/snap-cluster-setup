@@ -36,7 +36,7 @@ See dummy code here: https://github.com/brando90/evals-for-autoformalization/blo
 # Plan/Experiment 2: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
 Goal: evaluate using the LeanDojo Lean proving env and ReProver in LeanDojo
 
-starter code TODO: https://github.com/brando90/evals-for-autoformalization/tree/main/src/nlp_eval
+starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_re_prover_eval.py
 
 Suggested plan:
 - figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Need to read through the git repos and figure out what's needed
