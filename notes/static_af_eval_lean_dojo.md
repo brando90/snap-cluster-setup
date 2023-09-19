@@ -23,17 +23,12 @@ af_score = eval_af_static(model=af_model, equi_score=equivalence, env=LeanDojo)
 print(f'Autoformalization eval performance: {af_score=}
 ```
 
-# Plan/Experiment 1: Static eval for AutoFormalization (AF) using NLP equivalence loss
+# Plan/Experiment 1: Static eval for AutoFormalization (AF) using NLP equivalence score/loss
 Goal: first plan will be to use the AF data https://huggingface.co/datasets/brando/debug1_af to evaluate a models capabilities in Autoformalizing using a standard NLP loss function as the equivalence function. 
 
-Final code should look like:
-```python
-def ppl(predicted_formal_stmt, target_formal_stmt):
-  """Perplexity equivalence function.
-    High score if the formal statement is far from the target statement
-  """
+See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval2.py
 
+# Plan/Experiment 2: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
+Goal: evaluate using the LeanDojo Lean proving env and ReProver in LeanDojo
 
-af_score = eval_af_static(model=af_model, equi_score=ppl, env=LeanDojo)
-print(f'Autoformalization eval performance: {af_score=}
-```
+dummy code: todo, but I suggest we try to edit/add an eval loss function using LeanDojo as ITP + ReProver in LeanDojo and push the eval metric to the HF `evaluate` library: https://huggingface.co/docs/evaluate/creating_and_sharing
