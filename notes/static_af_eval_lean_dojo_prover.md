@@ -29,17 +29,17 @@ Goal: first plan will be to use the AF data https://huggingface.co/datasets/bran
 See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval2.py
 
 ```python
-...
   af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo)
   print(f'Autoformalization eval performance: {af_score=}')
-...
 ```
 
 # Plan/Experiment 2: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
 Goal: evaluate using the LeanDojo Lean proving env and ReProver in LeanDojo
 
-dummy code: todo, but I suggest we try to edit/add an eval loss function using LeanDojo as ITP + ReProver in LeanDojo and push the eval metric to the HF `evaluate` library: https://huggingface.co/docs/evaluate/creating_and_sharing
+starter code TODO: https://github.com/brando90/evals-for-autoformalization/tree/main/src/nlp_eval
 
-```python
-TODO
-```
+Suggested plan:
+- figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Need to read through the git repos and figure out what's needed
+- create an eval score/loss `metric = evaluate.load("re_prover_lean_dojo")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
+- then run eval benchmark on `debug1_af` (https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
+
