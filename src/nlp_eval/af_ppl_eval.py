@@ -7,10 +7,13 @@ https://claude.ai/chat/eb9b05c7-6aa9-4dca-9bd2-6c95621b0def
 https://huggingface.co/docs/evaluate/transformers_integrations
 https://huggingface.co/docs/evaluate/package_reference/evaluator_classes
 """
+LeanDojo = None  # TODO
 
-def eval_af_static(model, equi_score, eval_dataset, env=LeanDojo, per_device_eval_batch_size=16):
+def eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo, 
+                   per_device_eval_batch_size=16,  # Adjust based on your GPU memory; you can try 32, 64, etc.
+                  ):
   """ """
-  compute_metrics = equi_score
+  compute_metrics = equi_score_or_loss
   
   # Define training arguments with a reasonable batch size for evaluation
   training_args = TrainingArguments(
@@ -38,7 +41,27 @@ def eval_af_static(model, equi_score, eval_dataset, env=LeanDojo, per_device_eva
 
 def main_af_ppl_eval_hf_ds():
   """ Main fun to eval AF using PPL score/loss using hf dataset. """
-  # --- Define a function to compute perplexity using the evaluate library
+  seed = 0
+  
+  # 1. Load and tokenize the dataset
+  # ------------------------------
+  # Load the dataset
+  dataset_name = "brando/debug1_af"   #TODO: use https://huggingface.co/datasets/brando/debug1_af
+  dataset = load_dataset(dataset_name)
+
+  # Load the tokenizer for GPT-2
+  model_name = "gpt2-medium"  # TODO: custom AF model or
+  tokenizer = AutoTokenizer.from_pretrained(model_name)
+  model = AutoModelForCausalLM.from_pretrained(model_name)  # TODO: load to gpu
+
+  # Define a function to tokenize the dataset
+  def tokenize_function(examples):
+    return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=512)
+  # Tokenize the dataset
+  tokenized_eval_datasets = dataset.map(tokenize_function, batched=True)
+
+  # 2. Setup evaluation using the evaluate library
+  # ------------------------------
   # Load the perplexity metric from the evaluate library
   metric = evaluate.load("perplexity")  # TODO: this is the function to change to have Lean Dojo?
   def compute_metrics(eval_pred, metric):
@@ -47,13 +70,16 @@ def main_af_ppl_eval_hf_ds():
     probs = np.exp(logits) / np.sum(np.exp(logits), axis=-1, keepdims=True)
     # Compute perplexity
     return metric.compute(probs=probs, references=labels)
+  equi_score_or_loss = compute_metrics
 
-  # 4. Select a subset for evaluation and setup Trainer
+  # 3. Select a subset for evaluation and setup Trainer
   # ------------------------------
-  # Select 10,000 samples from the tokenized validation dataset
-  eval_subset = tokenized_datasets["validation"].shuffle(seed=42).select(range(10000))
+  # Select num_samples samples from the tokenized validation dataset
+  num_eval_samples: int = 10000
+  eval_subset = tokenized_datasets["validation"].shuffle(seed=seed).select(range(num_eval_samples))  # use take if using streamling = True
 
-  af_score = eval_af_static(model, equi_score, eval_dataset, env=LeanDojo, per_device_eval_batch_size=16)
+  # 4. Run AF eval on using equi_score
+  af_score = eval_af_static(model, equi_score_or_loss, tokenized_eval_datasets, env=LeanDojo, per_device_eval_batch_size=16)
   print(f'Autoformalization eval performance: {af_score=}')
 
 if __name__ == '__main__':
