@@ -9,7 +9,10 @@ https://huggingface.co/docs/evaluate/package_reference/evaluator_classes
 """
 LeanDojo = None  # TODO
 
-def eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo, 
+def eval_af_static(model, 
+                   equi_score_or_loss, 
+                   eval_dataset, 
+                   env=LeanDojo, 
                    per_device_eval_batch_size=16,  # Adjust based on your GPU memory; you can try 32, 64, etc.
                   ):
   """ """
@@ -46,11 +49,11 @@ def main_af_ppl_eval_hf_ds():
   # 1. Load and tokenize the dataset
   # ------------------------------
   # Load the dataset
-  dataset_name = "brando/debug1_af"   #TODO: use https://huggingface.co/datasets/brando/debug1_af
+  dataset_name = "brando/debug1_af"
   dataset = load_dataset(dataset_name)
 
   # Load the tokenizer for GPT-2
-  model_name = "gpt2-medium"  # TODO: custom AF model or
+  model_name = "gpt2-medium"  # TODO: custom AF model or code llama2 
   tokenizer = AutoTokenizer.from_pretrained(model_name)
   model = AutoModelForCausalLM.from_pretrained(model_name)  # TODO: load to gpu
 
@@ -63,7 +66,7 @@ def main_af_ppl_eval_hf_ds():
   # 2. Setup evaluation using the evaluate library
   # ------------------------------
   # Load the perplexity metric from the evaluate library
-  metric = evaluate.load("perplexity")  # TODO: this is the function to change to have Lean Dojo?
+  metric = evaluate.load("perplexity")  # TODO: this is the function to change to have Lean Dojo + ReProver
   def compute_metrics(eval_pred, metric):
     logits, labels = eval_pred
     # Convert logits to probabilities
