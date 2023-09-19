@@ -30,7 +30,7 @@ See dummy code here: https://github.com/brando90/evals-for-autoformalization/blo
 
 ```python
 ...
-  af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo, per_device_eval_batch_size=16)
+  af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo)
   print(f'Autoformalization eval performance: {af_score=}')
 ...
 ```
