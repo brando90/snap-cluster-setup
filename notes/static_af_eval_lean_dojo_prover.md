@@ -3,6 +3,16 @@
 # Goal
 Create a trust worthy benchmark that evaluating autoformalization LLM models using Lead Dojo
 
+# Background
+
+Read references:
+- https://arxiv.org/abs/2205.12615
+- https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
+- --- extra ---
+- https://leanprover-community.github.io/archive/stream/219941-Machine-Learning-for-Theorem-Proving/topic/Paper.3A.20Autoformalization.20with.20Large.20Language.20Models.html
+- https://arxiv.org/abs/2206.01962
+- --- extra ---
+
 # Idea
 The idea is to create a eval benchmark where we can measure reliably if a model is capable of translating natural language specificiations to formally verifiable specificiations (in the ITP Lean).
 Thus the task is:
