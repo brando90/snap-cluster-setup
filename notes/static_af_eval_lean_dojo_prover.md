@@ -5,7 +5,7 @@ Create a trust worthy benchmark that evaluating autoformalization LLM models usi
 
 # Background
 
-Read references:
+Read/skim references:
 - https://arxiv.org/abs/2205.12615
 - https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
 - --- extra ---
