@@ -1,5 +1,13 @@
 # Static eval for AutoFormalization (AF) using Lean Dojo with a Prover
 
+# High Level Motivation
+The dream is to build an automated mathematician that is powerful enough to:
+1. Guarantees that all software and AI system are safe
+2. Drastically augements mathematatical & scientific discoveries -- to improve the world
+With this in mind, there is tremendous amount of information that hasn't been unlocked in mathematical textbooks written in natural language (informal langauge).
+In addition, to guarantee correctness we want to leverage the power of formal languages and theorem proving.
+Overall the combination of these two worlds (informal and formal) is through the task of Autoformalization -- training AI systems to translate between informal languages (e.g., English) and formal languages (e.g., PyThon, Lean). 
+
 # Goal
 Create a trust worthy benchmark that evaluating autoformalization LLM models using Lead Dojo
 
