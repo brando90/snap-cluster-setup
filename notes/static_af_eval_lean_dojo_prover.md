@@ -16,6 +16,10 @@ Create a trust worthy benchmark that evaluating autoformalization LLM models usi
 Read/skim references:
 - https://arxiv.org/abs/2205.12615
 - https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
+Then write a reflection.
+Have GPT4/Claude evaluate your reflection and interact with it for a little to consolidate your understanding through a discussion.
+
+## Extra background (option)
 - --- extra ---
 - https://leanprover-community.github.io/archive/stream/219941-Machine-Learning-for-Theorem-Proving/topic/Paper.3A.20Autoformalization.20with.20Large.20Language.20Models.html
 - https://arxiv.org/abs/2206.01962
