@@ -39,7 +39,7 @@ The main components we will need are:
    - b. Equivalence score/loss function with a prover capable of proving true equivalences e.g., `fs1 === fs2 ? | Prover, ITP`
    - c. An ITP (Interactive Theorem Prover, Lean). In this case LeanDojo.
 
-So final code looks as follows
+So final call to code looks as follows:
 ```python
 af_score = eval_af_static(model=af_model, equi_score=equivalence, env=LeanDojo)
 print(f'Autoformalization eval performance: {af_score=}
