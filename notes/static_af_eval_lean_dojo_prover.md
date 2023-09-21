@@ -51,13 +51,35 @@ Goal: first plan will be to use the AF data https://huggingface.co/datasets/bran
 See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval.py
 
 ```python
-  af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo)
-  print(f'Autoformalization eval performance: {af_score=}')
+af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo)
+print(f'Autoformalization eval performance: {af_score=}')
 ```
 
-# Plan/Experiment 2: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
+# Plan/Experiment 2: Static eval for Autoformalization using a Lean Automation/tactic/Prover based equivalence score/loss
+Goal: evaluate a AF model using the LeanDojo proving env with the the simplest prover we can use -- an out of the box automation/tactic/prover in Lean.
+The idea is to try to **prove** equivalences between the autoformalized statement done by our model and the ground truth target formal statement i.e., `model(i_stmt) ===_tactic f_stmt*`.
+The simplest prover to try here would be a powerful tactic like [`linarith`](https://github.com/phlippe/Lean_hammer/issues/2) or [`LeanHammer`](https://github.com/phlippe/Lean_hammer).
+
+Conceptually the api/pseudo-code would look something like this:
+```python
+def equivalence_basic_lean_prover(formal_stmt: str, target_formal_stmt: str, prover = linarith) -> bool:
+   equivalent: bool = LeanDojo.env(formal_stmt, target_formal_stmt)
+   return equivalent
+
+af_score = eval_af_static(model=af_model, equi_score_or_loss=equivalence_basic_lean_prover, env=LeanDojo)
+print(f'Autoformalization eval performance: {af_score=}
+```
+
+starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_re_prover_eval.py
+
+Suggested plan:
+- figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Maybe we need to proof things in bulk e.g., an entire data set. What is the right way to use LeanDojo here for our purposes? Need to read through the git repos and figure out what's needed
+- create an eval score/loss `metric = evaluate.load("linarith")` or `metric = evaluate.load("LeanHammer")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
+- then run eval benchmark on `debug1_af` (https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
+
+# Plan/Experiment 3: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
 Goal: evaluate a AF model using the LeanDojo proving env with the Prover called ReProver. 
-The cruz is the implementation of the `equivance_score` score/loss function for scoring if `mld(i_stmt) === f_stmt`. 
+The cruz is the implementation of the `equivance_score` score/loss function for scoring if `mld(i_stmt) ===_re_prover f_stmt`. 
 
 starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_re_prover_eval.py
 
