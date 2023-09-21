@@ -41,7 +41,7 @@ The main components we will need are:
 
 So final call to code looks as follows:
 ```python
-af_score = eval_af_static(model=af_model, equi_score=equivalence, env=LeanDojo)
+af_score = eval_af_static(model=af_model, equi_score_or_loss=equivalence, env=LeanDojo)
 print(f'Autoformalization eval performance: {af_score=}
 ```
 
