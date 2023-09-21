@@ -56,7 +56,8 @@ See dummy code here: https://github.com/brando90/evals-for-autoformalization/blo
 ```
 
 # Plan/Experiment 2: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
-Goal: evaluate using the LeanDojo Lean proving env and ReProver in LeanDojo
+Goal: evaluate a AF model using the LeanDojo proving env with the Prover called ReProver. 
+The cruz is the implementation of the `equivance_score` score/loss function for scoring if `mld(i_stmt) === f_stmt`. 
 
 starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_re_prover_eval.py
 
