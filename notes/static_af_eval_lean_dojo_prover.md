@@ -7,9 +7,6 @@ With this in mind, there is tremendous amount of information that hasn't been un
 In addition, to guarantee correctness we want to leverage the power of formal languages and theorem proving.
 Overall the combination of these two worlds (informal and formal) is through the task of Autoformalization -- training AI systems to translate between informal languages (e.g., English) and formal languages (e.g., PyThon, Lean). 
 
-# Goal
-Create a trust worthy benchmark that evaluating autoformalization LLM models using Lead Dojo
-
 # Background
 
 Read/skim references:
@@ -17,6 +14,9 @@ Read/skim references:
 - https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
 Then write a reflection.
 Have GPT4/Claude evaluate your reflection and interact with it for a little to consolidate your understanding through a discussion.
+
+# Goal
+Create a trust worthy benchmark for evaluating Autoformalization LLM models using Lead Dojo.
 
 ## Extra background (option)
 - --- extra ---
