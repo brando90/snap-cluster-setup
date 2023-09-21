@@ -48,7 +48,7 @@ print(f'Autoformalization eval performance: {af_score=}
 # Plan/Experiment 1: Static eval for AutoFormalization (AF) using NLP equivalence score/loss
 Goal: first plan will be to use the AF data https://huggingface.co/datasets/brando/debug1_af to evaluate a models capabilities in Autoformalizing using a standard NLP loss function as the equivalence function. 
 
-See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval2.py
+See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval.py
 
 ```python
   af_score = eval_af_static(model, equi_score_or_loss, eval_dataset, env=LeanDojo)
