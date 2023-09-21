@@ -12,6 +12,7 @@ Overall the combination of these two worlds (informal and formal) is through the
 Read/skim references:
 - https://arxiv.org/abs/2205.12615
 - https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
+
 Then write a reflection.
 Have GPT4/Claude evaluate your reflection and interact with it for a little to consolidate your understanding through a discussion.
 
