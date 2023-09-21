@@ -33,7 +33,7 @@ Thus the task is:
 
 The main components we will need are:
 1. A benchmark with ground truth pairs of informal statements to formal statements (specifying Task AF via examples) see my current public hf data set https://huggingface.co/datasets/brando/debug1_af 
-2. An **equivalence** function to be used as a score/loss function. It tells (ideally) us **perfectly** if a traslated/autoformalize informal statement is equivalent to the target formal statement.
+2. An **equivalence** function to be used as a score/loss function. It tells us (ideally) **perfectly** if a traslated/autoformalize informal statement is equivalent to the target formal statement.
 3. Full pipeline code that runs eval given:
    - a. (AF) LLM model
    - b. Equivalence score/loss function with a prover capable of proving true equivalences e.g., `fs1 === fs2 ? | Prover, ITP`
