@@ -1,4 +1,4 @@
-# Static eval for AutoFormalization (AF) using Lean Dojo with a Prover
+# Development of a Static Evaluation Benchmark for AutoFormalization using Lean Dojo and Theorem Prover Equivalence
 
 # High Level Motivation
 The dream is to build an automated mathematician that is powerful enough to automate mathematics, sciencific discovery, and AI safety with an automated mathematician. 
@@ -9,14 +9,25 @@ With this in mind, there is tremendous amount of information that hasn't been un
 In addition, to guarantee correctness we want to leverage the power of formal languages and theorem proving.
 Overall the combination of these two worlds (informal and formal) is through the task of Autoformalization -- training AI systems to translate between informal languages (e.g., English) and formal languages (e.g., PyThon, Lean). 
 
-# Background
+# Development of a Static Evaluation Benchmark for AutoFormalization using Lean Dojo and Theorem Prover Equivalence
 
-Read/skim references:
-- https://arxiv.org/abs/2205.12615
-- https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
+# Project Description:
+Autoformalization is crucial for converting informal statements, typically in natural language, into formal, verifiable statements, such as those in Python, Lean, Coq, or Isabelle. This project aims to develop a reliable evaluation benchmark to measure the capability of machine learning models in translating natural language specifications to formally verifiable specifications using the Interactive Theorem Prover, Lean. The task to evaluate, termed as AF (AutoFormalization), will assess whether a model can create a formalization from an informal statement that is semantically equivalent to the target formalization. The project will involve creating a benchmark with ground truth pairs of informal and formal statements, developing an equivalence function as a score/loss function, and coding a full pipeline that runs evaluations, integrating an AF LLM model, equivalence score/loss function, and LeanDojo. This endeavor is motivated by the aspiration to build an automated mathematician capable of unlocking the vast knowledge encapsulated in mathematical textbooks written in natural language, contributing to advancements in mathematics, scientific discovery, and AI safety.
 
-Then write a reflection.
-Have GPT4/Claude evaluate your reflection and interact with it for a little to consolidate your understanding through a discussion.
+Key References:
+1. Autoformalization (AF): https://arxiv.org/abs/2205.12615
+2. AF video: https://youtu.be/_pqJYnQua58?si=jVliUTqqXTjpeods&t=1
+3. ProofNet: https://arxiv.org/abs/2302.12433
+4. LeanDojo: https://github.com/lean-dojo
+
+Recommended Background:
+Interested candidates are encouraged to share their background when reaching out. A strong foundation in Python is essential, and knowledge in theorem proving using Lean, Coq, or Isabelle is preferred but not mandatory. A passion or intense curiosity about mathematics, formalization/verification of mathematics, AI safety/alignment, or software verification & verified program synthesis would be ideal.
+
+Prerequisites / Preparation:
+Participants will be expected to make direct contributions to the project and should be comfortable coding in Python. Familiarity with theorem proving and a keen interest in mathematics or software verification would be advantageous.
+
+Contact:
+For further details and collaboration opportunities, please contact Brando Miranda at brando9@stanford.edu.
 
 # Goal
 Create a trust worthy benchmark for evaluating Autoformalization LLM models using Lead Dojo.
@@ -89,4 +100,3 @@ Suggested plan:
 - figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Need to read through the git repos and figure out what's needed
 - create an eval score/loss `metric = evaluate.load("re_prover_lean_dojo")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
 - then run eval benchmark on [debug1_af](https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
-
