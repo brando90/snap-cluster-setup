@@ -1,4 +1,4 @@
-# A Systematic Study of the Role of Data Quality and Alignment for Fine-tuning LLMs for Enhanced Autoformalization
+# A Systematic Study of the Role of Data Quality, Alignment and Diveristy for Fine-tuning LLMs for Enhanced Autoformalization
 
 Brando Miranda: brando9@stanford.edu
 AI/ML
@@ -7,7 +7,7 @@ Course credit
 Up to 5 students
 
 # Project Description
-This project embarks on a systematic/scientific exploration of data quality and alignment to optimize the performance of Large Language Models (LLMs) in Autoformalization, the process of translating informal natural language statements into formal, verifiable statements (e.g., Python, Lean, Coq, Isabelle). 
+This project embarks on a systematic/scientific exploration of data quality, diversity and data alignment to optimize the performance of Large Language Models (LLMs) in Autoformalization, the process of translating informal natural language statements into formal, verifiable statements (e.g., Python, Lean, Coq, Isabelle). 
 The endeavor aims to systematically identify the type of data that maximizes test performance for Autoformalization, utilizing Task2Vec data alignment coefficients to measure alignment between source and target tasks. 
 The hypothesis that the most aligned data yields the most significant improvement will be rigorously tested, exploring varying degrees and types of data, including exactly aligned data, unpaired data, formal data alone, and informal data alone, each with different alignment scores. 
 The ultimate aspiration is to construct an automated mathematician capable of advancing mathematics, scientific discovery, and AI safety, with a conjecture that formal mathematics is pivotal for creating safe AGI, as it can provide guarantees that are impossible to achieve empirically.
@@ -50,6 +50,10 @@ We will also test it in terms of conceptual categories to see which improve AF m
 - on informal data alone, irrelevant data to mathematics, relevant but informal, mathematics textbooks 
 - later use equivalence & proof acc to test our method
 - maybe also the role of data diversity with the Task2Vec diversity coefficient
+- fine-tuning done on lamma2 or Falcon, 1B or 7B, 13B probably max, ping me for code
+- note: all of the above should be done with in context learning/few shot condition besides fine-tuning i.e., select the seqs/batch to include in the prompt for AF
+- pre-training or continued pre-training can be done too when the focus is testing the diversity coefficient
+- AF diversity can be tested by having many AF challenges divided by textbooks or concepts
 
 ## Appendix
 code refs:
