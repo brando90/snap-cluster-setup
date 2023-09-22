@@ -16,6 +16,9 @@ Autoformalization is pivotal for converting informal statements, typically in na
 Interested candidates are requested to share their background when reaching out.
 ## Prerequisites / Preparation:
 Contributors to this project should be proficient in Python to make direct contributions to the project.
+Knowledge in Lean/Coq/Isabelle (Theorem Proving) is nice but not required.
+Ideally, you are passionate/intensely curious about mathematics or/and the formalization/verification of mathematics.
+Or software verification & verified program synthesis. 
 ## Key Citations:
 1. Autoformalization: https://arxiv.org/abs/2205.12615
 2. LIMA - Less is More For Alignment: https://arxiv.org/abs/2305.11206
