@@ -1,7 +1,9 @@
 # Static eval for AutoFormalization (AF) using Lean Dojo with a Prover
 
 # High Level Motivation
-The dream is to build an automated mathematician that is powerful enough to automate mathematics, sciencific discovery, and AI safety with an automated mathematician.
+The dream is to build an automated mathematician that is powerful enough to automate mathematics, sciencific discovery, and AI safety with an automated mathematician. 
+I conjecture formal maths is the only way to create safe AGI because safety requires a "for all" quantifier saying "there is no way AGI will kill humanity". That type of statement are impossible to guarantee empirically and only a mathematical formal proof can guarantee it. 
+Hence why I think building an automated mathematician is the only way for safe AGI.
 
 With this in mind, there is tremendous amount of information that hasn't been unlocked in mathematical textbooks written in natural language (informal langauge).
 In addition, to guarantee correctness we want to leverage the power of formal languages and theorem proving.
