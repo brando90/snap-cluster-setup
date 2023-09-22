@@ -32,7 +32,7 @@ Thus the task is:
 > Task = AF (AutoFormalization) =: can a ml model create a formalization (from an informal statement) that is (formally) semantically equivalent to the target formalization? `AF == i_stmt -> f_stmt`
 
 The main components we will need are:
-1. A benchmark with ground truth pairs of informal statements to formal statements (specifying Task AF via examples) see my current public hf data set https://huggingface.co/datasets/brando/debug1_af 
+1. A benchmark with ground truth pairs of informal statements to formal statements (specifying Task AF via examples) see my current public hf data set [debug1](https://huggingface.co/datasets/brando/debug1_af) or [ProofNet](https://huggingface.co/datasets/hoskinson-center/proofnet)
 2. An **equivalence** function to be used as a score/loss function. It tells us (ideally) **perfectly** if a traslated/autoformalize informal statement is equivalent to the target formal statement.
 3. Full pipeline code that runs eval given:
    - a. (AF) LLM model
@@ -46,7 +46,7 @@ print(f'Autoformalization eval performance: {af_score=}
 ```
 
 # Plan/Experiment 1: Static eval for AutoFormalization (AF) using NLP equivalence score/loss
-Goal: first plan will be to use the AF data https://huggingface.co/datasets/brando/debug1_af to evaluate a models capabilities in Autoformalizing using a standard NLP loss function as the equivalence function. 
+Goal: first plan will be to use the AF data in [ProoNet](https://huggingface.co/datasets/hoskinson-center/proofnet) or my [debug1](https://huggingface.co/datasets/brando/debug1_af) to evaluate a models capabilities in Autoformalizing using a standard NLP loss function as the equivalence function. 
 
 See dummy code here: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_ppl_eval.py
 
@@ -75,7 +75,7 @@ starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/
 Suggested plan:
 - figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Maybe we need to proof things in bulk e.g., an entire data set. What is the right way to use LeanDojo here for our purposes? Need to read through the git repos and figure out what's needed
 - create an eval score/loss `metric = evaluate.load("linarith")` or `metric = evaluate.load("LeanHammer")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
-- then run eval benchmark on `debug1_af` (https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
+- then run eval benchmark on [ProofNet](hoskinson-center/proofnet) or [debug1_af](https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
 
 # Plan/Experiment 3: Static eval for AutoFormalization (AF) using Prover based equivalence score/loss
 Goal: evaluate a AF model using the LeanDojo proving env with the Prover called ReProver. 
@@ -86,5 +86,5 @@ starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/
 Suggested plan:
 - figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Need to read through the git repos and figure out what's needed
 - create an eval score/loss `metric = evaluate.load("re_prover_lean_dojo")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
-- then run eval benchmark on `debug1_af` (https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
+- then run eval benchmark on [debug1_af](https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
 
