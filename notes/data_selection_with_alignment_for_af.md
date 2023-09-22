@@ -49,6 +49,7 @@ We will also test it in terms of conceptual categories to see which improve AF m
 - on formal data alone of different alignment scores e.g., python code, pytoch + docs, lean, lean + docs, Coq, cvc4, z3, fol, Isabelle, metamath, mizar, proof terms, proof states, etc.
 - on informal data alone, irrelevant data to mathematics, relevant but informal, mathematics textbooks 
 - later use equivalence & proof acc to test our method
+- maybe also the role of data diversity with the Task2Vec diversity coefficient
 
 ## Appendix
 code refs:
