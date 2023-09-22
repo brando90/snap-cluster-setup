@@ -73,7 +73,7 @@ print(f'Autoformalization eval performance: {af_score=}
 starter code TODO: https://github.com/brando90/evals-for-autoformalization/blob/main/src/nlp_eval/af_re_prover_eval.py
 
 Suggested plan:
-- figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Maybe we need to proof things in bulk e.g., an entire data set. What is the right way to use LeanDojo here for our purposes? Need to read through the git repos and figure out what's needed
+- figure out what the right way to use LeanDojo is https://github.com/lean-dojo maybe an import statement isn't the right way. Maybe we need to proof things in bulk e.g., an entire data set. What is the right way to use LeanDojo here for our purposes? Need to read through the git repos and figure out what's needed. Also see https://github.com/lean-dojo/LeanDojo/discussions/68
 - create an eval score/loss `metric = evaluate.load("linarith")` or `metric = evaluate.load("LeanHammer")` to evaluate AF using the default reprover prover and lean dojo lean env. Upload to https://huggingface.co/docs/evaluate/creating_and_sharing
 - then run eval benchmark on [ProofNet](hoskinson-center/proofnet) or [debug1_af](https://huggingface.co/datasets/brando/debug1_af/tree/main) and see the score of our AF model this way
 
