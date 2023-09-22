@@ -44,3 +44,5 @@ The overarching vision of this project is to pave the way for the realization of
 
 - evaluate it:
 - Are the scores of our reward model close to the ground truth human annotations? 
+
+## Experiment 5: Building an equivalente function using an LLM, it can help evaluate if two statements are equivalent and the model can also output a score too
