@@ -49,7 +49,8 @@ def main_af_ppl_eval_hf_ds():
   # 1. Load and tokenize the dataset
   # ------------------------------
   # Load the dataset
-  dataset_name = "brando/debug1_af"
+  # dataset_name = "brando/debug1_af"
+  dataset_name = "hoskinson-center/proofnet"
   dataset = load_dataset(dataset_name)
 
   # Load the tokenizer for GPT-2
