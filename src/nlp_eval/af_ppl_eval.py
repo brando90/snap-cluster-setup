@@ -86,6 +86,9 @@ def main_af_ppl_eval_hf_ds():
   af_score = eval_af_static(model, equi_score_or_loss, tokenized_eval_datasets, env=LeanDojo, per_device_eval_batch_size=16)
   print(f'Autoformalization eval performance: {af_score=}')
 
+def main():
+  main_af_ppl_eval_hf_ds()
+
 if __name__ == '__main__':
-    main_af_ppl_eval_hf_ds()
+    main()
     print(f'Done!\a')
