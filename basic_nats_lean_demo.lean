@@ -2,7 +2,7 @@
 -- Skipping importing default nat libraries
 -- import data.nat.basic -- imports standard nats in lean
 
----- 1. Defining unary natural numbers (could have defined it as my_nat)
+---- 1. Defining unary natural numbers
 inductive u_nat : Type
 | zero : u_nat -- #0
 | succ : u_nat → u_nat -- #1
