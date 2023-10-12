@@ -1,3 +1,8 @@
+(*
+ref: https://chat.openai.com/c/6881a873-3345-4883-86ba-4184a2f11fc4
+ref: https://claude.ai/chat/afba3ae8-6425-4919-881b-d867eb1c7162
+ref: https://discord.com/channels/1117623339456933940/1161025563708903445/1162113353657880616
+*)
 theory simple_nats
 imports Main
 begin
