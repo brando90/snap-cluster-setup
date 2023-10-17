@@ -3,11 +3,34 @@
 ## Compute
 
 ### Sherlock
+Quick Start:
 
-main website: https://www.sherlock.stanford.edu/docs/#what-to-expect
-Join their sherlock slack & follow their instructions (basically join the two channels they recoomend): https://www.sherlock.stanford.edu/docs/#user-community
-Support email, read this: https://www.sherlock.stanford.edu/docs/#email-recommended
+- main website: https://www.sherlock.stanford.edu/docs/#what-to-expect
+- Join their sherlock slack & follow their instructions (basically join the two channels they recommend by searching the channels in the slack app, they don't have a workspace it seems): https://www.sherlock.stanford.edu/docs/#user-community
+- Support email, read this: https://www.sherlock.stanford.edu/docs/#email-recommended
 
+
+### Set up Project in Sherlock
+
+High level plan
+1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```brando9@login.sherlock.stanford.edu```
+2. git clone the repo so it's accessible in any node when using the slurm resource manger
+3. set up the conda env so it's accesible in any node and learn to use pip install -e . 
+4. test the code by running with interactive job (srun) and background jon (sbatch)
+5. modify the code, test again, and learn to push to repo
+6. learn to vscode into sherlcok (either ssh or push file on save)
+7. then do new experiment repeat
+8. and request an optional pull rquest
+
+note: you should understand (roughly) what everything means in here to be effective.
+Google, gpt4/claude it etc. 
+Tips:
+- use `man` to understand bash command or if you want to chat with it use LLMs/GPT4/Claude.
+
+#### 1 Login to Login/head node
+```bash
+ssh your_sunetid@login.sherlock.stanford.edu
+```
 
 
 ## Tutorial on setting up a python project
