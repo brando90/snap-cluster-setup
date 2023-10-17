@@ -31,7 +31,7 @@ Tips:
 ```bash
 ssh your_sunetid@login.sherlock.stanford.edu
 ```
-get the git clone command from your fork (create your fork in github! For this go to github our project's webpage and click fork on the top right ) and do with your own specific ssh url clone text:
+get the git clone command from your fork (create your fork in github! To fork go to github our project's webpage and click fork on the top right) and do with your own specific ssh url clone text (gotten from the topish left green button called "code", copy the ssh flag):
 ```bash
 git clone git@github.com:brando90/evals-for-autoformalization.git
 ```
