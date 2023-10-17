@@ -35,6 +35,60 @@ get the git clone command from your fork (create your fork in github! To fork go
 git clone git@github.com:brando90/evals-for-autoformalization.git
 ```
 
+## SSH
+
+```bash
+ssh-keygen -t ed25519 -C "brandojazz@gmail.com"
+# enter key
+# enter key
+```
+Not run ssh agent
+```
+eval "$(ssh-agent -s)"
+```
+if ~.ssh/config doesn't exist i.e. try 
+```
+touch ~/.ssh/config
+```
+put the contets of (copy the bellow into your clip board)
+```
+Host github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+with vim editor (read about vim, it's just an edit) in the server i.e.
+do
+```
+cat ~/.ssh/config
+vim ~/.ssh/config
+# press i in the new black window,
+#copy paste the contents above after pressing i,
+#then press escape esc
+# then safe the file and exist with :x or :w followed by :q
+# then do 
+cat .config
+# confirms you copied it correctly
+```
+Then add the key to your github using https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account . For a summary of what I did do:
+```
+# in the sherlock login/head node do:
+cat ~/.ssh/id_ed25519.pub
+# then copy paste the output, very carefully
+```
+Then go to setting in your github e.g., https://github.com/settings/keys and create a new key by copy pasting the contents of the previous cat command.
+
+Then git clone on your fork should work, e.g.,:
+```
+[brando9@sh03-ln06 login ~/.ssh]$ git clone git@github.com:brando90/evals-for-autoformalization.git
+Cloning into 'evals-for-autoformalization'...
+remote: Enumerating objects: 270, done.
+remote: Counting objects: 100% (264/264), done.
+remote: Compressing objects: 100% (163/163), done.
+remote: Total 270 (delta 150), reused 175 (delta 90), pack-reused 6
+Receiving objects: 100% (270/270), 78.74 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (151/151), done.
+```
 
 ## Tutorial on setting up a python project
 1. create the `setup.py` file
