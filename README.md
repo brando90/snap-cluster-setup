@@ -13,7 +13,7 @@ Quick Start:
 
 High level plan
 1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```brando9@login.sherlock.stanford.edu```
-2. git clone the repo so it's accessible in any node when using the slurm resource manger
+2. git clone the repo so it's accessible in any node when using the slurm resource manger, to do that you need to put the public ssh key on sherlock
 3. set up the conda env so it's accesible in any node and learn to use pip install -e . 
 4. test the code by running with interactive job (srun) and background jon (sbatch)
 5. modify the code, test again, and learn to push to repo
