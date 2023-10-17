@@ -9,7 +9,6 @@ Quick Start:
 - Join their sherlock slack & follow their instructions (basically join the two channels they recommend by searching the channels in the slack app, they don't have a workspace it seems): https://www.sherlock.stanford.edu/docs/#user-community
 - Support email, read this: https://www.sherlock.stanford.edu/docs/#email-recommended
 
-
 ### Set up Project in Sherlock
 
 High level plan
