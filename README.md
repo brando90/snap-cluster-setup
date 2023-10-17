@@ -36,31 +36,51 @@ git clone git@github.com:brando90/evals-for-autoformalization.git
 ```
 
 ## SSH
+Goal: add the public key you created on sherlock's login node to your github so you can clone your fork. For that follow the instructions here https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account or the outline from bellow that was inspired from the official github link in this sentence.
 
+First create ssh public key on sherlock
 ```bash
-ssh-keygen -t ed25519 -C "brandojazz@gmail.com"
-# enter key
-# enter key
+ssh your_sunetid@login.sherlock.stanford.edu
+[brando9@sh03-ln06 login ~/.ssh]$ ssh-keygen -t ed25519 -C "brandojazz@gmail.com"
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/users/brando9/.ssh/id_ed25519):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/users/brando9/.ssh/id_ed25519.
+Your public key has been saved in /home/users/brando9/.ssh/id_ed25519.pub.
+The key fingerprint is:
+...
+The key's randomart image is:
++--[ED25519 256]--+
+...
++----[SHA256]-----+
+# press the enter key to not change file name
+# press the enter key or a passphase to use this key
 ```
-Not run ssh agent
+Now run ssh agent in sherlock
 ```
-eval "$(ssh-agent -s)"
+[brando9@sh03-ln06 login ~/.ssh]$ eval "$(ssh-agent -s)"
+Agent pid 50895
 ```
-if ~.ssh/config doesn't exist i.e. try 
+Now configure your .ssh if you've never done it on this server.
+Concretely, if ~.ssh/config doesn't exist create it with (or vim): 
 ```
 touch ~/.ssh/config
+# or
+[brando9@sh03-ln06 login ~/.ssh]$ vim .config
 ```
-put the contets of (copy the bellow into your clip board)
+put the contets of for hithub (i.e., copy the bellow into your clip board, read it) with the vim:
 ```
 Host github.com
   AddKeysToAgent yes
   UseKeychain yes
   IdentityFile ~/.ssh/id_ed25519
 ```
-with vim editor (read about vim, it's just an edit) in the server i.e.
+i.e. use vim editor in sherlock(read about vim, it's just an edit) in the server i.e.
 do
 ```
-cat ~/.ssh/config
+[brando9@sh03-ln06 login ~/.ssh]$ cat ~/.ssh/config
+cat: /home/users/brando9/.ssh/config: No such file or directory
 vim ~/.ssh/config
 # press i in the new black window,
 #copy paste the contents above after pressing i,
@@ -69,12 +89,17 @@ vim ~/.ssh/config
 # then do 
 cat .config
 # confirms you copied it correctly
+[brando9@sh03-ln06 login ~/.ssh]$ cat .config
+Host github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
 ```
 Then add the key to your github using https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account . For a summary of what I did do:
 ```
 # in the sherlock login/head node do:
-cat ~/.ssh/id_ed25519.pub
-# then copy paste the output, very carefully
+[brando9@sh03-ln06 login ~/.ssh]$ cat ~/.ssh/id_ed25519.pub
+# then copy paste the output, very carefully, do not share this stuff publicly wide web
 ```
 Then go to setting in your github e.g., https://github.com/settings/keys and create a new key by copy pasting the contents of the previous cat command.
 
