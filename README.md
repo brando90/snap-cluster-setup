@@ -1,5 +1,15 @@
 # evals-for-autoformalization
 
+## Compute
+
+### Sherlock
+
+main website: https://www.sherlock.stanford.edu/docs/#what-to-expect
+Join their sherlock slack & follow their instructions (basically join the two channels they recoomend): https://www.sherlock.stanford.edu/docs/#user-community
+Support email, read this: https://www.sherlock.stanford.edu/docs/#email-recommended
+
+
+
 ## Tutorial on setting up a python project
 1. create the `setup.py` file
 2. Make sure your setup.py file has the following
