@@ -77,3 +77,11 @@ cd ~/massive-autoformalization-maf
 ## Basic Docker
 
 ## Basic Cluster use (Snap)
+
+## Lean4
+
+Recommend watching:
+
+https://www.youtube.com/watch?v=yZo6k48L0VY
+
+https://www.youtube.com/watch?v=_0QZXHoyZlA 
