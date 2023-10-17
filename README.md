@@ -12,7 +12,7 @@ Quick Start:
 ### Set up Project in Sherlock
 
 High level plan
-1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```brando9@login.sherlock.stanford.edu```
+1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
 2. git clone the repo so it's accessible in any node when using the slurm resource manger, to do that you need to put the public ssh key on sherlock
 3. set up the conda env so it's accesible in any node and learn to use pip install -e . 
 4. test the code by running with interactive job (srun) and background jon (sbatch)
@@ -25,6 +25,10 @@ note: you should understand (roughly) what everything means in here to be effect
 Google, gpt4/claude it etc. 
 Tips:
 - use `man` to understand bash command or if you want to chat with it use LLMs/GPT4/Claude.
+
+List of thinks to know about:
+- git, ssh, bash,
+- basic unix commands, ls, ls -lah, cd, pwd, which,
 
 #### 1 Login to Login/head node
 ```bash
