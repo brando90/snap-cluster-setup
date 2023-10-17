@@ -31,6 +31,10 @@ Tips:
 ```bash
 ssh your_sunetid@login.sherlock.stanford.edu
 ```
+get the git clone command from your fork (create your fork in github! For this go to github our project's webpage and click fork on the top right ) and do with your own specific ssh url clone text:
+```bash
+git clone git@github.com:brando90/evals-for-autoformalization.git
+```
 
 
 ## Tutorial on setting up a python project
