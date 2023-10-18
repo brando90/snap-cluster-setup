@@ -13,8 +13,8 @@ Quick Start:
 
 High level plan
 1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
-2. git clone the repo so it's accessible in any node when using the slurm resource manger, to do that you need to put the public ssh key on sherlock
-3. set up the conda env so it's accesible in any node and learn to use pip install -e . 
+2. create a public ssh key on sherlock and then git clone the repo so it's accessible in any node when using the slurm resource manger, then use this command to get an interactive session (`$ srun -p gpu --gpus 1 --pty bash`)
+3. set up the `conda` env so it's accesible in any node and learn to use `pip install -e .` 
 4. test the code by running with interactive job (srun) and background jon (sbatch)
 5. modify the code, test again, and learn to push to repo
 6. learn to vscode into sherlcok (either ssh or push file on save)
@@ -24,11 +24,14 @@ High level plan
 note: you should understand (roughly) what everything means in here to be effective.
 Google, gpt4/claude it etc. 
 Tips:
-- use `man` to understand bash command or if you want to chat with it use LLMs/GPT4/Claude.
+- use `man` to understand bash command or if you want to chat with it use LLMs/GPT4/Claude and `--help` or `-h`.
 
 List of thinks to know about:
 - git, ssh, bash,
 - basic unix commands, ls, ls -lah, cd, pwd, which,
+- vim
+- nvidia-smi
+- module load (common in HPC's)
 
 #### 1 Login to Login/head node
 ```bash
