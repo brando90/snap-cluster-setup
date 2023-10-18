@@ -73,7 +73,7 @@ touch ~/.ssh/config
 # or
 [brando9@sh03-ln06 login ~/.ssh]$ vim .config
 ```
-put the contets of for hithub (i.e., copy the bellow into your clip board, read it) with the vim:
+add the content for github (i.e., copy the bellow into your clip board, read it) with the vim:
 ```
 Host github.com
   AddKeysToAgent yes
