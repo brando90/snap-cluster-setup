@@ -18,7 +18,7 @@ Note snap currently has no slurm (HPC workload manager).
 
 High level plan
 1. Vscode ssh into your server, which enables modifying the files on the server directly (other options are usually modify locally and push on save)
-2. ssh into your server of choice ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
+2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu```  or ```ssh brando9@mercury2.stanford.edu``` or ```ssh brando9@hyperturning1.stanford.edu``` (div)
 3. create a public ssh key the snap server of choice and then git clone the repo
 4. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
 5. test some code in your server + test the gpu works
@@ -29,6 +29,7 @@ High level plan
 Bonus:
 - kinit for avoiding passwords
 - request an optional pull rquest to the original repo
+- ampere arch fp32 vs fp 16 and bf16. The goods for ML are bf16 and fp32.
 
 note: you should understand (roughly) what everything means in here to be effective. Google, gpt4/claude it etc. 
 Tips:
