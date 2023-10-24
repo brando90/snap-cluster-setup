@@ -18,7 +18,7 @@ Note snap currently has no slurm (HPC workload manager).
 
 High level plan
 1. Vscode ssh into your server, which enables modifying the files on the server directly (other options are usually modify locally and push on save)
-2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu```  or ```ssh brando9@mercury2.stanford.edu``` or ```ssh brando9@hyperturning1.stanford.edu``` (div)
+2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu``` (algign-4-af)  or ```ssh brando9@mercury2.stanford.edu``` (equiv prover bench) or ```ssh brando9@hyperturning1.stanford.edu``` (div team)
 3. create a public ssh key the snap server of choice and then git clone the repo
 4. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
 5. test some code in your server + test the gpu works
