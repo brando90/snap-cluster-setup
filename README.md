@@ -3,13 +3,13 @@
 ## Compute
 
 ### Snap Cluster
-Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your "snap bible").
+Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your **snap bible**).
 Other useful resources:
 - compute instructions from Professor Koyejo's (Sanmi's) lab (STAIR Lab): https://docs.google.com/document/d/1PSTLJdtG3AymDGKPO-bHtzSnDyPmJPpJWXLmnJKzdfU/edit?usp=sharing
 - advanced video from Rylan and Brando (made for the STAIR/Koyejo Lab): https://www.youtube.com/watch?v=XEB79C1yfgE&feature=youtu.be
 - support IT for snap: il-action@cs.stanford.edu
 - our CS 197 section channel
-- join the snap slack & ask questions there too: 
+- join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
 ### Set up Project in the Snap Cluster
 
