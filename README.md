@@ -21,15 +21,20 @@ High level plan
 2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu``` (algign-4-af)  or ```ssh brando9@mercury2.stanford.edu``` (equiv prover bench) or ```ssh brando9@hyperturning1.stanford.edu``` (div team)
 3. create a public ssh key the snap server of choice and then git clone the repo
 4. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
-5. test some code in your server + test the gpu works
-6. then understand the workflow for long running jobs
-7. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
+  i. if `conda` is not available install it here locally in the server you're suing follwing these instructions: https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh (bonus, `module avail` might have it, but it might also be a good thing to ask them to install it for you or why isn't it available) 
+6. test some code in your server + test the gpu works 
+7. then understand the workflow for long running jobs
+8. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
 9. then run a real experiment then repeat
+
+Need to know let's decide later where to put this in the intructions:
+- .bashrc + .bashrc details of snap: https://github.com/brando90/.dotfiles 
 
 Bonus:
 - kinit for avoiding passwords
 - request an optional pull rquest to the original repo
 - ampere arch fp32 vs fp 16 and bf16. The goods for ML are bf16 and fp32.
+
 
 note: you should understand (roughly) what everything means in here to be effective. Google, gpt4/claude it etc. 
 Tips:
