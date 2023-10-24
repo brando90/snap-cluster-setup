@@ -17,17 +17,20 @@ The details of how to use different storage systems are complicated and you don'
 Note snap currently has no slurm (HPC workload manager).
 
 High level plan
-1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
-2. create a public ssh key on sherlock and then git clone the repo so it's accessible in any node when using the slurm resource manger, then use this command to get an interactive session (`$ srun -p gpu --gpus 1 --pty bash`)
-3. set up the `conda` env so it's accesible in any node and learn to use `pip install -e .` 
-4. test the code by running with interactive job (srun) and background jon (sbatch)
-5. modify the code, test again, and learn to push to repo
-6. learn to vscode into sherlcok (either ssh or push file on save)
-7. then do new experiment repeat
-8. and request an optional pull rquest
+1. Vscode ssh into your server, which enables modifying the files on the server directly (other options are usually modify locally and push on save)
+2. ssh into your server of choice ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
+3. create a public ssh key the snap server of choice and then git clone the repo
+4. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
+5. test some code in your server + test the gpu works
+6. then understand the workflow for long running jobs
+7. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
+9. then run a real experiment then repeat
 
-note: you should understand (roughly) what everything means in here to be effective.
-Google, gpt4/claude it etc. 
+Bonus:
+- kinit for avoiding passwords
+- request an optional pull rquest to the original repo
+
+note: you should understand (roughly) what everything means in here to be effective. Google, gpt4/claude it etc. 
 Tips:
 - use `man` to understand bash command or if you want to chat with it use LLMs/GPT4/Claude and `--help` or `-h`.
 
