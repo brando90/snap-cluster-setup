@@ -10,9 +10,10 @@ Other useful resources:
 - support IT for snap: il-action@cs.stanford.edu
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
+- clusters their own video tutorials (TODO)
 
 ### Set up Project in the Snap Cluster - assuming a single Sever
-Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single ocmputer, since that is most simple + good enough for essential goal (i.e., doing research).
+Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single computer, since that is most simple + good enough for essential goal (i.e., doing research).
 The details of how to use different storage systems are complicated and you don't need that version right now.
 Note snap currently has no slurm (HPC workload manager).
 
