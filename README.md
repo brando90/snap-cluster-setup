@@ -24,11 +24,12 @@ High level plan
   i. if `conda` is not available install it here locally in the server you're suing follwing these instructions: https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh (bonus, `module avail` might have it, but it might also be a good thing to ask them to install it for you or why isn't it available)
   ii. create a conda env for your project with a good yet short name (`conda create -n align_4_af python=3.10`)
   iii. put `conda activate` in your `.bashrc.user` file in snap as instructed here https://ilwiki.stanford.edu/doku.php?id=hints:enviroment (so you don't have to run conda activate your_env every time) [TODO: ask it for help or help fix]
-6. `pip install -e .`
-7. test some code in your server + test the gpu works 
-8. then understand the workflow for long running jobs
-9. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
-10. then run a real experiment then repeat
+5. now let's instlal the library `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py`
+6. test the gpu works by running pytorch
+7. test some code in your server + nvidia-smi + set visible devices + cudda stuff set up properly
+8. then understand the workflow for long running jobs: krbtmux, reauth, tmux attach -t 0, tmux ls
+10. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
+11. then run a real experiment then repeat
 
 Need to know let's decide later where to put this in the intructions:
 - .bashrc + .bashrc details of snap: https://github.com/brando90/.dotfiles 
