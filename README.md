@@ -2,14 +2,16 @@
 
 ## Compute
 
-### Sherlock
-Quick Start:
+### Snap Cluster
+Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your "snap bible").
+Other useful resources:
+- compute instructions from Professor Koyejo's (Sanmi's) lab (STAIR Lab): https://docs.google.com/document/d/1PSTLJdtG3AymDGKPO-bHtzSnDyPmJPpJWXLmnJKzdfU/edit?usp=sharing
+- advanced video from Rylan and Brando (made for the STAIR/Koyejo Lab): https://www.youtube.com/watch?v=XEB79C1yfgE&feature=youtu.be
+- support IT for snap: il-action@cs.stanford.edu
+- our CS 197 section channel
+- join the snap slack & ask questions there too: 
 
-- main website: https://www.sherlock.stanford.edu/docs/#what-to-expect
-- Join their sherlock slack & follow their instructions (basically join the two channels they recommend by searching the channels in the slack app, they don't have a workspace it seems): https://www.sherlock.stanford.edu/docs/#user-community
-- Support email, read this: https://www.sherlock.stanford.edu/docs/#email-recommended
-
-### Set up Project in Sherlock
+### Set up Project in the Snap Cluster
 
 High level plan
 1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
