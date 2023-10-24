@@ -20,4 +20,5 @@
 - [proofnet](https://huggingface.co/datasets/hoskinson-center/proofnet)
 
 # Models
-- [morph-prover-v0-7b](https://huggingface.co/morph-labs/morph-prover-v0-7b) (mostly lean AutoFormalization) 
+- [morph-prover-v0-7b](https://huggingface.co/morph-labs/morph-prover-v0-7b) (mostly lean AutoFormalization)
+- llema https://huggingface.co/EleutherAI/llemma_7b
