@@ -1,8 +1,8 @@
 # evals-for-autoformalization
 
-## Compute
+## Get Compute for your Research Project
 
-### Snap Cluster
+### Snap Cluster Important References
 Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your **snap bible**).
 Other useful resources:
 - compute instructions from Professor Koyejo's (Sanmi's) lab (STAIR Lab): https://docs.google.com/document/d/1PSTLJdtG3AymDGKPO-bHtzSnDyPmJPpJWXLmnJKzdfU/edit?usp=sharing
@@ -11,7 +11,10 @@ Other useful resources:
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
-### Set up Project in the Snap Cluster
+### Set up Project in the Snap Cluster - assuming a single Sever
+Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single ocmputer, since that is most simple + good enough for essential goal (i.e., doing research).
+The details of how to use different storage systems are complicated and you don't need that version right now.
+Note snap currently has no slurm (HPC workload manager).
 
 High level plan
 1. ssh into the login/head node ```ssh your_sunetid@login.sherlock.stanford.edu``` e.g., ```ssh brando9@login.sherlock.stanford.edu``` (see https://www.sherlock.stanford.edu/docs/#quick-start)
