@@ -19,17 +19,19 @@ Note snap currently has no slurm (HPC workload manager).
 High level plan
 1. Vscode ssh into your server, which enables modifying the files on the server directly (other options are usually modify locally and push on save)
 2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu``` (algign_4_af)  or ```ssh brando9@mercury2.stanford.edu``` (equiv prover bench) or ```ssh brando9@hyperturning1.stanford.edu``` (div team)
-3. create a public ssh key the snap server of choice and then git clone the repo
-4. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
+3. ---
+4. create a public ssh key the snap server of choice and then git clone the repo
+5. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
   i. if `conda` is not available install it here locally in the server you're suing follwing these instructions: https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh (bonus, `module avail` might have it, but it might also be a good thing to ask them to install it for you or why isn't it available)
   ii. create a conda env for your project with a good yet short name (`conda create -n align_4_af python=3.10`)
   iii. put `conda activate` in your `.bashrc.user` file in snap as instructed here https://ilwiki.stanford.edu/doku.php?id=hints:enviroment (so you don't have to run conda activate your_env every time) [TODO: ask it for help or help fix]
-5. now let's instlal the library `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py`
-6. test the gpu works by running pytorch
-7. test some code in your server + nvidia-smi + set visible devices + cudda stuff set up properly
-8. then understand the workflow for long running jobs: krbtmux, reauth, tmux attach -t 0, tmux ls
-10. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
-11. then run a real experiment then repeat
+6. now let's instlal the library `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py`
+7. test gpu works by running pytorch (or cpu locally)
+8. test some code in your server + nvidia-smi + set visible devices + cuda stuff set up properly
+9. ---
+10. then understand the workflow for long running jobs: krbtmux, reauth, tmux attach -t 0, tmux ls
+11. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
+12. then run a real experiment then repeat
 
 Need to know let's decide later where to put this in the intructions:
 - .bashrc + .bashrc details of snap: https://github.com/brando90/.dotfiles 
