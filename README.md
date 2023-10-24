@@ -215,7 +215,9 @@ pip install -e ~/massive-autoformalization-maf
 #pip uninstall ~/massive-autoformalization-maf
 cd ~/massive-autoformalization-maf
 ```
-
+## VSCode
+TODO
+  Next session, we need to walk through how to use the VSCode debugger with snap
 ## Basic Docker
 
 ## Basic Cluster use (Snap)
