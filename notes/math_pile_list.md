@@ -1,7 +1,7 @@
 # Data
 - v1-v4
 - openmath web
-- kaiyu's coqgym
+- [kaiyu's coqgym](https://zenodo.org/records/8101883)
 - jin's isabelle data
 - (lean dojo, lean4)
 - AF train rt isa data
