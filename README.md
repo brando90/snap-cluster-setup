@@ -25,14 +25,26 @@ High level plan
 5. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
   i. if `conda` is not available install it here locally in the server you're suing follwing these instructions: https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh (bonus, `module avail` might have it, but it might also be a good thing to ask them to install it for you or why isn't it available)
   ii. create a conda env for your project with a good yet short name (`conda create -n align_4_af python=3.10`)
-  iii. put `conda activate` in your `.bashrc.user` file in snap as instructed here https://ilwiki.stanford.edu/doku.php?id=hints:enviroment (so you don't have to run conda activate your_env every time) [TODO: ask it for help or help fix]
-6. now let's instlal the library `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py`
-7. test gpu works by running pytorch (or cpu locally)
+  iii. put `conda activate align_4_af` in your `.bashrc.user` file in snap as instructed here https://ilwiki.stanford.edu/doku.php?id=hints:enviroment (so you don't have to run conda activate your_env every time) [TODO: ask it for help or help fix], see your conda envs with `conda info -e`
+6. now let's instlal the library `cd $HOME/evals-for-autoformalization` `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py` or  `pip install -e path_to _project` [TODO: exactly what is path for this]
+7. test gpu works by running pytorch (or cpu locally), 
+```bash
+# TODO: we need to figure out why we can't use this GPU (ally, carlos)
+export PATH=/usr/local/cuda-11.7/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+
+python -c "import torch; print(torch.cuda.get_device_capability());print('if >=8 you can use bfloat16');"
+python -c "import torch; print(torch.bfloat16);"
+```
 8. test some code in your server + nvidia-smi + set visible devices + cuda stuff set up properly
-9. ---
-10. then understand the workflow for long running jobs: krbtmux, reauth, tmux attach -t 0, tmux ls
+9. 
+10. then understand the workflow for long running jobs: krbtmux, reauth, 
+10. tmux attach -t 0 for more experiments (long process) (tmux ls)
 11. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
 12. then run a real experiment then repeat
+(13. if you learn to wandb)
+
+TODO: write a nice readme with commands demoing how to use snap.
 
 Need to know let's decide later where to put this in the intructions:
 - .bashrc + .bashrc details of snap: https://github.com/brando90/.dotfiles 
@@ -42,6 +54,7 @@ Bonus:
 - request an optional pull rquest to the original repo
 - ampere arch fp32 vs fp 16 and bf16. The goods for ML are bf16 and fp32.
 
+TODO: carlos, why isn't conda available in snap?
 
 note: you should understand (roughly) what everything means in here to be effective. Google, gpt4/claude it etc. 
 Tips:
