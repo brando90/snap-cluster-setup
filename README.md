@@ -5,44 +5,99 @@
 ### Snap Cluster Important References
 Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your **snap bible**).
 Other useful resources:
+- Support IT for snap: il-action@cs.stanford.edu
 - compute instructions from Professor Koyejo's (Sanmi's) lab (STAIR Lab): https://docs.google.com/document/d/1PSTLJdtG3AymDGKPO-bHtzSnDyPmJPpJWXLmnJKzdfU/edit?usp=sharing
 - advanced video from Rylan and Brando (made for the STAIR/Koyejo Lab): https://www.youtube.com/watch?v=XEB79C1yfgE&feature=youtu.be
-- support IT for snap: il-action@cs.stanford.edu
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
-- clusters their own video tutorials (TODO)
 
 ### Set up Project in the Snap Cluster - assuming a single Sever
-Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single computer, since that is most simple + good enough for essential goal (i.e., doing research).
+Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single computer, since that is most simple + good enough for essential goal (i.e., doing research)).
 The details of how to use different storage systems are complicated and you don't need that version right now.
 Note snap currently has no slurm (HPC workload manager).
 
-High level plan
-1. Vscode ssh into your server, which enables modifying the files on the server directly (other options are usually modify locally and push on save)
-2. ssh into your server of choice ```ssh brando9@mercury1.stanford.edu``` (algign_4_af)  or ```ssh brando9@mercury2.stanford.edu``` (equiv prover bench) or ```ssh brando9@hyperturning1.stanford.edu``` (div team)
-3. ---
-4. create a public ssh key the snap server of choice and then git clone the repo
-5. then you need to set up a python env, in this case `conda` and install the projects using `pip install -e .` (and have a rough idea how python packing works)
-  i. if `conda` is not available install it here locally in the server you're suing follwing these instructions: https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh (bonus, `module avail` might have it, but it might also be a good thing to ask them to install it for you or why isn't it available)
-  ii. create a conda env for your project with a good yet short name (`conda create -n align_4_af python=3.10`)
-  iii. put `conda activate align_4_af` in your `.bashrc.user` file in snap as instructed here https://ilwiki.stanford.edu/doku.php?id=hints:enviroment (so you don't have to run conda activate your_env every time) [TODO: ask it for help or help fix], see your conda envs with `conda info -e`
-6. now let's instlal the library `cd $HOME/evals-for-autoformalization` `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization/setup.py` or  `pip install -e path_to _project` [TODO: exactly what is path for this]
-7. test gpu works by running pytorch (or cpu locally), 
-```bash
-# TODO: we need to figure out why we can't use this GPU (ally, carlos)
-export PATH=/usr/local/cuda-11.7/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+## Get access to snap
+Send an e-mail to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access **for the quarter you are working with me**. 
+CC my advisor (Sanmi) and me (Brando). 
+The title email should be
+> Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only
+the emails are:
+- Eric Pineda: eric.pineda@stanford.edu
+- Professor Sanmi Koyejo: sanmi@stanford.edu
+- Brando Miranda: brando9@stanford.edu
+We already have an advanced video for snap: https://youtu.be/XEB79C1yfgE .
 
-python -c "import torch; print(torch.cuda.get_device_capability());print('if >=8 you can use bfloat16');"
-python -c "import torch; print(torch.bfloat16);"
+## Setting up your compute environment in Snap
+note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if they don't work then the docs are wrong and you should e-mail the it for them to fix the docs il-action@cs.stanford.edu 
+
+### SSH into cluster
+First SSH in the cluster to use the server computer you were assigned:
+```bash
+#10 Quadro RTX 8000 48GB
+ssh brando9@hyperturing1.stanford.edu
+ssh brando9@hyperturing2.stanford.edu
+#10 RTX A4000 16GB
+ssh brando9@mercury1.stanford.edu
+# ssh brando9@mercury2.stanford.edu
 ```
-8. test some code in your server + nvidia-smi + set visible devices + cuda stuff set up properly
-9. 
-10. then understand the workflow for long running jobs: krbtmux, reauth, 
-10. tmux attach -t 0 for more experiments (long process) (tmux ls)
-11. understand how to modify your code, test the code, and learn to git push to your team's github repo/fork
-12. then run a real experiment then repeat
-(13. if you learn to wandb)
+you run these commands from you computer.
+You should see a bash shell in the cluster.
+Sample output:
+```bash
+(data_quality) brandomiranda~ ❯ ssh brando9@mercury2.stanford.edu
+Last login: Fri Oct 27 15:34:59 2023 from 172.24.69.154
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ mercury2.stanford.edu
+ Ubuntu 20.04 (5.4.0-135-generic)
+ 96 x Intel(R) Xeon(R) Gold 6342 CPU @ 2.80GHz, 503.55 GiB RAM, 2.00 GiB swap
+
+ eno1: 172.24.75.55
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   -> For help or to report problems, go to http://support.cs.stanford.edu
+
+brando9@mercury2:~$
+```
+This might look different if you already set up your .bashrc file. This is what we will go set up next.
+
+### Seeting up your bashrc file in Snap
+tip: anything you don't understand discuss with GPT4/Claude! Highly recommend it. I do it often and save the conv links or convs in my evernote. e.g., ask it what an env variable is. Or what vim is. Or what git clone is. etc.
+
+Every time you login to server or open a linux terminal, you need to configure your unix/linux environment 
+(i.e., set up environment variables that your bash shell uses to figure out where things are, like commands etc.)
+
+Usually the linux terminal runs `.bash_profile` to set up your linux environment. 
+In this case if you inspect it with cat `.bash_profile` you can see it runs ("sources") another file called `.bashrc` i.e.,
+```bash
+brando9@mercury2:~$ cat .bash_profile
+# DO NOT MODIFY THIS FILE! Your changes will be overwritten!
+# For user-customization, please edit ~/.bashrc.user
+#
+# $ROOT$
+#
+# CSD-CF miles 2003-01-24
+
+# Don't do anything in this file -- do it in .bashrc
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+```
+So it means we need to put our personal configurations in ~/.bashrc
+
+First echo `$HOME` to figure out what home path you're using:
+```bash
+brando9@mercury2:~$ echo $HOME
+/afs/cs.stanford.edu/u/brando9
+```
+So this means we need to our bash configurations at `~/.bashrc`.
+So first let's create that file with vim (see Basic Vim bellow in this tutorial to know the basics):
+```bash
+# note I used the absolute path because we will have $HOME (i.e., tilde) point to the local (lfs) home directory.
+cd /afs/cs.stanford.edu/u/brando9
+vim .bashrc
+```
+Now press `i` in vim 
 
 TODO: write a nice readme with commands demoing how to use snap.
 
@@ -229,6 +284,15 @@ pip install -e ~/massive-autoformalization-maf
 #pip uninstall ~/massive-autoformalization-maf
 cd ~/massive-autoformalization-maf
 ```
+
+## Basic vim
+Vim is for editing file in the terminal (or cli). These are the commands you might need https://coderwall.com/p/adv71w/basic-vim-commands-for-getting-started
+Mostly knowing that:
+-> pressing `i` puts you in insert mode
+-> pressing `w` writes/save the files
+-> pressing `q` quits
+that's all you need.
+Note: ask GPT4/Claude for help if your stuck.
 
 ## Basic Docker
 
