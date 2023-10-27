@@ -26,7 +26,9 @@ export CUDA_VISIBLE_DEVICES=3,4,5,6; export SLURM_JOBID=$(python -c "import rand
 export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7; export SLURM_JOBID=$(python -c "import random;print(random.randint(0, 1_000_000))"); echo $SLURM_JOBID;
 echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES; echo SLURM_JOBID = $SLURM_JOBID; echo hostname = $(hostname)
 
-python -c "import uutils; uutils.torch_uu.gpu_test()"
+# -- Test Pytorch GPU
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+python -c "import torch; print(torch.cuda.get_device_capability())"
 python -c "import torch; print(torch.cuda.get_device_capability());print('if >=8 you can use bfloat16');"
 python -c "import torch; print(torch.bfloat16);"
 
