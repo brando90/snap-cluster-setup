@@ -82,7 +82,7 @@ if [[ $(hostname) == "mercury1.stanford.edu" ]]; then
     # export CUDA_VISIBLE_DEVICES=0
     # export PATH=/usr/local/cuda-11.7/bin:$PATH
     # export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
-    conda activate align_4_af
+    conda activate my_env
 else
     # install the right version of pytorch compatible with cuda 11.7
     # pip3 install torch torchvision torchaudio
@@ -90,7 +90,7 @@ else
     # export CUDA_VISIBLE_DEVICES=0 
     # export PATH=/usr/local/cuda-11.7/bin:$PATH
     # export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
-    # conda activate my_env
+    conda activate base
 fi
 
 # -- Optionally test pytorch with a gpu
