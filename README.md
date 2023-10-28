@@ -59,7 +59,7 @@ brando9@mercury2:~$
 ```
 This might look different if you already set up your .bashrc file. This is what we will go set up next.
 
-### Seeting up your bashrc file in Snap
+### Setting up your bashrc file in Snap
 tip: anything you don't understand discuss with GPT4/Claude! Highly recommend it. I do it often and save the conv links or convs in my evernote. e.g., ask it what an env variable is. Or what vim is. Or what git clone is. etc.
 
 Every time you login to server or open a linux terminal, you need to configure your unix/linux environment 
@@ -83,21 +83,102 @@ if [ -f ~/.bashrc ]; then
 	. ~/.bashrc
 fi
 ```
-So it means we need to put our personal configurations in ~/.bashrc
+So it means we need to put our personal linix configurations in ~/.bashrc
 
-First echo `$HOME` to figure out what home path you're using:
+First echo `$HOME` to figure out what home path you're using (since the .bashrc is located at `~` which is `$HOME`):
 ```bash
 brando9@mercury2:~$ echo $HOME
 /afs/cs.stanford.edu/u/brando9
 ```
-So this means we need to our bash configurations at `~/.bashrc`.
+So this means we need our bash configurations at `~/.bashrc` i.e., to be at `$HOME/.bashrc`.
 So first let's create that file with vim (see Basic Vim bellow in this tutorial to know the basics):
 ```bash
 # note I used the absolute path because we will have $HOME (i.e., tilde) point to the local (lfs) home directory.
 cd /afs/cs.stanford.edu/u/brando9
 vim .bashrc
 ```
-Now press `i` in vim 
+Now go to this https://github.com/brando90/evals-for-autoformalization/blob/33e1bf825f7de5d49557256332355fa2872bbbd7/.bashrc#L1 and copy paste it to your clip board e.g., with command/control + c. 
+Now press `i` to go in vim's insert mode and paste the file as you'd normally e.g., with control/command + v. 
+You can read through the `.bashrc` to see why it's set up the way it is.
+Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit).
+Note, this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
+
+The goal will be to have all your files live at the storage space for your local server (LFS, stands for local file server).
+Therefore, let's move this .bashrc, $HOME (~) and all your git close at the home of lfs for your assinged server.
+
+#### Move .bashrc to your LFS
+First let's create a soft link to your .bashrc at your lfs $HOME.
+Creete that environment variable
+```bash
+export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
+export HOME=$LOCAL_MACHINE_PWD
+echo $HOME
+cd ~
+
+# the full output
+brando9@mercury2:~$ pwd
+/afs/cs.stanford.edu/u/brando9
+brando9@mercury2:~$ export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
+brando9@mercury2:~$ export HOME=$LOCAL_MACHINE_PWD
+brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ echo $HOME
+/lfs/mercury2/0/brando9
+brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ cd ~
+brando9@mercury2:~$ pwd
+/lfs/mercury2/0/brando9
+```
+the last line confirms we are at the local servers storage (called lfs).
+
+If you look at the .bashrc there is this line:
+```bash
+# - The defaul $HOME is /afs/cs.stanford.edu/u/brando9 but since you want to work in a specific server due to otherwise conda being so hard you need to reset what home is, see lfs: https://ilwiki.stanford.edu/doku.php?id=hints:storefiles#lfs_local_server_storage  
+export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
+mkdir -p $LOCAL_MACHINE_PWD
+export WANDB_DIR=$LOCAL_MACHINE_PWD
+export HOME=$LOCAL_MACHINE_PWD
+
+# - set up afs short cuts
+# since you are logged in to afs this moves you to your local computer
+cd $HOME
+```
+meaning that every time you login to the server assigned you got to your lfs directory instead of the afs home directory (since `$HOME` was changed).
+
+### Git clone, Install conda and your project
+Now that you have a sensible `.bashrc` file that cd's you to your local server's lfs storage, it's time to git clone your project, conda install all of the project's depedencies and pip install the project.
+
+First you need set up an SSH keys in your lfs server individually.
+For that see the bellow instructions for SSH with sample outputs of the termianl.
+
+After that works first check you are in your server's lfs home:
+```bash
+(data_quality) brandomiranda~ ❯ ssh brando9@mercury2.stanford.edu
+Last login: Fri Oct 27 18:34:13 2023 from 172.24.69.154
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ mercury2.stanford.edu
+ Ubuntu 20.04 (5.4.0-135-generic)
+ 96 x Intel(R) Xeon(R) Gold 6342 CPU @ 2.80GHz, 503.55 GiB RAM, 2.00 GiB swap
+
+ eno1: 172.24.75.55
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   -> For help or to report problems, go to http://support.cs.stanford.edu
+
+brando9@mercury2~ $ pwd
+/lfs/mercury2/0/brando9
+brando9@mercury2~ $ realpath .
+/lfs/mercury2/0/brando9
+```
+we are at lfs! Good. 
+Now make sure you have a **team** fork of your project's repo e.g., project links:
+- https://github.com/brando90/evals-for-autoformalization/tree/main
+- https://github.com/brando90/beyond-scale-language-data-diversity/tree/main
+click the git forke and then go to settings, collaborators and choose one of the forks to be the team's fork where everyone pushes the git changes to the project.
+Assuming each person's SSH keys for their server and your github correct as the instructions bellow, create a **local copy (git clone) of the tema github fork**: 
+```bash
+git clone git@github.com:brando90/beyond-scale-language-data-diversity.git
+# or
+git clone git@github.com:brando90/evals-for-autoformalization.git
+```
+
+
 
 TODO: write a nice readme with commands demoing how to use snap.
 
