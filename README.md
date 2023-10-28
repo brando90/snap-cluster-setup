@@ -59,6 +59,15 @@ brando9@mercury2:~$
 ```
 This might look different if you already set up your .bashrc file. This is what we will go set up next.
 
+Tip, since the server's have weird security persmission you might need to reauth often (or your programs are killed by the admins/IT's):
+```bash
+reauth
+```
+type password. If the reauth command doesn't work do:
+```bash
+export PATH="/afs/cs/software/bin:$PATH"
+```
+
 ### Setting up your bashrc file in Snap
 tip: anything you don't understand discuss with GPT4/Claude! Highly recommend it. I do it often and save the conv links or convs in my evernote. e.g., ask it what an env variable is. Or what vim is. Or what git clone is. etc.
 
@@ -396,8 +405,57 @@ Installing collected packages: evals-for-autoformalization
   Running setup.py develop for evals-for-autoformalization
 Successfully installed evals-for-autoformalization-0.0.1
 ```
+then this should mean your project is correct installed! 
 
+### Testing the main script you are developing
+Now you should install vscode in your computer.
+Download the SSH extension in vscode.
+Then as we did in seciton (see video https://youtu.be/dzMAtTGplGg or https://youtu.be/8PBL-qcJWZw I think the first one has the vscode part with the SSH extension) create a host to conect to the server you are using for snap. 
+After that your vscode should editing files from the server directly. 
+You can do `File > Add Folder to Workspace` so that it appears on your explorer window on vscode.
+Then after adding the root of your project e.g.,
+```
+# added via vscode 
+/lfs/mercury1/0/brando9/evals-for-autoformalization
+# added via vscode
+/lfs/mercury1/0/brando9/beyond-scale-language-data-diversity
+```
+Now, open your main projects file and edit it in vscode. 
+Then save it.
+Now let's run the hellopy and your main project's file it to test the changes:
+```
+# test hello.py
+python /lfs/mercury1/0/brando9/evals-for-autoformalization/src/hello.py
+python ~/evals-for-autoformalization/src/hello.py
+(my_env) brando9@mercury1~/evals-for-autoformalization $ python ~/evals-for-autoformalization/src/hello.py
+hello (Test your python pip install -e . by printing hello)
 
+(8, 6)
+torch.bfloat16
+tensor([[0.6177],
+        [2.2084]], device='cuda:0')
+```
+then test the main project's file
+```bash
+# - prover based eval project (runs the ppl eval)
+# sanity check full pipeline of eval works using ppl
+python ~/evals-for-autoformalization/src/nlp_eval/af_ppl_eval.py
+# sanity check full pipeline of eval works for your prover based model
+python ~/evals-for-autoformalization/src/prover_based_evals/af_lean_tactic_eval.py
+python ~/evals-for-autoformalization/src/prover_based_evals/af_re_prover_eval.py
+
+# - diversity project
+# sample scrip to train a model, goal is to reproduce the results form beyond scale and train for very long or for a deeper network e.g., falcon-1B is good (but initialize it from scratch)
+python ~/beyond-scale-language-data-diversity/src/train/train.py
+
+# - alignment af-fine-tuning
+# test that the alignment code outputs sensible values according to the sanity check
+python ~/beyond-scale-language-data-diversity/src/alignment/align.py
+# fine tuning script for AF, test if fine tuning in aligned or not aligned improves test ppl most assuming same trained tokens (fair comparison)
+python ~/beyond-scale-language-data-diversity/src/alignment/fine_tuning_with_aligned_data.py
+```
+
+### Other
 
 TODO: write a nice readme with commands demoing how to use snap.
 
@@ -421,15 +479,6 @@ List of thinks to know about:
 - vim
 - nvidia-smi
 - module load (common in HPC's)
-
-#### 1 Login to Login/head node
-```bash
-ssh your_sunetid@login.sherlock.stanford.edu
-```
-get the git clone command from your fork (create your fork in github! To fork go to github our project's webpage and click fork on the top right) and do with your own specific ssh url clone text (gotten from the topish left green button called "code", copy the ssh flag):
-```bash
-git clone git@github.com:brando90/evals-for-autoformalization.git
-```
 
 ## SSH
 Goal: add the public key you created on sherlock's login node to your github so you can clone your fork. For that follow the instructions here https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account or the outline from bellow that was inspired from the official github link in this sentence.
@@ -523,10 +572,7 @@ Anything outside `src`` won't be found for this libraries pip -e install.
 Read the comments for those lines in `setup.py`` to understand it if you wish and refs.
 3. Now you can do `pip install -e .` or `pip install -e $HOME/evals-for-autoformalization` (assuming you have your python env/conda env activated).
 
-Now you should be able to import statements for this library in the expected way! e.g.,
-```python
-# TODO
-```
+Now you should be able to import statements for this library in the expected way!
 
 ## Python Envs with conda & using pip instlal -e <path>
 
@@ -575,7 +621,6 @@ python -c "import torch; print(torch.version.cuda); print((torch.randn(2, 4).cud
 ref: https://chat.openai.com/c/375d5d26-7602-4888-9ef5-9f92359330dc
 
 ## Basic Git
-TODO
 ```bash
 cd /afs/cs.stanford.edu/u/brando9/
 git clone git@github.com:brando90/massive-autoformalization-maf.git
@@ -594,14 +639,7 @@ Mostly knowing that:
 that's all you need.
 Note: ask GPT4/Claude for help if your stuck.
 
-## Basic Docker
-
-## Basic Cluster use (Snap)
-
 ## Lean4
-
 Recommend watching:
-
-https://www.youtube.com/watch?v=yZo6k48L0VY
-
-https://www.youtube.com/watch?v=_0QZXHoyZlA 
+- https://www.youtube.com/watch?v=yZo6k48L0VY
+- https://www.youtube.com/watch?v=_0QZXHoyZlA 
