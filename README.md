@@ -493,9 +493,8 @@ tmux attach -t <tmux_session_name>
 # e.g.
 tmux attach -t 0
 ```
-
-ref: snap's tutorial on long running prcesses https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs
-ref: read about tmux https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
+- ref: snap's tutorial on long running prcesses https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs
+- ref: read about tmux https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
 
 ### Other
 
