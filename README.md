@@ -455,6 +455,48 @@ python ~/beyond-scale-language-data-diversity/src/alignment/align.py
 python ~/beyond-scale-language-data-diversity/src/alignment/fine_tuning_with_aligned_data.py
 ```
 
+## Running long running jobs
+Due to very unstandard set up of snap, your long running processes will be killed if they do not (kerberos) reauthenticate (that it's you).
+So the practice to run long processes/jobs in snap is:
+1. Run a tmux session (or kerberos tmux `krbtmux`) (read about regular (tmux)[https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/]).
+```bash
+# note this is not the standard tmux command tmux
+krbtmux
+```
+2. Then run the reauthentication daemon/backgrou process command `reuath` and type your password, so that your tmux session is not killed
+```bash
+reauth
+```
+3. Then you can run whatever long process you want e.g., your experiment script:
+```bash
+python ~/beyond-scale-language-data-diversity/src/alignment/fine_tuning_with_aligned_data.py
+```
+once inside your temux sessions.
+
+Usually, you will want to "go out" of your tmux session.
+This is done with keyboard scroke "tmuyx prefix + d" which ends up being `contro b` follewed by `d`. 
+This returns you to your normal bash terminal.
+
+Then you can see which tmux sessions you have with:
+```bash
+tmux ls
+```
+and you can create a new tmux session with:
+```bash
+tmux new -t <tmux_session_name>
+# e.g.,
+tmux new -s 0
+```
+and you can return to see how your script is doing with (assuming you login from scratch to your server again)
+```bash
+tmux attach -t <tmux_session_name>
+# e.g.
+tmux attach -t 0
+```
+
+ref: snap's tutorial on long running prcesses https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs
+ref: read about tmux https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
+
 ### Other
 
 TODO: write a nice readme with commands demoing how to use snap.
