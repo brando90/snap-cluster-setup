@@ -78,6 +78,11 @@ Every time you login to server or open a linux terminal, you need to configure y
 Usually the linux terminal runs `.bash_profile` to set up your linux environment. 
 In this case if you inspect it with cat `.bash_profile` you can see it runs ("sources") another file called `.bashrc` i.e.,
 ```bash
+# note ~ is at AFS path before we changed it to the LFS for your server
+brando9@mercury2:~ $ pwd .bash_profile
+/afs/cs.stanford.edu/u/brando9
+brando9@mercury2:~ $ realpath .
+/afs/cs.stanford.edu/u/brando9
 brando9@mercury2:~$ cat .bash_profile
 # DO NOT MODIFY THIS FILE! Your changes will be overwritten!
 # For user-customization, please edit ~/.bashrc.user
@@ -100,8 +105,8 @@ First echo `$HOME` to figure out what home path you're using (since the .bashrc 
 brando9@mercury2:~$ echo $HOME
 /afs/cs.stanford.edu/u/brando9
 ```
-So this means we need our bash configurations at `~/.bashrc` i.e., to be at `$HOME/.bashrc`.
-So first let's create that file with vim (see Basic Vim bellow in this tutorial to know the basics):
+So this means we need our bash configurations at `~/.bashrc` i.e., to be at `$HOME/.bashrc` (`~` means `$HOME`).
+So first let's create that file with vim (see basic Vim bellow in this tutorial to know the basics):
 ```bash
 # note I used the absolute path because we will have $HOME (i.e., tilde) point to the local (lfs) home directory.
 cd /afs/cs.stanford.edu/u/brando9
