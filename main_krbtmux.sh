@@ -96,16 +96,18 @@ huggingface-cli login
 python ~/evals-for-autoformalization/src/train/train_full_fine_tune.py
 
 
-# # - create accelerate config & run script using accelerate
+# - Create accelerate config & run script using accelerate
 # accelerate config
-# # accelerate config -- ~/massive-autoformalization-maf/configs/accelerate/default_config_ddp_bm.yaml 
-# #login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
+# accelerate config -- ~/massive-autoformalization-maf/configs/accelerate/default_config_ddp_bm.yaml 
+cat ~/evals-for-autoformalization/configs/accelerate/default_config_ddp_bm.yaml
+# - Login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
 # huggingface-cli login
-# # get top 3 free gpus & export so every child process gets it
-# export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | sort -t ',' -k2 -nr | head -n 3 | awk -F ', ' '{printf "%s,",$1}' | sed 's/,$//')
-# echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
-# # accelerate launch --config_file ~/.cache/huggingface/accelerate/default_config.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
+# get top 3 free gpus & export so every child process gets it
+export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | sort -t ',' -k2 -nr | head -n 3 | awk -F ', ' '{printf "%s,",$1}' | sed 's/,$//')
+echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
+# accelerate launch --config_file ~/.cache/huggingface/accelerate/default_config.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
 # accelerate launch --config_file ~/massive-autoformalization-maf/configs/accelerate/default_config_bm.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
+accelerate launch --config_file ~/evals-for-autoformalization/configs/accelerate/default_config_bm.yaml ~/evals-for-autoformalization/src/train/train_full_fine_tune.py
 
 # -- other option is to run `echo $SU_PASSWORD | /afs/cs/software/bin/reauth` inside of python, right?
 export JOB_PID=$!

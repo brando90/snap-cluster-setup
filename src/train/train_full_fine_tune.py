@@ -76,10 +76,11 @@ def train():
     # mode = 'online'; seed = 0; report_to = 'wandb'
 
     # - c4 wt single
-    path, name, data_files, split = ['c4'], ['en'], [None], ['train']
+    # path, name, data_files, split = ['c4'], ['en'], [None], ['train']
     # path, name, data_files, split = ['csv'], [None], [os.path.expanduser('~/data/maf_data/csv_bm_maf_trainable_v1/train.csv')], ['train']
     # path, name, data_files, split = ['EleutherAI/proof-pile-2'], ['default'], [None], ['train']
     # path, name, data_files, split = ['suolyer/pile_pile-cc'] + ['parquet'] * 4, [None] + ['hacker_news', 'nih_exporter', 'pubmed', 'uspto'], [None] + [urls_hacker_news, urls_nih_exporter, urls_pubmed, urls_uspto], ['validation'] + ['train'] * 4
+    path, name, data_files, split = ['brando/debug1_af'], [None], [None], ['train']  # to test hypothesis that AF data is better for AF eval
     # - models
     # pretrained_model_name_or_path = 'gpt2'
     # name = "tiiuae/falcon-rw-1b",
@@ -217,11 +218,12 @@ def train():
     per_device_eval_batch_size = 4  # TODO: change to something larger, right now due to size of my debug0
     eval_accumulation_steps=1
     # eval_steps=1
-    eval_steps=1000
+    # eval_steps=1000
     # TODO: probably need to write a collate_fn for the eval so that the eval is done right?
     # TODO: we need ppl (and ideally token edit distance for eval, reason explained here: https://arxiv.org/abs/2304.15004)
-    path, name = 'brando/debug1_af', None
-    eval_dataset = load_dataset(path, name, streaming=False, split="test").with_format(type="torch") 
+    path, name, split = 'brando/debug1_af', None, "test"
+    assert split == 'test'
+    eval_dataset = load_dataset(path, name, streaming=False, split=split).with_format(type="torch") 
     eval_dataset = eval_dataset.select(range(per_device_eval_batch_size))  # ref: https://stackoverflow.com/questions/74257764/how-to-select-a-subset-of-the-eval-dataset-when-training-with-huggingface-traine
     ## eval_dataset = train_dataset  # TODO: fix obviously to something else using af
     raw_text_batch = eval_dataset.select(range(per_device_eval_batch_size)) if not isinstance(eval_dataset, datasets.iterable_dataset.IterableDataset) else train_dataset.take(per_device_eval_batch_size)
@@ -321,8 +323,8 @@ def train():
         logging_dir=Path('~/data/maf/logs').expanduser(),
         save_steps=2000,  # alpaca does 2000, other defaults were 500
         # logging_steps=250,
-        logging_steps=50,  
-        # logging_steps=1,
+        # logging_steps=50,  
+        logging_steps=1,
         remove_unused_columns=False,  # TODO don't get why https://stackoverflow.com/questions/76879872/how-to-use-huggingface-hf-trainer-train-with-custom-collate-function/76929999#76929999 , https://claude.ai/chat/475a4638-cee3-4ce0-af64-c8b8d1dc0d90
         report_to=report_to,  # change to wandb!
         fp16=False,  # never ever set to True
@@ -330,7 +332,9 @@ def train():
         evaluation_strategy='steps',
         per_device_eval_batch_size=per_device_eval_batch_size,
         eval_accumulation_steps=eval_accumulation_steps,
-        eval_steps=eval_steps,
+        # eval_steps=eval_steps,
+        eval_steps=1,
+        # eval_steps=1000,
     )
     # print(f'{training_args=}')
     print(f'{pretrained_model_name_or_path=}')
