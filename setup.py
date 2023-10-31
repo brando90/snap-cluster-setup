@@ -115,6 +115,7 @@ setup(
         # 'transformers', # already above
         'accelerate',
         # 'peft',
+        'sentencepiece',  # llama2
 
         # 'datasets'
         # 'bitsandbytes',
