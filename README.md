@@ -67,6 +67,7 @@ type password. If the reauth command doesn't work do:
 ```bash
 export PATH="/afs/cs/software/bin:$PATH"
 ```
+Consider adding that to your `.bashrc`, but my suggested `.bashrc` should already have it.
 
 ### Setting up your bashrc file in Snap
 tip: anything you don't understand discuss with GPT4/Claude! Highly recommend it. I do it often and save the conv links or convs in my evernote. e.g., ask it what an env variable is. Or what vim is. Or what git clone is. etc.
