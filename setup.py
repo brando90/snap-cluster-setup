@@ -116,12 +116,14 @@ setup(
         'accelerate',
         # 'peft',
         'sentencepiece',  # llama2
+        
+        'zstandard', # for the proofpile2 ref: https://huggingface.co/datasets/EleutherAI/proof-pile-2
 
         # 'datasets'
-        # 'bitsandbytes',
+        'bitsandbytes',
+        'bnb', 
         # 'einops',
         # 'wandb'
-
     ]
 )
 

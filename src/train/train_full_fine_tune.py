@@ -52,7 +52,8 @@ def train():
     buffer_size = 500_000
     probabilities = []
     data_mixture_name = None
-    streaming = False
+    streaming = True
+    # streaming = False
     data_files = [None]
     seed = 0
     split = 'train'
@@ -72,17 +73,22 @@ def train():
 
     # - Online (real experiment)
     # mode = 'online'; seed = random.randint(0, 2**32 - 1)
-    mode = 'online'; seed = 0; report_to = 'wandb'
+    # mode = 'online'; seed = 0; report_to = 'wandb'
 
     # - c4 wt single
-    path, name, data_files, split = ['csv'], [None], [os.path.expanduser('~/data/maf_data/maf_textbooks_csv_v1/train.csv')], ['train']
+    path, name, data_files, split = ['c4'], ['en'], [None], ['train']
+    # path, name, data_files, split = ['csv'], [None], [os.path.expanduser('~/data/maf_data/csv_bm_maf_trainable_v1/train.csv')], ['train']
+    # path, name, data_files, split = ['EleutherAI/proof-pile-2'], ['default'], [None], ['train']
     # path, name, data_files, split = ['suolyer/pile_pile-cc'] + ['parquet'] * 4, [None] + ['hacker_news', 'nih_exporter', 'pubmed', 'uspto'], [None] + [urls_hacker_news, urls_nih_exporter, urls_pubmed, urls_uspto], ['validation'] + ['train'] * 4
+    # - models
     # pretrained_model_name_or_path = 'gpt2'
+    # name = "tiiuae/falcon-rw-1b",
     pretrained_model_name_or_path = 'meta-llama/Llama-2-7b-hf'
     # pretrained_model_name_or_path = 'meta-llama/Llama-2-7b-chat-hf'
     # pretrained_model_name_or_path = 'meta-llama/Llama-2-13b-hf'
     # pretrained_model_name_or_path = 'meta-llama/Llama-2-70b-hf'
     pretrained_model_name_or_path = 'mistralai/Mistral-7B-v0.1'
+    pretrained_model_name_or_path = 'morph-labs/morph-prover-v0-7b'
     # - important training details or it wont run, mem issues maybe
     num_epochs = 1
     # num_epochs = 2
@@ -104,7 +110,8 @@ def train():
 
     # - Init wandb
     debug: bool = mode == 'dryrun'  # BOOL, debug?
-    run = wandb.init(mode=mode, project="maf", name=run_name, save_code=True)
+    # run = wandb.init(mode=mode, project="maf", name=run_name, save_code=True)
+    run = wandb.init(mode=mode, project="eval_af", name=run_name, save_code=True)
     # wandb.config.update({"num_batches": num_batches, "path": path, "name": name, "today": today, 'probabilities': probabilities, 'batch_size': batch_size, 'debug': debug, 'data_mixture_name': data_mixture_name, 'streaming': streaming, 'data_files': data_files, 'seed': seed, 'pretrained_model_name_or_path': pretrained_model_name_or_path})
     wandb.config.update({"path": path, "name": name, "today": today, 'probabilities': probabilities, 'batch_size': batch_size, 'debug': debug, 'data_mixture_name': data_mixture_name, 'streaming': streaming, 'data_files': data_files, 'seed': seed, 'pretrained_model_name_or_path': pretrained_model_name_or_path, 'num_epochs': num_epochs, 'gradient_accumulation_steps': gradient_accumulation_steps})
     # run.notify_on_failure() # https://community.wandb.ai/t/how-do-i-set-the-wandb-alert-programatically-for-my-current-run/4891
@@ -124,15 +131,12 @@ def train():
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-    elif 'Llama-2' in pretrained_model_name_or_path or 'Mistral' in pretrained_model_name_or_path:
+    elif 'Llama-2' in pretrained_model_name_or_path or 'Mistral' in pretrained_model_name_or_path or 'morph-prover' in pretrained_model_name_or_path or 'falcon' in pretrained_model_name_or_path:
         # - llama2
         from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer
         # bf16 or fp32
-        bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
-        if bf16:
-            torch_dtype = torch.bfloat16
-        else: 
-            torch_dtype = torch.float32
+        bf16: bool = torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
+        torch_dtype: torch.dtype = torch.bfloat16 if bf16 else torch.float32
         # get model
         model = AutoModelForCausalLM.from_pretrained(
             pretrained_model_name_or_path,
@@ -151,13 +155,19 @@ def train():
         # if not is_fsdp_enabled: # not sure if this is needed but its for sure safer
         #     # maybe figuring out how to run everything with accelerate would fix things...
         #     # ref: https://stackoverflow.com/questions/77204403/does-one-need-to-load-the-model-to-gpu-before-calling-train-when-using-accelerat
+        #     # related HF discord: https://discord.com/channels/879548962464493619/1169012020721504347/1169012020721504347
+        #     # cross: https://discuss.huggingface.co/t/does-one-need-to-load-the-model-to-gpu-before-calling-train-when-using-accelerate/56852
         #     device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         #     model = model.to(device)
         # https://github.com/artidoro/qlora/blob/7f4e95a68dc076bea9b3a413d2b512eca6d004e5/qlora.py#L347C13-L347C13
+        # - Set GPU manually, note: for now set the gpu manually and hope/pray that HF accelerate still works or overwrites it properly, else fix issue
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        # - Set up tokeniser
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path,
             # cache_dir=args.cache_dir,
-            padding_side="right",
+            padding_side="right",  
             use_fast=False, # Fast tokenizer giving issues.
             # tokenizer_type='llama' if 'llama' in args.model_name_or_path else None, # Needed for HF name change
             # tokenizer_type='llama',
@@ -182,12 +192,11 @@ def train():
     # print(f'{device=}')
     print(f'{torch.cuda.device_count()=} (makes sure GPUs are visible and accesible to Pytorch.)')
     print(f'Model is currently on: {next(iter(model.parameters())).device=}')
-    # name = "tiiuae/falcon-rw-1b",
     
     # -- Load datasets
     # - Get train data set
-    # train_datasets = [load_dataset(path, name, streaming=True, split="train").with_format("torch") for path, name in zip(path, name)]
-    train_datasets = [load_dataset(path, name, data_files=data_file, streaming=streaming, split=split).with_format("torch") for path, name, data_file, split in zip(path, name, data_files, split)]
+    train_datasets = [load_dataset(path, name, streaming=True, split="train").with_format("torch") for path, name in zip(path, name)]
+    # train_datasets = [load_dataset(path, name, data_files=data_file, streaming=streaming, split=split).with_format("torch") for path, name, data_file, split in zip(path, name, data_files, split)]
     probabilities = [1.0/len(train_datasets) for _ in train_datasets]  # TODO: perhaps we should change weights to informal and formal have same weight? right now is just in terms of list of data sets perhaps having 2 interleaves one for formal one for informal then use another interleave and do 50/50?. 
     train_dataset = interleave_datasets(train_datasets, probabilities)
     # TODO: suffle data set False, True, note i've experienced that with shuffle_ds.take(512) is slow...
@@ -215,7 +224,7 @@ def train():
     eval_dataset = load_dataset(path, name, streaming=False, split="test").with_format(type="torch") 
     eval_dataset = eval_dataset.select(range(per_device_eval_batch_size))  # ref: https://stackoverflow.com/questions/74257764/how-to-select-a-subset-of-the-eval-dataset-when-training-with-huggingface-traine
     ## eval_dataset = train_dataset  # TODO: fix obviously to something else using af
-    raw_text_batch = eval_dataset.take(per_device_eval_batch_size) if streaming else eval_dataset.select(range(per_device_eval_batch_size))
+    raw_text_batch = eval_dataset.select(range(per_device_eval_batch_size)) if not isinstance(eval_dataset, datasets.iterable_dataset.IterableDataset) else train_dataset.take(per_device_eval_batch_size)
     print(f'{raw_text_batch=}')
     print(f'{next(iter(raw_text_batch))=}')
     column_names = next(iter(raw_text_batch)).keys()
@@ -231,8 +240,8 @@ def train():
     # -- Compute max steps
     per_device_train_batch_size = batch_size
     print(f'{per_device_train_batch_size=}')
-    # dataset_size: int = int(1.5e12)  # TODO, doesn't seem easy to solve. Either count all the sequennces/rows or have the meta data have this. Or make this number huge. 
-    dataset_size: int = train_dataset.num_rows
+    dataset_size: int = int(1.5e12)  # TODO, doesn't seem easy to solve. Either count all the sequennces/rows or have the meta data have this. Or make this number huge. 
+    # dataset_size: int = train_dataset.num_rows
     # dataset_size: int = len(train_dataset)
     # TODO dataset.info['split']['train']['num_examples']
     # dataset_size = sum(len(dataset) for dataset in datasets)  # TODO: works on with streaming = False?
