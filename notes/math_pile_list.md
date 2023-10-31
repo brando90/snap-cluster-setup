@@ -14,6 +14,7 @@
 - (o)
 - (none existent coq af data)
 - [proofpile II](https://huggingface.co/datasets/EleutherAI/proof-pile-2)
+- [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
 
 ## Eval
 - [debug1](https://huggingface.co/datasets/brando/debug1_af)
