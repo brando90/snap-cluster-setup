@@ -1,6 +1,7 @@
 # Data
 - v1-v4
-- openmath web
+- [OpenWebMath](https://huggingface.co/datasets/open-web-math/open-web-math)
+    - included in ProofPile II
 - [kaiyu's coqgym](https://zenodo.org/records/8101883)
 - jin's isabelle data
 - (lean dojo, lean4)
@@ -17,8 +18,11 @@
 - [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
 
 ## Eval
-- [debug1](https://huggingface.co/datasets/brando/debug1_af)
-- [proofnet](https://huggingface.co/datasets/hoskinson-center/proofnet)
+- AF
+    - [debug1](https://huggingface.co/datasets/brando/debug1_af)
+    - [proofnet](https://huggingface.co/datasets/hoskinson-center/proofnet)
+    - full IsaProofNet (used to be called round trip)
+    - CoqProofNet
 
 # Models
 - [morph-prover-v0-7b](https://huggingface.co/morph-labs/morph-prover-v0-7b) (mostly lean AutoFormalization)
