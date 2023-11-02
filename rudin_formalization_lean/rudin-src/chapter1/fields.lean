@@ -48,8 +48,6 @@ holds for all $x, y, z \in F$.
 https://leanprover-community.github.io/mathematics_in_lean/C02_Basics.html#
 -/
 
--- structure == inductive, but structure has one constructor
--- class ≈ structure + other machinery
 class Field (α : Type) where
   add : α → α → α
   comm: ∀ x y : α, add x y = add y x
@@ -66,3 +64,20 @@ class Field (α : Type) where
 -- since we are defining what the structure (class) is, then we define that it is commutative (then later you can show specifc objects like Q, Reals are Fields)
 
 -- Goal prove rationals are a field (to debug my definition of field) & use def of rationals
+
+-- structure == inductive, but structure has one constructor
+-- class ≈ structure + other machinery
+/-
+structure foo_s where
+  x : Nat
+  y : Nat
+#check foo_s.mk
+inductive foo_i
+| mk (x y : Nat)
+
+def foo_i.x : foo_i → Nat
+| mk x _ => x
+
+#check foo_s.x
+#check foo_i.x
+-/
