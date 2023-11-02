@@ -502,7 +502,40 @@ tmux attach -t 0
 - ref: snap's tutorial on long running prcesses https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs
 - ref: read about tmux https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
 
-### Other
+# Vscode
+
+## SSH remote extension
+
+## Python Environment (e.g., venv, conda, poetry)
+If you want to be able to run the script or the debugger from within python you need to tell vscode the path to the python environment you are using (you need python envs to manage different dependencies between different projects to avoid conflict. If you are unsure why you need python envs, ask ChatGPT, likely focusing on conda & python).
+To tell vscode first figure out where the python interpreter is
+```bash
+(evals_af) brando9@skampere1~ $ which python
+/lfs/skampere1/0/brando9/miniconda/envs/evals_af/bin/python
+```
+then press Command + Shift + p to get vscode's command pallete.
+Then you should have a `>` and start typing 
+```
+> Python: Select Interpreter
+```
+press enter. Then type in vscode's command window:
+```
+select at workspace level
+```
+then type
+```
+select interpreter path
+```
+then copy paste the path you got above:
+```
+/lfs/skampere1/0/brando9/miniconda/envs/evals_af/bin/python
+```
+your python env should be working now when you run the file or run the debugger from vscode (even from the ssh extension! which means you can debug your code using GPUs! The real env for your experiments which likely decreases iterations for coding!).
+You can also visually check the bottm left corner with the name of your env, in this case `evals_af`.
+
+## Debugger
+
+# Other
 
 TODO: write a nice readme with commands demoing how to use snap.
 
