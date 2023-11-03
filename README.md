@@ -356,12 +356,12 @@ But sometimes some other depedency could mean you need to change your pytorch cu
 But you will learn what those are here and fix them if you need by returning here.
 
 So install pytorch with gpu https://pytorch.org/get-started/locally/. That is the official way to do it. 
-But all these options worked for me:
+But one these options worked for me (hint: **see the version pytorch needs and cuda needs**):
 ```bash
-pip3 install torch torchvision torchaudio
+#pip3 install torch torchvision torchaudio
 # these last too are explicit on the torch and cuda version
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-# pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
+#pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 then tell your linux environment where the installation of the cuda driver is:
 ```bash
