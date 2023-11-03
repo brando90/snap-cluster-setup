@@ -79,6 +79,8 @@ Usually the linux terminal runs `.bash_profile` to set up your linux environment
 In this case if you inspect it with cat `.bash_profile` you can see it runs ("sources") another file called `.bashrc` i.e.,
 ```bash
 # note ~ is at AFS path before we changed it to the LFS for your server
+brando9@mercury2:~ $ realpath .bash_profile
+/afs/cs.stanford.edu/u/brando9/.bash_profile
 brando9@mercury2:~ $ pwd .bash_profile
 /afs/cs.stanford.edu/u/brando9
 brando9@mercury2:~ $ realpath .
