@@ -79,6 +79,8 @@ Usually the linux terminal runs `.bash_profile` to set up your linux environment
 In this case if you inspect it with cat `.bash_profile` you can see it runs ("sources") another file called `.bashrc` i.e.,
 ```bash
 # note ~ is at AFS path before we changed it to the LFS for your server
+brando9@mercury2:~ $ realpath .bash_profile
+/afs/cs.stanford.edu/u/brando9/.bash_profile
 brando9@mercury2:~ $ pwd .bash_profile
 /afs/cs.stanford.edu/u/brando9
 brando9@mercury2:~ $ realpath .
@@ -98,8 +100,12 @@ if [ -f ~/.bashrc ]; then
 	. ~/.bashrc
 fi
 ```
-So it means we need to put our personal linix configurations in ~/.bashrc
+So it means we need to put our personal linix configurations in `~/.bashrc` (i.e., `$HOME/.bashrc`). 
+The goal will be to have `$HOME` (and `~`) point to your lfs home directory (e.g., not only for `.bashrc` to work but also because we want the experiments to be saved in your local machine (lfs) so that you don't run into disk space issues).
 
+Note, we will change `$HOME` (i.e., `~`) to point to your lfs path and hence have to move `.bashrc` later.
+
+So let's create your `.bashrc` at afs and then we will move it to lfs and have everything life at lfs permentantly.
 First echo `$HOME` to figure out what home path you're using (since the .bashrc is located at `~` which is `$HOME`):
 ```bash
 brando9@mercury2:~$ echo $HOME
@@ -118,23 +124,21 @@ You can read through the `.bashrc` to see why it's set up the way it is.
 Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit).
 Note, this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
 
-The goal will be to have all your files live at the storage space for your local server (LFS, stands for local file server).
-Therefore, let's move this .bashrc, $HOME (~) and all your git close at the home of lfs for your assinged server.
+Then the goal will be to have all your files live at the storage space for your local server (LFS, stands for local file server).
+Therefore, let's move this `.bashrc` to your lfs username by permentantly changing `$HOME` (`~`) and all your git clones at the home of lfs for your assinged server.
 
-#### Move .bashrc to your LFS
-First let's create a soft link to your .bashrc at your lfs $HOME.
-Creete that environment variable
+#### Copy your .bashrc to your LFS
+Recall we want everything including your .bashrc to live at your home's username at lfs.
+
+So likely `$HOME` is not pointing to your lfs username home. 
+So let's first let's make sure `$HOME` (`~`) to your permanent location of your username home at lfs.
 ```bash
-export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
-export HOME=$LOCAL_MACHINE_PWD
-echo $HOME
-cd ~
-
-# the full output
-brando9@mercury2:~$ pwd
-/afs/cs.stanford.edu/u/brando9
+# run these commands in your terminal, this will make sure $HOME (and ~) point to your lfs location for only the current bash session (to have it permanent change it has to be in the bash file .bash_profile is sourcing/running each time you start a bash session
+# -- Set up the lfs home for this bash session
 brando9@mercury2:~$ export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
 brando9@mercury2:~$ export HOME=$LOCAL_MACHINE_PWD
+
+# -- Confirm $HOME and that you're in lfs
 brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ echo $HOME
 /lfs/mercury2/0/brando9
 brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ cd ~
@@ -143,7 +147,26 @@ brando9@mercury2:~$ pwd
 ```
 the last line confirms we are at the local servers storage (called lfs).
 
-If you look at the .bashrc there is this line:
+Now the goal will be have `.bash_profile` run the right bash file you have set up (in this case it's running `~/.bashrc` so we need to set that up).
+For that we can copy your `.bashrc` file in afs to your lfs location.
+Or copy paste the right contents to a new `~/.bashrc` file to your lfs user location (e.g., either from the .bashrc file I set up for you or the contents of your afs one).
+(note a 3rd option exists to soft link to the afs .bashrc, which is the one I usually use).
+To do that do this:
+```bash
+# confirm your home points to the right place
+brando9@mercury2:~$ echo $HOME
+/lfs/mercury2/0/brando9
+
+brando9@mercury2:~$ cp /afs/cs.stanford.edu/u/brando9/.bashrc ~/.bashrc
+
+# Run this to confirm you moved it!
+brando9@mercury2:~$ cat ~/.bashrc
+```
+This should copy your .bashrc file to your lfs location (and always confirm and read what your running!).
+
+But why is it that now that we login to the cluster we are in the lfs location and not afs?
+Well look at look at the .bashrc there is this line:
+```
 ```bash
 # - The defaul $HOME is /afs/cs.stanford.edu/u/brando9 but since you want to work in a specific server due to otherwise conda being so hard you need to reset what home is, see lfs: https://ilwiki.stanford.edu/doku.php?id=hints:storefiles#lfs_local_server_storage  
 export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
@@ -154,6 +177,9 @@ export HOME=$LOCAL_MACHINE_PWD
 # - set up afs short cuts
 # since you are logged in to afs this moves you to your local computer
 cd $HOME
+
+...
+
 ```
 meaning that every time you login to the server assigned you got to your lfs directory instead of the afs home directory (since `$HOME` was changed).
 
@@ -309,7 +335,7 @@ brando9@mercury1:/lfs/mercury1/0/brando9/evals-for-autoformalization$ bash
 ```
 We can already see something is different with the prefix `(base)`, but `which conda` confirms which conda we are using (it tells us the location of the binary for the command conda).
 
-Now we can create a conda env for our project:
+Now we can create a conda env for our project (please choose a beter name than `my_env`!):
 ```bash
 (base) brando9@mercury1~ $ conda create -n my_env python=3.10
 (base) brando9@mercury1~ $ conda activate my_env
@@ -330,12 +356,12 @@ But sometimes some other depedency could mean you need to change your pytorch cu
 But you will learn what those are here and fix them if you need by returning here.
 
 So install pytorch with gpu https://pytorch.org/get-started/locally/. That is the official way to do it. 
-But all these options worked for me:
+But one these options worked for me (hint: **see the version pytorch needs and cuda needs**):
 ```bash
-pip3 install torch torchvision torchaudio
+#pip3 install torch torchvision torchaudio
 # these last too are explicit on the torch and cuda version
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-# pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
+#pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 then tell your linux environment where the installation of the cuda driver is:
 ```bash
