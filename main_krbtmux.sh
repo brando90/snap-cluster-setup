@@ -15,7 +15,8 @@ ssh brando9@mercury2.stanford.edu
 tput rmcup
 
 source $AFS/.bashrc.lfs
-conda activate maf
+# conda activate maf
+conda activate evals_af
 export CUDA_VISIBLE_DEVICES=5; export SLURM_JOBID=$(python -c "import random;print(random.randint(0, 1_000_000))"); echo $SLURM_JOBID;
 echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES; echo SLURM_JOBID = $SLURM_JOBID; echo hostname = $(hostname)
 ulimit -n 120000; ulimit -Sn; ulimit -Hn;
@@ -77,7 +78,8 @@ reauth
 reauth
 
 source $AFS/.bashrc.lfs
-conda activate maf
+# conda activate maf
+conda activate evals_af
 export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | sort -k2 -nr | head -n 1 | awk -F ', ' '{print $1}')
 echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
 
@@ -86,26 +88,26 @@ echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
 # conda activate maf
 # python ~/massive-autoformalization-maf/maf-src/data_utils/textbook2hf_dataset.py
 
-# # -- Train
-# #login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
-# huggingface-cli login
-# #login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
+# -- Train
+#login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
+huggingface-cli login
+#login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
 # python ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
+python ~/evals-for-autoformalization/src/train/train_full_fine_tune.py
 
-# # - create accelerate config & run script using accelerate
+
+# - Create accelerate config & run script using accelerate
 # accelerate config
-# # accelerate config -- ~/massive-autoformalization-maf/configs/accelerate/default_config_ddp_bm.yaml 
-# #login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
+# accelerate config -- ~/massive-autoformalization-maf/configs/accelerate/default_config_ddp_bm.yaml 
+cat ~/evals-for-autoformalization/configs/accelerate/default_config_ddp_bm.yaml
+# - Login to hf to use llama2, get your hf token eg cat ~/keys/brandos_hf_token.txt
 # huggingface-cli login
-# # get top 3 free gpus & export so every child process gets it
-# export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | sort -t ',' -k2 -nr | head -n 3 | awk -F ', ' '{printf "%s,",$1}' | sed 's/,$//')
-# echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
-# # accelerate launch --config_file ~/.cache/huggingface/accelerate/default_config.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
+# get top 3 free gpus & export so every child process gets it
+export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,memory.free --format=csv,noheader,nounits | sort -t ',' -k2 -nr | head -n 3 | awk -F ', ' '{printf "%s,",$1}' | sed 's/,$//')
+echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
+# accelerate launch --config_file ~/.cache/huggingface/accelerate/default_config.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
 # accelerate launch --config_file ~/massive-autoformalization-maf/configs/accelerate/default_config_bm.yaml ~/massive-autoformalization-maf/maf-src/af_train/unpaired_pytorch_hf_training.py
-
-# -- Maf eval data extraction
-# conda activate evaporate
-conda activate maf
+accelerate launch --config_file ~/evals-for-autoformalization/configs/accelerate/default_config_bm.yaml ~/evals-for-autoformalization/src/train/train_full_fine_tune.py
 
 # -- other option is to run `echo $SU_PASSWORD | /afs/cs/software/bin/reauth` inside of python, right?
 export JOB_PID=$!

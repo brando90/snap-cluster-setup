@@ -79,17 +79,17 @@ if [[ $(hostname) == "mercury1.stanford.edu" ]]; then
     # install the right version of pytorch compatible with cuda 11.7
     # pip3 install torch torchvision torchaudio
     # pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
-    # export CUDA_VISIBLE_DEVICES=0
-    # export PATH=/usr/local/cuda-11.7/bin:$PATH
-    # export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+    export CUDA_VISIBLE_DEVICES=0
+    export PATH=/usr/local/cuda-11.7/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
     conda activate my_env
 else
     # install the right version of pytorch compatible with cuda 11.7
     # pip3 install torch torchvision torchaudio
     # pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
-    # export CUDA_VISIBLE_DEVICES=0 
-    # export PATH=/usr/local/cuda-11.7/bin:$PATH
-    # export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+    export CUDA_VISIBLE_DEVICES=0 
+    export PATH=/usr/local/cuda-11.7/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
     conda activate base
 fi
 
