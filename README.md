@@ -118,7 +118,7 @@ So first let's create that file with vim (see basic Vim bellow in this tutorial 
 cd /afs/cs.stanford.edu/u/brando9
 vim .bashrc
 ```
-Now go to this https://github.com/brando90/evals-for-autoformalization/blob/33e1bf825f7de5d49557256332355fa2872bbbd7/.bashrc#L1 and copy paste it to your clip board e.g., with command/control + c. 
+Now go to this https://github.com/brando90/evals-for-autoformalization/edit/main/.bashrc and copy paste it to your clip board e.g., with command/control + c. 
 Now press `i` to go in vim's insert mode and paste the file as you'd normally e.g., with control/command + v. 
 You can read through the `.bashrc` to see why it's set up the way it is.
 Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit).
