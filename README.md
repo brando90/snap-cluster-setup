@@ -528,6 +528,14 @@ tmux attach -t 0
 - ref: snap's tutorial on long running prcesses https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs
 - ref: read about tmux https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
 
+## Wandb key
+
+Sign up for wandb: https://wandb.ai/site and read what it's about. It will help you track your experiments.
+Theny you need to edit your `.bashrc` (in your lfs) file to have the right env variable with your wandb key. 
+Carefuly to pushing private keys to github.
+
+Now you can run your experiments with wandb!
+
 # Vscode
 
 ## SSH remote extension
