@@ -1,21 +1,25 @@
 # Data
-- v1-v4
+- [Multilingual Mathematical Autoformalization](https://github.com/albertqjiang/MMA)
+- [proofpile II](https://huggingface.co/datasets/EleutherAI/proof-pile-2)
 - [OpenWebMath](https://huggingface.co/datasets/open-web-math/open-web-math)
     - included in ProofPile II
 - [kaiyu's coqgym](https://zenodo.org/records/8101883)
-- jin's isabelle data
-- (lean dojo, lean4)
-- AF train rt isa data
+- [Isabelle-AF dataset full](https://docs.google.com/spreadsheets/d/1dEWWzjuEXwf9s4II0CixH4sqopc1flIMFx19UjHiyNU/edit?resourcekey=0-_G7oxmbh7szV5jx-HxhepQ#gid=1063821127)
+- jin's isabelle data (ping me for it
+- [lean dojo's lean4](https://zenodo.org/records/10044516)
+- [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
+- lean dojo's lean3
 - (cvc4, z3 data)
 - (mizar)
-- (coq-lsp)
+- (my all coqs & coq-lsp)
 - (cvc5, clark b)
 - (s)
 - (l)
 - (o)
 - (none existent coq af data)
-- [proofpile II](https://huggingface.co/datasets/EleutherAI/proof-pile-2)
-- [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
+-  my private v5 maths data set
+-  pact in lean
+-  pact in coq
 
 ## Eval
 - AF
