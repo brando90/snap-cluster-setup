@@ -21,6 +21,8 @@
 -  pact in lean
 -  pact in coq
 -  [meta-math](https://github.com/brando90/MetaMath)
+-  go through all formal language data sets. Compute some proof representation (proof term, concatenation of proof states) and informalize it (and the theorem/lemma)
+    - `(informalize(formal_thm), informalize(formal_proof))`
 
 ## Eval
 - AF
