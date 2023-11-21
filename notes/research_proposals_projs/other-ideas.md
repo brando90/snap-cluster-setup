@@ -1,0 +1,3 @@
+- getting informal exercises formalizing the statement with using mathlib or ala MiniF2F, then proving them to get formal proof, mining this proof for both informal and formal data for training
+- similar but translating the informal proofs that have proofs and formalizing them to get more data for both
+- trying to battle hallucinations by feeding it correct data
