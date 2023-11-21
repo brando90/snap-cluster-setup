@@ -20,7 +20,7 @@
 -  my private v5 maths data set
 -  pact in lean
 -  pact in coq
--  [meta-math](https://github.com/brando90/MetaMath)
+-  [meta-math](https://github.com/brando90/MetaMath), [meta-math HF dataset card](https://huggingface.co/datasets/meta-math/MetaMathQA/tree/main)
 -  go through all formal language data sets. Compute some proof representation (proof term, concatenation of proof states) and informalize it (and the theorem/lemma)
     - `(informalize(formal_thm), informalize(formal_proof))`
 
