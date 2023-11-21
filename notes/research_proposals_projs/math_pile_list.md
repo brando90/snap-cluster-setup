@@ -20,6 +20,7 @@
 -  my private v5 maths data set
 -  pact in lean
 -  pact in coq
+-  [meta-math](https://github.com/brando90/MetaMath)
 
 ## Eval
 - AF
