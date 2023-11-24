@@ -1,4 +1,4 @@
-# Project Options
+# Project Options: Using Formalization & Informalization to improve all Benchmarks
 
 Three Standard benchmarks to evaluate on:
 1. AF: ProofNet
