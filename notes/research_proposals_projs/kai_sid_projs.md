@@ -47,6 +47,9 @@ needs:
    1. Neural Theorem Prover (parsel, DSP, ReProver)
    2. Expert Iteration
 
+Question:
+   - does MMA train on informalizations of formal proof steps to improve AF? Or only on theorems? What exactly do they train on?
+
 # Wish list
 
 - Better benchmarks
