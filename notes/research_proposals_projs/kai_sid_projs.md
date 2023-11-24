@@ -23,10 +23,15 @@ Project Options (always thinking how to improve the above 3 benchmarks + what is
       2. generate formal proofs for MATH's APS and repeat above
       3. Report improvement on all 3: AF, MATH, TP
       4. Study data alignment/quality
-3. In depth study of different data domains on 3 benchmarks & quantitative data quality/alignment metrics
+3. In depth study of different data domains on 3 benchmarks & quantitative [data quality](https://github.com/brando90/beyond-scale-language-data-diversity/blob/main/notes/data_quality_eq_div_plus_alignment_and_data_selection.md)/[alignment](https://github.com/brando90/evals-for-autoformalization/blob/main/notes/research_proposals_projs/data_selection_with_alignment_for_af.md) metrics (other ref [Align for AF](https://github.com/brando90/evals-for-autoformalization/blob/main/notes/research_proposals_projs/af-ft-plan-kai-align-vs-eval-perf.jpeg))
    1. coq, isabelle, pair, unpaired, mixed but unpaired, textbook, python-docstrings, etc
    2. I feel we can give up this part and instead do 1 & 2 and put the data metrics study at the end
 4. Formalize a textbook autonomously + improve AF on a new textbook AF based benchmark
+5. Continually training on [all maths data](https://github.com/brando90/evals-for-autoformalization/blob/main/notes/research_proposals_projs/math_pile_list.md)
+6. prompting + data generation with
+   1. Mathematics_and_Plausible_Reasoning_vol2_G_Polya_Patterns_of_Plausible_Inference_Princeton_Univ_Pr_1969
+   2. George_Polya_How_to_Solve_It_A_New_Aspect_of_Mathematical_Method_Princeton_University_Press_2015   
+7. Backtranslation based data augmentation using mathematical textbooks
 
 idea of ps, tact -> informal docs informal 
 Remark: 
@@ -38,6 +43,9 @@ Remark:
          - `LLM(tac, "informalize") -> i_reasoning_step = i_rea_step`. Here the prompt engineering is important. We use few-shot example + importantly, the observation tactics are really hard to make human/informal interpretable. So we use the change in the proof state + the documentation of the tactic to produce a high quality informalization.
          - then concantenate to produce a proof/solution that AF based (not exactly synthetic)
          - (we can always improve diversity via MetaMath's techniques)
+needs:
+   1. Neural Theorem Prover (parsel, DSP, ReProver)
+   2. Expert Iteration
 
 # Wish list
 
