@@ -1,9 +1,9 @@
 # Project Options: Using Formalization & Informalization to improve all Benchmarks
 
 Three Standard benchmarks to evaluate on:
-1. AF: ProofNet
-2. informal maths: MATH
-3. proving accuracy: MiniF2F
+1. Autoformalization (AF) e.g., ProofNet, debug1, IsaAF
+2. Informal Theorem Proving (iTP) e.g., MATH
+3. Formal Theorm Proving (fTP) e.g., MiniF2F
 
 Project Options (always thinking how to improve the above 3 benchmarks + what is the new conceptual novel contribution):
 1. formal proofs -> informal proofs (main: improve ProofNet, MATH)
