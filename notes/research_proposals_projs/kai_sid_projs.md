@@ -2,8 +2,11 @@
 
 Three Standard benchmarks to evaluate on:
 1. Autoformalization (AF) e.g., ProofNet, debug1, IsaAF
+   1. metrics: CE loss/perplexity (extact string mathc, formal equivalence)
 2. Informal Theorem Proving (iTP) e.g., MATH
-3. Formal Theorm Proving (fTP) e.g., MiniF2F
+   1. metrics: exact match on boxed answers.
+3. Formal Theorm Proving (fTP) e.g., MiniF2F, LeanDojo's Mathlib split
+   1. metrics: proving accuracy
 
 Project Options (always thinking how to improve the above 3 benchmarks + what is the new conceptual novel contribution):
 1. formal proofs -> informal proofs (main: improve ProofNet, MATH)
