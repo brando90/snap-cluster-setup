@@ -10,6 +10,7 @@ search engine for data sets: https://datasetsearch.research.google.com/
 - jin's isabelle data (ping me for it
 - [lean dojo's lean4](https://zenodo.org/records/10044516)
 - [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
+- [TAL math eval data set English-Chineese](https://huggingface.co/datasets/math-eval/TAL-SCQ5K?row=0)
 - lean dojo's lean3
 - (cvc4, z3 data)
 - (mizar)
