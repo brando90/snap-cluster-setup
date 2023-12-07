@@ -27,6 +27,7 @@ search engine for data sets: https://datasetsearch.research.google.com/
 -  go through all formal language data sets. Compute some proof representation (proof term, concatenation of proof states) and informalize it (and the theorem/lemma)
     - `(informalize(formal_thm), informalize(formal_proof))`
 - [deep mind mathematics data set](https://github.com/google-deepmind/mathematics_dataset)
+- [GSM8K](https://huggingface.co/datasets/gsm8k)
 
 ## Eval
 - AF
