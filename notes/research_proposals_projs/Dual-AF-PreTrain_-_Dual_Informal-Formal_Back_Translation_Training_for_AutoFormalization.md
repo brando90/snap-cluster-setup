@@ -42,6 +42,7 @@ def train_to_af_for_maf(mdl : causal_lm,
         # - Train Step to Formalize from high quality formal dataset ~ opt.step((nl_i -> fl*)_i) 
         loss = loss_fn([fl*, fl_i]_i); loss.backward() 
         loss = lss_fn([nl, nl_i]_i); loss.backward() if nl != '' else None
+        # if data improves val loss e.g., on Proonet, save for future use!
     
         # -- Learn to Informalize: fl_j->nl* from nl* -> [fl_j]_j -> nl*
         [fl_j]_j := mdl('formalize ' + nl*, sampling=top_p, num_out=k)
