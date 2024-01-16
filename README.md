@@ -17,15 +17,15 @@ The details of how to use different storage systems are complicated and you don'
 Note snap currently has no slurm (HPC workload manager).
 
 ## Get access to snap
-Send an e-mail to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access **for the quarter you are working with me**. 
-CC my advisor (Sanmi) and me (Brando). 
+If you do not have access to snap already, send an friendly reminder by email to Brando and to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access. 
+State that Brando should have already sent the e-mail and that **you will be working we me during the qurater doing research under CS 197**. 
+CC me (Brando). 
 The title email should be
 > Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only
 the emails are:
 - Eric Pineda: eric.pineda@stanford.edu
-- Professor Sanmi Koyejo: sanmi@stanford.edu
 - Brando Miranda: brando9@stanford.edu
-We already have an advanced video for snap: https://youtu.be/XEB79C1yfgE .
+We have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
 
 ## Setting up your compute environment in Snap
 note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if they don't work then the docs are wrong and you should e-mail the it for them to fix the docs il-action@cs.stanford.edu 
