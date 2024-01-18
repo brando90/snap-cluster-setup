@@ -17,11 +17,12 @@ The details of how to use different storage systems are complicated and you don'
 Note snap currently has no slurm (HPC workload manager).
 
 ## Get access to snap
-If you do not have access to snap already, send an friendly reminder by email to Brando and to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access. 
+If you do not have access to snap already, send an friendly reminder by email to Brando and (cc) to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access. 
 State that Brando should have already sent the e-mail and that **you will be working we me during the qurater doing research under CS 197**. 
 CC me (Brando). 
 The title email should be
-> Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only and **include your full name and CSID/SNET**.
+> Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only and **include your full name and CSID/SUNET**.
+**You need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid. **
 The emails are:
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
