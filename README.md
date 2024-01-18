@@ -29,6 +29,7 @@ The title email should be
 The emails are:
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
+
 We have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
 
 ## Setting up your compute environment in Snap
