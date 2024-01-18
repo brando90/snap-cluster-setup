@@ -24,7 +24,7 @@ The title email should be
 
 > Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only and **include your full name and CSID/SUNET**.
 
-**You need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid. **
+**You need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid.**
 The emails are:
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
