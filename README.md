@@ -761,4 +761,16 @@ Note: ask GPT4/Claude for help if your stuck.
 ## Lean4
 Recommend watching:
 - https://www.youtube.com/watch?v=yZo6k48L0VY
-- https://www.youtube.com/watch?v=_0QZXHoyZlA 
+- https://www.youtube.com/watch?v=_0QZXHoyZlA
+
+## Kinit
+
+If you don't want to retype your password everytime you connect to snap do:
+```bash
+kinit USERNAME@CS.STANFORD.EDU
+
+e.g.,
+
+kinit brando9@CS.STANFORD.EDU
+```
+then type the password. Then you can ssh in the terminal & vscode without re-typing your password. 
