@@ -8,6 +8,7 @@ search engine for data sets: https://datasetsearch.research.google.com/
 - [kaiyu's coqgym](https://zenodo.org/records/8101883)
 - [Isabelle-AF dataset full](https://docs.google.com/spreadsheets/d/1dEWWzjuEXwf9s4II0CixH4sqopc1flIMFx19UjHiyNU/edit?resourcekey=0-_G7oxmbh7szV5jx-HxhepQ#gid=1063821127)
 - [Generative AI for Math: Part I -- MathPile: A Billion-Token-Scale Pretraining Corpus for Math](https://gair-nlp.github.io/MathPile/) and [twitter](https://twitter.com/arankomatsuzaki/status/1740564961032556942?s=20)
+    - [Hugging Face](https://x.com/SinclairWang1/status/1743544292637921542?s=20)
 - jin's isabelle data (ping me for it
 - [lean dojo's lean4](https://zenodo.org/records/10044516)
 - [Measuring Mathematical Problem Solving With the MATH Dataset](https://github.com/hendrycks/math)
