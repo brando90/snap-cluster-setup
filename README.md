@@ -780,7 +780,7 @@ If you close your laptop and then vscode remote ssh disconnects from the SNAP no
 ```bash
 pkill -u brando9
 ```
-or ([WARNING: untested) kill all the server vscode processes running on the node/server your connecting to](https://chat.openai.com/c/a114f637-cfb7-4515-afe8-6590d0ce9c78)https://chat.openai.com/c/a114f637-cfb7-4515-afe8-6590d0ce9c78:
+or ([WARNING: untested) kill all the server vscode processes running on the node/server your connecting to](https://chat.openai.com/c/a114f637-cfb7-4515-afe8-6590d0ce9c78):
 ```bash
 pkill -f 'code-server'
 pkill -f 'vscode-remote'
