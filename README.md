@@ -2,7 +2,7 @@
 
 ## Get Compute for your Research Project
 
-### Snap Cluster Important References
+### Snap Cluster Important References & Help/Support
 Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your **snap bible**).
 Other useful resources:
 - Support IT for snap: il-action@cs.stanford.edu
@@ -17,26 +17,36 @@ The details of how to use different storage systems are complicated and you don'
 Note snap currently has no slurm (HPC workload manager).
 
 ## Get access to snap
-If you do not have access to snap already, send an friendly reminder by email to Brando and (cc) to professor Koyejo's (Brando's advisor) administrator Eric pined requesting for Snap access. 
-State that Brando should have already sent the e-mail and that **you will be working we me during the qurater doing research under CS 197**. 
-CC me (Brando). 
+If you do not have access to snap already, send an friendly reminder by email to Brando and (cc) to professor Koyejo's (Brando's advisor) administrator Eric Pineda requesting for Snap access with your CSID in that e-mail (if you need to create a CSID I strongly recommend it matches your SUNet ID). 
+State that Brando should have already sent the e-mail and that **you will be working we me during the qurater doing research under CS 197 and CC me (Brando)**. 
 The title email should be
 
-> Compute access request Snap Cluster -- Working With Brando Miranda CS197 for this quarter only and **include your full name and CSID/SUNET**.
+> Compute access request Snap Cluster -- Working With Brando Miranda CS 197 for this quarter only and **include your full name and CSID & SUNET**.
 
-**You need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid.**
+**If you need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid. DO THIS STEP ASAP.**
 
 The emails are:
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
 
-We have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
-
 ## Setting up your compute environment in Snap
-note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if they don't work then the docs are wrong and you should e-mail the it for them to fix the docs il-action@cs.stanford.edu 
+Note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if their wiki doesn't work then the you should e-mail the IT to fix the docs il-action@cs.stanford.edu. For help & support see the Help/Support section. Before e-mailing me, make sure you had given a good at attempt at the other options for IT support. Also, we have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
 
-### SSH into cluster
-First SSH in the cluster to use the server computer you were assigned:
+### SSH into cluster via some Node that serves your needs
+
+First SSH into a SNAP server/node from the recommneded list of servers/nodes (in decreasing order of recommendation or see SNAP wiki):
+````
+mercury1
+mercury2
+skampere1
+ampere1
+ampere8
+ampere9
+hyperturing1
+hyperturing2
+...anything else with a gpu from the Wiki docs...
+````
+then login to your chosen node (note you'll have to re-setup everytime you choose a new node/server to work on):
 ```bash
 #10 Quadro RTX 8000 48GB
 ssh brando9@hyperturing1.stanford.edu
@@ -44,9 +54,9 @@ ssh brando9@hyperturing2.stanford.edu
 #10 RTX A4000 16GB
 ssh brando9@mercury1.stanford.edu
 # ssh brando9@mercury2.stanford.edu
+# ssh brando9@skampere1.stanford.edu
 ```
-you run these commands from you computer.
-You should see a bash shell in the cluster.
+Run the following unix commands from you local/personal computer to login to a node.
 Sample output:
 ```bash
 (data_quality) brandomiranda~ ❯ ssh brando9@mercury2.stanford.edu
@@ -62,28 +72,37 @@ Last login: Fri Oct 27 15:34:59 2023 from 172.24.69.154
 
 brando9@mercury2:~$
 ```
-This might look different if you already set up your .bashrc file. This is what we will go set up next.
+Note: this might look different if you already set up your `.bashrc` file. 
+Though, this is what we will go set up next. 
 
-Tip, since the server's have weird security persmission you might need to reauth often (or your programs are killed by the admins/IT's):
+Important Tip: since the SNAPS node's/server's has a (very) unsusual security setup, you might need to re-authenticate often or kill a subset of your running processes in your snap node (e.g., your vscode processes if vscode gives issues) or your programs are killed by the admins/IT's. 
+Tip: to type passwords less from your personal laptop to a node, see the `knit` command and appendix to this tutorial. 
+e.g., to reathenticate in a node:
 ```bash
+# run on SNAP server e.g., especially for your tmux processes/long running processes
 reauth
 ```
-type password. If the reauth command doesn't work do:
+then type the password. 
+If the reauth command doesn't work do:
 ```bash
 export PATH="/afs/cs/software/bin:$PATH"
 ```
-Consider adding that to your `.bashrc`, but my suggested `.bashrc` should already have it.
+Consider adding that to your `.bashrc`, but my suggested `.bashrc` should already have it. 
+NOTE: you might have to ssh into your node again outside of vscode for this to work if vscode is giving you permission issues. 
 
 ### Setting up your bashrc file in Snap
-tip: anything you don't understand discuss with GPT4/Claude! Highly recommend it. I do it often and save the conv links or convs in my evernote. e.g., ask it what an env variable is. Or what vim is. Or what git clone is. etc.
+TIP: anything you don't understand please discuss with GPT4/Claude or the Snap IT. 
+I do it often and save the conv links or convs in my evernote. 
+e.g., ask it what an env variable is, git command does, nvidia-smi command does, rr what vim is orr what `git clone` is, `pip install`, `pip instlal -e .` , conda, python envs, what `$PATH` or `$HOME` is, tmux, etc.
 
-Every time you login to server or open a linux terminal, you need to configure your unix/linux environment 
-(i.e., set up environment variables that your bash shell uses to figure out where things are, like commands etc.)
+Every time one logins into a snap node/server (or creates a new linux terminal), it needs to configure your unix/linux environment 
+e.g., set up environment variables that your bash shell uses to figure out where things are, like commands etc.
 
-Usually the linux terminal runs `.bash_profile` to set up your linux environment. 
-In this case if you inspect it with cat `.bash_profile` you can see it runs ("sources") another file called `.bashrc` i.e.,
+Usually the linux terminal runs `.bash_profile` to set up your linux environment before providing you a cli/terminal/bash session. 
+In this case if you inspect that file with `cat <PATH_to>/.bash_profile` you can see it runs ("sources") another file called `.bashrc` 
+i.e.,
 ```bash
-# note ~ is at AFS path before we changed it to the LFS for your server
+# note ~/$HOME is pointing AFS path before we changed it to the LFS for your server
 brando9@mercury2:~ $ realpath .bash_profile
 /afs/cs.stanford.edu/u/brando9/.bash_profile
 brando9@mercury2:~ $ pwd .bash_profile
@@ -105,35 +124,42 @@ if [ -f ~/.bashrc ]; then
 	. ~/.bashrc
 fi
 ```
-So it means we need to put our personal linix configurations in `~/.bashrc` (i.e., `$HOME/.bashrc`). 
-The goal will be to have `$HOME` (and `~`) point to your lfs home directory (e.g., not only for `.bashrc` to work but also because we want the experiments to be saved in your local machine (lfs) so that you don't run into disk space issues).
+So it means we need to put our personal linux configurations at `$HOME/.bashrc` in the `.bash_profile `. 
+We will also have `$HOME` (and `~`) point to your node's lfs home directory e.g., not only for `.bashrc` to work but also because we want the experiments to be saved in your node's lfs path, so that you don't run into disk space issues.
 
-Note, we will change `$HOME` (i.e., `~`) to point to your lfs path and hence have to move `.bashrc` later.
+Thus, we will 
+1. change `$HOME` (i.e., `~`) to point to your (local) lfs path and 
+2. hence move `.bashrc` later from your general `afs` path to your specific's node's `lfs` path (Optionally: you can also have a single `.bashrc` at AFS and every node's lfs you use point to it to save time & have a single `.bashrc`).
 
-So let's create your `.bashrc` at afs and then we will move it to lfs and have everything life at lfs permentantly.
-First echo `$HOME` to figure out what home path you're using (since the .bashrc is located at `~` which is `$HOME`):
+Therefore, the goal is create your `.bashrc` at afs (some weird Stanford where your stuff might live with limited space) and then move it to your node's lfs and have everything live at your node's lfs permentantly (or optionally soft link it from you're node's lfs).
+
+First echo `$HOME` (i.e., `~`) to figure out where your current home path is pointing too (most likely your `.bashrc` is located at `$HOME` or doesn't exist). 
+Sample output: 
 ```bash
+# where is $HOME or ~ pointing too?
 brando9@mercury2:~$ echo $HOME
 /afs/cs.stanford.edu/u/brando9
 ```
 So this means we need our bash configurations at `~/.bashrc` i.e., to be at `$HOME/.bashrc` (`~` means `$HOME`).
-So first let's create that file with vim (see basic Vim bellow in this tutorial to know the basics):
+So first let's create that file with `vi`m (see basic Vim bellow in this tutorial to know the basics or use ChatGPT):
 ```bash
-# note I used the absolute path because we will have $HOME (i.e., tilde) point to the local (lfs) home directory.
+# note I used the absolute path because we will have $HOME (i.e., ~) point to the local (lfs) home directory.
 cd /afs/cs.stanford.edu/u/brando9
 vim .bashrc
 ```
-Now go to this https://github.com/brando90/evals-for-autoformalization/blob/main/.bashrc and copy paste it to your clip board e.g., with command/control + c. 
-Now press `i` to go in vim's insert mode and paste the file as you'd normally e.g., with control/command + v. 
-You can read through the `.bashrc` to see why it's set up the way it is.
+Now go to this https://github.com/brando90/evals-for-autoformalization/blob/main/.bashrc and copy paste it to your clip board 
+e.g., with command/control + c. 
+Now press `i` to go in vim's insert mode and paste the file as you'd normally 
+e.g., with control/command + v. 
+Read/sim through the `.bashrc` to see why it's set up the way it is.
 Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit).
-Note, this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
+Note: this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
 
 Then the goal will be to have all your files live at the storage space for your local server (LFS, stands for local file server).
 Therefore, let's move this `.bashrc` to your lfs username by permentantly changing `$HOME` (`~`) and all your git clones at the home of lfs for your assinged server.
 
 #### Copy your .bashrc to your LFS
-Recall we want everything including your .bashrc to live at your home's username at lfs.
+Recall we want everything including your `.bashrc` to live at your home's username at lfs (Optional TIP: you can also have a single `.bashrc` at AFS and every node's lfs you use point to it at afs, to save time & have a single `.bashrc`).
 
 So likely `$HOME` is not pointing to your lfs username home. 
 So let's first let's make sure `$HOME` (`~`) to your permanent location of your username home at lfs.
@@ -183,12 +209,13 @@ export HOME=$LOCAL_MACHINE_PWD
 # since you are logged in to afs this moves you to your local computer
 cd $HOME
 
-...
-
+...more code...
 ```
 meaning that every time you login to the server assigned you got to your lfs directory instead of the afs home directory (since `$HOME` was changed).
 
 ### Git clone
+NOTE: you will install conda next for a python env to work!
+
 Now that you have a sensible `.bashrc` file that cd's you to your local server's lfs storage, it's time to git clone your project, conda install all of the project's depedencies and pip install the project.
 
 First you need set up an SSH keys in your lfs server individually.
@@ -267,7 +294,7 @@ brando9@mercury2~ $ cd evals-for-autoformalization/
 brando9@mercury2~/evals-for-autoformalization $ pwd
 /lfs/mercury2/0/brando9/evals-for-autoformalization
 ```
-now we need to install the conda package manager using this cript https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh. 
+now we need to install the conda package manager using this script https://github.com/brando90/ultimate-utils/blob/master/sh_files_repo/download_and_install_conda.sh. 
 Check it's not there:
 ```bash
 brando9@mercury1:/lfs/mercury1/0/brando9/evals-for-autoformalization$ conda
