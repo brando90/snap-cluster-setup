@@ -67,14 +67,14 @@ export TEMP=$HOME
 # fi
 # unset __conda_setup
 # # <<< conda initialize <<<
-# Check if Conda is not installed
-if ! which conda > /dev/null; then
-    echo "Conda is not installed. Most likely you will need to install conda in your node's lsf given afs is too small and dfs is too slow. See for an example: https://github.com/brando90/evals-for-autoformalization/tree/main?tab=readme-ov-file#install-conda"
-fi
 # put conda in PATH env where to find executable commands (so conda coommand works)
 export PATH="$HOME/miniconda/bin:$PATH"
 # activates base to test things
 source $HOME/miniconda/bin/activate
+# Check if Conda is not installed. HAS TO GO AFTER EXPORT AND SOURCE CONDA PREV CMDS
+if ! which conda > /dev/null; then
+    echo "Conda is not installed. Most likely you will need to install conda in your node's lsf given afs is too small and dfs is too slow. See for an example: https://github.com/brando90/evals-for-autoformalization/tree/main?tab=readme-ov-file#install-conda"
+fi
 
 # Note: since each server has a specific GPU you might have to set up a seperate conda env and cuda driver, but I think this works for all snap servers (tested on mercercy1, mercuery2, hyperturning1, skampere1)
 # Check if the hostname is X, Y, Z to activate the right conda env with the right pytorch version for the current cuda driver
