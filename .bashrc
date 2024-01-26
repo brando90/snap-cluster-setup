@@ -67,6 +67,10 @@ export TEMP=$HOME
 # fi
 # unset __conda_setup
 # # <<< conda initialize <<<
+# Check if Conda is not installed
+if ! which conda > /dev/null; then
+    echo "Conda is not installed. Most likely you will need to install conda in your node's lsf given afs is too small and dfs is too slow. See for an example: https://github.com/brando90/evals-for-autoformalization/tree/main?tab=readme-ov-file#install-conda"
+fi
 # put conda in PATH env where to find executable commands (so conda coommand works)
 export PATH="$HOME/miniconda/bin:$PATH"
 # activates base to test things
