@@ -103,6 +103,7 @@ fi
 
 # -- If you use wandb you might need this:
 export WANDB_API_KEY=TODO
+export HF_TOKEN='your_token_here'
 
 # - Start this linux env with the gpu with most memory available
 #export CUDA_VISIBLE_DEVICES=5
