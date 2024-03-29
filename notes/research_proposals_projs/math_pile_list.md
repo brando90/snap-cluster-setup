@@ -25,7 +25,7 @@ search engine for data sets: https://datasetsearch.research.google.com/
 -  my private v5 maths data set
 -  pact in lean
 -  pact in coq
--  [meta-math](https://github.com/brando90/MetaMath), [meta-math HF dataset card](https://huggingface.co/datasets/meta-math/MetaMathQA/tree/main)
+-  [original meta-math github repo](https://github.com/meta-math/MetaMath), [meta-math HF dataset card](https://huggingface.co/datasets/meta-math/MetaMathQA/tree/main)
 -  go through all formal language data sets. Compute some proof representation (proof term, concatenation of proof states) and informalize it (and the theorem/lemma)
     - `(informalize(formal_thm), informalize(formal_proof))`
 - [deep mind mathematics data set](https://github.com/google-deepmind/mathematics_dataset)
