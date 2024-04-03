@@ -1,3 +1,0 @@
-/-
-Put real proofs here.
--/

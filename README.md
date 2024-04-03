@@ -16,18 +16,25 @@ Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if yo
 The details of how to use different storage systems are complicated and you don't need that version right now.
 Note snap currently has no slurm (HPC workload manager).
 
-## Get access to snap
-If you do not have access to snap already, send an friendly reminder by email to Brando and (cc) to professor Koyejo's (Brando's advisor) administrator Eric Pineda requesting for Snap access with your CSID in that e-mail (if you need to create a CSID I strongly recommend it matches your SUNet ID). 
-State that Brando should have already sent the e-mail and that **you will be working we me during the qurater doing research under CS 197 and CC me (Brando)**. 
-The title email should be
+## Get access to snap and requesting CSID
+First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
+Request it here:  https://webdb.cs.stanford.edu/csid
 
-> Compute access request Snap Cluster -- Working With Brando Miranda CS 197 for this quarter only and **include your full name and CSID & SUNET**.
+To get access to snap write an e-mail with this subject:
 
-**If you need to request to get a CSID with Michael Bernstein as faculty sponser. To request a CSID fill this form https://webdb.cs.stanford.edu/csid. DO THIS STEP ASAP.**
+> Access Request Snap Cluster Working With Brando Miranda CS197 for <full_name> <CSID>  <SUNET>
 
-The emails are:
+For example: 
+
+> Access Request Snap Cluster Working With Brando Miranda CS197 for Brando Miranda brando9 brando9$ 
+
+and sent it to
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
+- [Snap cluster IT](https://ilwiki.stanford.edu/doku.php?id=start): il-action@cs.stanford.edu
+- Sanmi Koyejo: sanmi@stanford.edu
+
+Once you get access to it you will be able to login to the cluster via the ssh command in the terminal (cli) and vscode.
 
 ## Setting up your compute environment in Snap
 Note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if their wiki doesn't work then the you should e-mail the IT to fix the docs il-action@cs.stanford.edu. For help & support see the Help/Support section. Before e-mailing me, make sure you had given a good at attempt at the other options for IT support. Also, we have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
