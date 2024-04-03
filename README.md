@@ -110,7 +110,7 @@ We will only be using `afs` and `lfs`.
 So what we will do is put your code `afs` and create a soft link to it in `lfs`.
 `lfs` stands for local file system and it's where your actual data (trainning data, models, python conda environment etc.) and lnk to your code/github repos will be. 
 
-### Setting up your .bashrc file in Snap 
+### Setting up your .bashrc file in Snap and redirect the $HOME (~) envi variable from afs to lfs
 **TIP**: anything you don't understand please discuss with GPT4/Claude or the Snap IT. 
 e.g., ask it what an env variable is, git command does, nvidia-smi command does, what vim is or what `git clone` is, `pip install`, `pip instlal -e .` , conda, python envs, what `$PATH` or `$HOME` is, tmux, etc.
 
