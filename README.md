@@ -3,18 +3,13 @@
 ## Get Compute for your Research Project
 
 ### Snap Cluster Important References & Help/Support
-Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start (your **snap bible**).
+Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start -- your **snap bible**.
 Other useful resources:
-- Support IT for snap: il-action@cs.stanford.edu
+- Support IT for snap: il-action@cs.stanford.edu (don't be shy to ask them question or help for SNAP.)
 - compute instructions from Professor Koyejo's (Sanmi's) lab (STAIR Lab): https://docs.google.com/document/d/1PSTLJdtG3AymDGKPO-bHtzSnDyPmJPpJWXLmnJKzdfU/edit?usp=sharing
 - advanced video from Rylan and Brando (made for the STAIR/Koyejo Lab): https://www.youtube.com/watch?v=XEB79C1yfgE&feature=youtu.be
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
-
-### Set up Project in the Snap Cluster - assuming a single Sever
-Goal: Set up Project in the Snap Cluster - **assuming a single sever** (as if you were using a single computer, since that is most simple + good enough for essential goal (i.e., doing research)).
-The details of how to use different storage systems are complicated and you don't need that version right now.
-Note snap currently has no slurm (HPC workload manager).
 
 ## Get access to snap and requesting CSID
 First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
@@ -35,9 +30,6 @@ and sent it to
 - Sanmi Koyejo: sanmi@stanford.edu
 
 Once you get access to it you will be able to login to the cluster via the ssh command in the terminal (cli) and vscode.
-
-## Setting up your compute environment in Snap
-Note: compute clusters usually have their official docs/wiki https://ilwiki.stanford.edu/doku.php?id=start always check those and if their wiki doesn't work then the you should e-mail the IT to fix the docs il-action@cs.stanford.edu. For help & support see the Help/Support section. Before e-mailing me, make sure you had given a good at attempt at the other options for IT support. Also, we have an advanced video for how to use snap here: https://youtu.be/XEB79C1yfgE .
 
 ### SSH into cluster via some Node that serves your needs
 
