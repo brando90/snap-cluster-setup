@@ -43,8 +43,10 @@ ssh CSID@skampere1.stanford.edu
 type your password and login. 
 Then use the `ls` command and `pwd` and `realpath ~` and `realpath $HOME` and `realpath .` commands to see the contents of your root `~` directory.
 Do the `cd ..` and `pwd` to be familiar with the file system/directory structure in snap.
+Then run the `reauth` command, this command is needed due to the (kerberos) security settings in SNAP (hote: Brando strongly disagrees with how IT set up this part and apologizes for the complexity for you).
+[For more info on reauth read the wiki here](https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs).
 
-tip: see the wiki for other nodes that exist on snap!
+**Tip**: see the wiki for other nodes that exist on snap!
 
 Sample output if it worked:
 ```bash
@@ -87,10 +89,27 @@ lean4ai							  the-data-quality-edge-for-top-llms
 /lfs/skampere1/0
 (evals_af) brando9@skampere1/lfs/skampere1/0 $ cd ~
 (evals_af) brando9@skampere1~ $
+(evals_af) brando9@skampere1~ $ reauth
+Password for brando9:
+Background process pid is: 4145964
 ```
 Note: this might look slightly different if you already set up your `.bashrc` file. 
 
+**Tip**: If the `reauth `command doesn't work do or/and e-mail the [Snap cluster IT](https://ilwiki.stanford.edu/doku.php?id=start) il-action@cs.stanford.edu:
+```bash
+export PATH="/afs/cs/software/bin:$PATH"
+```
+**TIP**: Ask ChatGPT what `export PATH="/afs/cs/software/bin:$PATH"` does. ChatGPT is excellent at the terminal and bash commands. 
+
+## Setup your .bashrc and Snap's file system (lfs, dfs, afs)
+
+
 ### SSH into cluster via some Node that serves your needs
+TODO
+
+
+
+
 
 e.g., to reathenticate in a node:
 ```bash
