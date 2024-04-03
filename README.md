@@ -209,6 +209,7 @@ sample output:
 (evals_af) brando9@skampere1~ $ pwd ~/.bashrc
 /lfs/skampere1/0/brando9
 ```
+make sure you understand the difference between `realpath ~/.bashrc` and `pwd ~/.bashrc`.
 
 ### Setting up your bashrc file in Snap
 Therefore, the goal is create your `.bashrc` at afs (some weird Stanford where your stuff might live with limited space) and then move it to your node's lfs and have everything live at your node's lfs permentantly (or optionally soft link it from you're node's lfs).
