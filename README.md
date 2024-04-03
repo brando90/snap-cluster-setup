@@ -31,51 +31,67 @@ and sent it to
 
 Once you get access to it you will be able to login to the cluster via the ssh command in the terminal (cli) and vscode.
 
-### SSH into cluster via some Node that serves your needs
-
-First SSH into a SNAP server/node from the recommneded list of servers/nodes (in decreasing order of recommendation or see SNAP wiki):
-````
-mercury1
-mercury2
-skampere1
-ampere1
-ampere8
-ampere9
-hyperturing1
-hyperturing2
-...anything else with a gpu from the Wiki docs...
-````
-then login to your chosen node (note you'll have to re-setup everytime you choose a new node/server to work on):
+## SSH into a Sanmi owned node/server
+SSH into a SNAP server/node owned by Sanmi's Lab (`skampere1`, `mercury1`, `mercury2`) directly with your csid/sunet e.g.,:
 ```bash
-#10 Quadro RTX 8000 48GB
-ssh brando9@hyperturing1.stanford.edu
-ssh brando9@hyperturing2.stanford.edu
-#10 RTX A4000 16GB
-ssh brando9@mercury1.stanford.edu
-# ssh brando9@mercury2.stanford.edu
-# ssh brando9@skampere1.stanford.edu
+# Example
+ssh brando9@skampere1.stanford.edu
+
+# Yours
+ssh CSID@skampere1.stanford.edu
 ```
-Run the following unix commands from you local/personal computer to login to a node.
-Sample output:
-```bash
-(data_quality) brandomiranda~ ❯ ssh brando9@mercury2.stanford.edu
-Last login: Fri Oct 27 15:34:59 2023 from 172.24.69.154
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- mercury2.stanford.edu
- Ubuntu 20.04 (5.4.0-135-generic)
- 96 x Intel(R) Xeon(R) Gold 6342 CPU @ 2.80GHz, 503.55 GiB RAM, 2.00 GiB swap
+type your password and login. 
+Then use the `ls` command and `pwd` and `realpath ~` and `realpath $HOME` and `realpath .` commands to see the contents of your root `~` directory.
+Do the `cd ..` and `pwd` to be familiar with the file system/directory structure in snap.
 
- eno1: 172.24.75.55
+tip: see the wiki for other nodes that exist on snap!
+
+Sample output if it worked:
+```bash
+(base) brandomiranda~ ❯ ssh brando9@skampere1.stanford.edu
+brando9@skampere1.stanford.edu's password:
+Last login: Wed Apr  3 12:07:20 2024 from 172.24.69.154
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ skampere1.stanford.edu
+ Ubuntu 20.04 (5.4.0-162-generic)
+ 128 x AMD EPYC 7543 32-Core Processor, 1.96 TiB RAM, 8.00 GiB swap
+
+ enp44s0f0: 172.24.75.194
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    -> For help or to report problems, go to http://support.cs.stanford.edu
 
-brando9@mercury2:~$
+ln: failed to create symbolic link '/lfs/skampere1/0/brando9/iit-term-synthesis': File exists
+(evals_af) brando9@skampere1~ $
+(evals_af) brando9@skampere1~ $ realpath ~
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ realpath $HOME
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ realpath .
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ ls
+beyond-scale-language-data-diversity			  massive-autoformalization-maf       ultimate-anatome
+data							  miniconda			      ultimate-pycoq
+diversity-for-predictive-success-of-meta-learning	  miniconda.sh			      ultimate-utils
+evals-for-autoformalization				  nltk_data			      vscode.beyond-scale-language-data-diversity.skampere1.code-workspace
+evaporate						  proverbot9001			      vscode.evaporate.skampere1.code-workspace
+iit-term-synthesis					  putnam-math			      vscode.lean4ai.skampere1.code-workspace
+keys							  pycoq				      vscode.maf_data.creating_data_math_training.skamapere1.code-workspace
+_KoyejoLab-Predictable-LLM-Evals			  snap-cluster-setup		      vscode.maf_data.training_af_model.skampere1.code-workspace
+KoyejoLab-Predictable-LLM-Evals				  tempt.txt			      vscode.snap-cluster-setup.code-workspace
+KoyejoLab-Predictable-LLM-Evals.skampere1.code-workspace  test_folder			      wandb
+lean4ai							  the-data-quality-edge-for-top-llms
+(evals_af) brando9@skampere1~ $ pwd
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ cd ..
+(evals_af) brando9@skampere1/lfs/skampere1/0 $ pwd
+/lfs/skampere1/0
+(evals_af) brando9@skampere1/lfs/skampere1/0 $ cd ~
+(evals_af) brando9@skampere1~ $
 ```
-Note: this might look different if you already set up your `.bashrc` file. 
-Though, this is what we will go set up next. 
+Note: this might look slightly different if you already set up your `.bashrc` file. 
 
-Important Tip: since the SNAPS node's/server's has a (very) unsusual security setup, you might need to re-authenticate often or kill a subset of your running processes in your snap node (e.g., your vscode processes if vscode gives issues) or your programs are killed by the admins/IT's. 
-Tip: to type passwords less from your personal laptop to a node, see the `knit` command and appendix to this tutorial. 
+### SSH into cluster via some Node that serves your needs
+
 e.g., to reathenticate in a node:
 ```bash
 # run on SNAP server e.g., especially for your tmux processes/long running processes
