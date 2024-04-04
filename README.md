@@ -160,7 +160,7 @@ First create a file `.bashrc` at `/afs/cs.stanford.edu/u/<YOUR_CSID>/` with (if 
 touch /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
 open it with a terminal text editor. 
-I suggest `vim` since that is what I use:
+I suggest `vim` (read [this for a quick ref for vim](https://coderwall.com/p/adv71w/basic-vim-commands-for-getting-started)) since that is what I use:
 ```bash
 vim /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
@@ -257,3 +257,62 @@ sample output:
 make sure you understand the difference between `realpath ~/.bashrc` and `pwd ~/.bashrc`.
 
 Bonus Note: this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
+
+### Basic editing in the terminal with vim
+You already created a `.bashrc`
+Vim is for editing file in the terminal (cli). 
+These are the commands you might need https://coderwall.com/p/adv71w/basic-vim-commands-for-getting-started. 
+Mostly knowing that:
+-> pressing `i` puts you in insert mode
+-> pressing `w` writes/save the files
+-> pressing `q` quits
+that's all you need.
+If you want more experience with vim do this:
+
+Certainly! Below is a small, self-contained markdown tutorial focusing on editing files in the terminal using Vim. This tutorial will cover the basics of opening a file, entering insert mode for editing, exiting insert mode, and saving your changes.
+
+```markdown
+#### Vim Editing Basics Tutorial
+Vim is a highly efficient text editor that operates in various modes. The most commonly used modes are "Normal" and "Insert" modes. This tutorial will guide you through opening a file in Vim, editing it, and saving your changes.
+## Opening a File in Vim
+To open a file with Vim, use the following command in your terminal:
+```bash
+vim filename
+```
+Replace `filename` with the name of the file you wish to edit. If the file does not exist, Vim will create it for you.
+Entering Insert Mode: 
+Once you have your file opened in Vim, you'll start in Normal mode. To start editing your file, you need to enter Insert mode.
+```vim
+i
+```
+Pressing `i` will switch you from Normal mode to Insert mode. Now you can start typing and editing the file as you would in a conventional text editor.
+Exiting Insert Mode: 
+To stop editing and return to Normal mode, press:
+```vim
+Esc
+```
+The `Esc` key brings you back to Normal mode, where you can execute Vim commands.
+
+Saving Changes: To save your changes in Normal mode, type:
+```vim
+:w
+```
+This command writes your modifications to the file but keeps it open in Vim.
+
+Exiting Vim: If you want to exit Vim *after* saving your changes, type:
+```vim
+:q
+```
+However, to both save your changes and exit Vim in one command, you can use:
+```vim
+:x
+```
+or
+```vim
+:wq
+```
+Both commands save any changes and then close the file.
+
+Conclusion: 
+This tutorial covered the basics of file editing with Vim in the terminal, including opening files, switching between Insert and Normal modes, saving changes, and exiting Vim. With these commands, you can start editing files efficiently in the terminal. 
+[Couresty of ChatGPT (GPT4)](https://chat.openai.com/c/9fbefbf9-f7c7-4e68-84de-6bbd23853a77).
