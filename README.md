@@ -364,4 +364,67 @@ realpath snap-cluster-setup
 ```
 Sample output: 
 ```bash
+(evals_af) brando9@skampere1~ $ cd $AFS
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ 
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $  git clone git@github.com:brando90/snap-cluster-setup.git
+Cloning into 'snap-cluster-setup'...
+remote: Enumerating objects: 906, done.
+remote: Counting objects: 100% (360/360), done.
+remote: Compressing objects: 100% (134/134), done.
+remote: Total 906 (delta 284), reused 291 (delta 225), pack-reused 546
+Receiving objects: 100% (906/906), 74.63 MiB | 7.03 MiB/s, done.
+Resolving deltas: 100% (503/503), done.
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ ls -lah
+total 74M
+drwxrwxrwx 29 brando9 users 4.0K Apr  3 13:41 .
+drwxr-xr-x  2 root    users 520K Apr  1 11:10 ..
+...
+-rw-r--r--  1 brando9 users 8.8K Jan 29 16:33 .bashrc
+...
+drwxr-xr-x  5 brando9 users 2.0K Apr  3 16:50 snap-cluster-setup
+...
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ realpath snap-cluster-setup
+/afs/cs.stanford.edu/u/brando9/snap-cluster-setup
 ```
+Note that since you are at your root `afs`, the `.bashrc` file is not a soft link. 
+Your `snap-cluster-setup` should also **not** be a soft link at your root `afs` directory. 
+
+Now we will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file). 
+Run and understand these commands (and only run the next command until the previous one is outputting correct strings): 
+```bash
+echo $HOME
+# cd ~ 
+cd $HOME
+# ln -s /afs/cs.stanford.edu/u/brando9/snap-cluster-setup $HOME/snap-cluster-setup
+ln -s $AFS/snap-cluster-setup $HOME/snap-cluster-setup
+ls -lah
+pwd $HOME/snap-cluster-setup
+realpath $HOME/snap-cluster-setup
+```
+Tip: to learn, re-run the pwd command with `~`, instead of `$HOME`. What happens?
+
+Sample output:
+```bash
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ echo $HOME
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ cd $HOME
+(evals_af) brando9@skampere1~ $ ln -s $AFS/snap-cluster-setup $HOME/snap-cluster-setup
+(evals_af) brando9@skampere1~ $ ln -s $AFS/snap-cluster-setup $HOME/snap-cluster-setup
+(evals_af) brando9@skampere1~ $ ls -lah
+total 99M
+drwxr-sr-x  22 brando9 root 4.0K Apr  3 19:39 .
+drwxrwsrwt  24 root    root 4.0K Apr  3 18:33 ..
+...
+lrwxrwxrwx   1 brando9 root   38 Oct 27 12:57 .bashrc -> /afs/cs.stanford.edu/u/brando9/.bashrc
+...
+lrwxrwxrwx   1 brando9 root   49 Apr  3 11:02 snap-cluster-setup -> /afs/cs.stanford.edu/u/brando9/snap-cluster-setup
+...
+(evals_af) brando9@skampere1~ $ pwd $HOME/snap-cluster-setup
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ realpath $HOME/snap-cluster-setup
+/afs/cs.stanford.edu/u/brando9/snap-cluster-setup
+```
+This sanity checks that your `snap-cluster-setup` indeed is locacted at your root `afs` but a soft link is at your root `lfs` path. 
+This should convince you by looking where `.bashrc` points too and where your github repo called `snap-cluster-setup` points too. 
+Q: same Q as with pwd realpath .bashrc
+Q: reflect sanity checks always, understand what your doing.
