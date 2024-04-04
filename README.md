@@ -118,10 +118,12 @@ Now that you understand the rationale, so background on how starting a terminal 
 Every time one logins into a snap node/server (or creates a new linux terminal with the `bash` cli command), the terminal (cli) needs to configure your unix/linux environment (the set of variables that hold important paths so that the terminal/cli "works as expected" e.g., standard commands/execuatable binaries are found like `python`, `ls`, `cd`, `echo`, `pwd`, `cat`, `vim` etc. or environment variables like `$HOME`, `$PATH`, etc. have the right content)
 
 Usually the linux terminal (e.g. `bash`) runs ("sources") `.bash_profile` to set up your linux environment before providing the bash/cli/terminal session (where you write commands). 
-Let's inspect your `.bash_profile`. 
-For that we need to go to `/afs/cs.stanford.edu/u/brando9` first with the `cd` command then we can display the contents of the file with `cat`:
+This command usually sets up your environment variables for your terminal (e.g., current `bash` session) by running commands you specify in that file. 
+In particular, it sets up [environment variables](https://www.google.com/search?q=environment+variables&rlz=1C5CHFA_enUS741US741&oq=environment+variab&gs_lcrp=EgZjaHJvbWUqDQgAEAAYgwEYsQMYgAQyDQgAEAAYgwEYsQMYgAQyBwgBEAAYgAQyBwgCEAAYgAQyBwgDEAAYgAQyBggEEEUYOTIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCDQ0MjVqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8), which are terminal/cli variables that point to important locations in the node/computer so that everything works! 
+Now, let's inspect your `.bash_profile`. 
+For that we need to go to first go to `/afs/cs.stanford.edu/u/brando9` with the `cd` command and then we can display the contents of the file with `cat`:
 ```bash
-# AFTER sshing to a SNAP node
+# ... AFTER sshing to a SNAP node
 (evals_af) brando9@skampere1~ $
 (evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ cd /afs/cs.stanford.edu/u/brando9
 (evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ cat .bash_profile
@@ -139,15 +141,22 @@ if [ -f ~/.bashrc ]; then
 	. ~/.bashrc
 fi
 ```
-In this case file with `cat <PATH_to>/.bash_profile` you can see it runs ("sources") another file called `.bashrc`  -->
-Since `.bash_profile` runs/sources your `.bashrc` file each time you ssh/login to snap we will put our personal configurations for SNAP in our `.bashrc` located at `~/.bashrc` (note: `~` is the same as `$HOME` and points to your local path). 
-We will also change where `$HOME` (and `~`) point to and have it point your node's path lfs home directory, in this case to one of the nodes we have access to `skampere1, mercury1, mercuery2, ampere1`.
+In this specific `.bash_profile` runs ("sources") another file called `.bashrc`. 
+Since `.bash_profile` runs/sources your `.bashrc` file each time you ssh/login to snap we will put our personal configurations for SNAP in our `.bashrc` located at `~/.bashrc` (note: `~` is the same as `$HOME` and points to your local path) i.e., that is the meaning of `. ~/.bashrc`. 
+
+The plan is to:
+  1. put `.bashrc` in `afs` since `afs` is accessible via all nodes (to manage a single version for all SNAP nodes)
+  2. have the environment variable `$HOME` (`~`) point from the root of `afs` to `lfs` automatically everytime you login to any node.
+  3. create a soft link in your node's lfs home root `$HOME` (`~`) pointing to the path at `afs` for the `.bashrc` file (otherwise when `.bash_profile` is ran/sourced your terminal won't be set up as you expect/want)
 This culminates in you putting your `.bashrc` file in exactly this path:
 ```bash
 /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
-To do that 
-create a file at `/afs/cs.stanford.edu/u/<YOUR_CSID>/` with:
+
+Let's do setps 1, 2, 3. 
+
+Now we are doing 1 and 2 in one shot in `.bashrc`. 
+First create a file `.bashrc` at `/afs/cs.stanford.edu/u/<YOUR_CSID>/` with (if it doesn't exist already, if it does exit remove it's contents, you will change it):
 ```bash
 touch /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
@@ -157,8 +166,7 @@ I suggest `vim` since that is what I use:
 vim /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
 then in `vim` press `i` to get into insert mode. 
-Then [copy paste the contents of our base `.bashrc`](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L24) file but change everywhere the string `brando9` appears and put your `CSID`. 
-
+Then [copy paste the contents of our base `.bashrc`](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L24) file **but change everywhere the string `brando9` appears and put your `CSID`** (so read the file carefully before copy pasting). 
 In particular, [note this command in your `.bashrc` file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31):
 ```bash
 # - The defaul $HOME is /afs/cs.stanford.edu/u/brando9 but since you want to work in a specific server due to otherwise conda being so hard you need to reset what home is, see lfs: https://ilwiki.stanford.edu/doku.php?id=hints:storefiles#lfs_local_server_storage  
@@ -167,24 +175,58 @@ mkdir -p $LOCAL_MACHINE_PWD
 export WANDB_DIR=$LOCAL_MACHINE_PWD
 export HOME=$LOCAL_MACHINE_PWD
 ```
-which changes where your `$HOME` directory points to every time you login to a node in SNAP.
-It changes it's default location from `afs` (some weird Stanford file system with limited disk space) to the local node's `lfs` file system/directories. 
+which changes where your `$HOME` directory points to every time you login to a node in SNAP (since `.bashrc` is sourced via `.bash_profile` everytime you login or run the `bash` terminal command). 
+It changes your default home/root location from `afs` (some weird Stanford file system with limited disk space) to the local node's `lfs` file system/directories. 
 We do this because `afs` does not have a lot of disk compared to `lfs` (so that you don't run into disk space issues, if you do however, you will need to clean your disk or e-mail snap's IT). 
-Also, `lfs` is also quicker. 
-We won't be using `dfs`.
-The goal is that your original code will be at `afs` and your data, soft links to your code will be at `lfs`, python conda environment be at `lfs`.
+However, `afs` is fast but has little space (so it can only hold small text file e.g., usually git hub repos with code only, so not with data or gitlfs). 
+In addition, `lfs` is also quicker (since it is "a local computer" i.e., you are logged in to **a compute node directly**, which is an unusual set up for a cluster). 
+I repeat, we won't be using `dfs`. 
+The eventual goal is that your code will be at `afs` and that soft link to your code will be at `lfs`. 
+Note: the python conda environment, data and big files or data that needs fast access will be at `lfs`.
 
-Now that your `.bashrc` is in the `afs` location and `$HOME` points to your node's `lfs` home path, we can setart your bash terminal in SNAP so that the changes take effect. 
-This happens because `.bash_profile` runs `.bashrc` if you recall from above.
-So run one at a time and read the output of each command (never run any command blindly, always read/understand the command you're running and it's output):
+Now let's do 3 manually and needs to be done manually **every time you want to use a new node in SNAP**. 
+This is only SNAP specific. 
+Note: if you think you know how to not set up this manually each time, open a gitissue and propose a solution!
+So let's make sure there is a pointer/reference to the your `.bashrc` file so `.bash_profile` can actually find it and run it when you create a terminal/cli or run `bash`.
+For that create the soft link but change `brando9` to your `CSID`:
+```bash
+ln -s /afs/cs.stanford.edu/u/brando9/.bashrc ~/.bashrc
+```
+check that this worked by inspecting if the link exists at your root in lfs. 
+Run these commands: 
+```bash
+cd /lfs/skampere1/0/<CSID>
+ls -lah
+```
+Sample output:
+```bash
+(evals_af) brando9@skampere1~ $ cd /lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ ls -lah
+total 99M
+drwxr-sr-x  22 brando9 root 4.0K Apr  3 17:07 .
+drwxrwsrwt  23 root    root 4.0K Mar 27 19:21 ..
+-rw-------   1 brando9 root  48K Apr  3 11:20 .bash_history
+lrwxrwxrwx   1 brando9 root   38 Oct 27 12:57 .bashrc -> /afs/cs.stanford.edu/u/brando9/.bashrc
+...
+lrwxrwxrwx   1 brando9 root   49 Apr  3 11:02 snap-cluster-setup -> /afs/cs.stanford.edu/u/brando9/snap-cluster-setup
+...
+```
+Notice how we have `.bashrc -> /afs/cs.stanford.edu/u/brando9/.bashrc`, which menas the name `.bashrc` actually points to ` /afs/cs.stanford.edu/u/brando9/.bashrc`.  
+
+Now that your `.bashrc` is in the `afs` location and `$HOME` (`~`) points to your node's `lfs` home path, we should restart your bash terminal in SNAP to test that your changes take effect. 
+Recall, your terminal is now set up as in described in 1,2, 3 because `.bash_profile` runs `.bashrc`. 
+So let's test it. 
+Run in your terminal, one at a time and read the output of each command 
+(never run any command blindly, always read/understand the command you're running and it's output): 
 ```bash
 bash
 echo $HOME
 realpath ~/.bashrc
 pwd ~/.bashrc
 ```
-sample ouput:
+Sample ouput:
 ```bash
+# Or log out and relogin to snap with your preferred node, so bash isn't needed anymore
 (evals_af) brando9@skampere1~ $ bash
 ln: failed to create symbolic link '/lfs/skampere1/0/brando9/iit-term-synthesis': File exists
 (evals_af) brando9@skampere1~ $ echo $HOME
@@ -194,7 +236,7 @@ ln: failed to create symbolic link '/lfs/skampere1/0/brando9/iit-term-synthesis'
 (evals_af) brando9@skampere1~ $ pwd ~/.bashrc
 /lfs/skampere1/0/brando9
 ```
-this demonstrates `$HOME` points to your node's lfs and that the real path of `.bashrc` is actually in `afs`. 
+this demonstrates `$HOME` (`~`) points to your node's `lfs` and that the real path of `.bashrc` is actually in `afs`. 
 
 Now repeat the above (without the `bash` command) but log out the snap node you are into and re login via ssh, and check your `.bashrc` is in `afs` and `$HOME` points to `lfs` (never run any command blindly, always read/understand the command you're running and it's output)::
 ```bash

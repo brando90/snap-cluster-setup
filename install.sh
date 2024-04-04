@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# check .bashrc
+ln -s /afs/cs.stanford.edu/u/brando9/.bashrc ~/.bashrc
+
 #- check envs
 conda info -e
 
