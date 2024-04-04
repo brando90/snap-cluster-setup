@@ -103,7 +103,6 @@ export PATH="/afs/cs/software/bin:$PATH"
 **TIP**: you might have to ssh into your node again outside of vscode for this to work if vscode is giving you permission issues or e-mail snap IT. 
 
 ## Setup your .bashrc and redirect the $HOME (~) envi variable from afs to lfs 
-### lfs, dfs, afs
 Rationale: [Snap has 3 file systems afs, lfs, dfs](https://ilwiki.stanford.edu/doku.php?id=hints:storefiles) (folders where your files, data and code could potentially be stored). 
 We will only be using `afs` and `lfs`. 
 `dsf` stands for distributed file system and it makes your files available with all nodes/servers/computers in the snap cluster but it's too slow to be usable (IT should have set `dfs` up properly but they did not and this is why this tutorial is long).
