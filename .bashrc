@@ -17,7 +17,7 @@
 # e.g., you can activate the conda env and install the cuda versions you need want
 # note: the cuda and conda versions you need might depend on the specific server since the specific cuda version might only work for the gpu that server has
 
-# ---- Brando's Real .bashrc file ----
+# ---- Brando's scaffold .bashrc file ----
 # since snap is set up badly and it needs the reauth command to re-authenticate randomly somtimes, you need to make sure reauth cmd is available
 export PATH="/afs/cs/software/bin:$PATH"
 # 
@@ -50,6 +50,8 @@ export HOME=$LOCAL_MACHINE_PWD
 # since you are loged in to afs this moves you to your local computer
 cd $HOME
 export TEMP=$HOME
+export AFS=/afs/cs.stanford.edu/u/brando9
+export DFS=/dfs/scratch0/brando9/
 
 # -- Conda needs to be set up first before you can test the gpu & the right pytorch version has to be installed e.g., see: https://github.com/brando90/ultimate-utils/blob/45d8b2f47ace4d09ea63fe7cca7a7822b3af2961/sh_files_repo/download_and_install_conda.sh#L1C1-L31C32
 # conda magic, unsure if needed but leaving here
@@ -75,6 +77,7 @@ source $HOME/miniconda/bin/activate
 if ! which conda > /dev/null; then
     echo "Conda is not installed. Most likely you will need to install conda in your node's lsf given afs is too small and dfs is too slow. See for an example: https://github.com/brando90/evals-for-autoformalization/tree/main?tab=readme-ov-file#install-conda"
 fi
+conda activate snap_cluster_setup
 
 # Note: since each server has a specific GPU you might have to set up a seperate conda env and cuda driver, but I think this works for all snap servers (tested on mercercy1, mercuery2, hyperturning1, skampere1)
 # Check if the hostname is X, Y, Z to activate the right conda env with the right pytorch version for the current cuda driver
@@ -100,12 +103,17 @@ fi
 # -- Optionally test pytorch with a gpu
 # nvcc -V
 # python -c "import torch; print(torch.randn(2, 4).to('cuda') @ torch.randn(4, 1).to('cuda'));"
+# - https://ilwiki.stanford.edu/doku.php?id=hints:gpu
+# export CUDA_VISIBLE_DEVICES=0
+# export PATH=/usr/local/cuda-11.7/bin:$PATH
+# export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
 
 # -- If you use wandb you might need this:
 export WANDB_API_KEY=TODO
 export HF_TOKEN='your_token_here'
+export OPENAI_KEY='your_openai_key_here'
 
 # - Start this linux env with the gpu with most memory available
-#export CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=5
 export LEAST_GPU_ID=$(nvidia-smi --query-gpu=memory.used --format=csv,nounits,noheader | awk '{print NR-1 " " $1}' | sort -nk2 | head -n1 | cut -d' ' -f1)
 export CUDA_VISIBLE_DEVICES=$LEAST_GPU_ID

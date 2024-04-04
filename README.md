@@ -317,5 +317,51 @@ Conclusion:
 This tutorial covered the basics of file editing with Vim in the terminal, including opening files, switching between Insert and Normal modes, saving changes, and exiting Vim. With these commands, you can start editing files efficiently in the terminal. 
 [Couresty of ChatGPT (GPT4)](https://chat.openai.com/c/9fbefbf9-f7c7-4e68-84de-6bbd23853a77).
 
-## Git, conda and pip install -e .
-TODO
+## Using git and conda environments in Snap
+At this point, you know what the environment variable `$HOME` is and it should be pointing to your node’s `lfs` home directory -- as suggested by [this .bahrc file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31) (but using your CSID).
+
+Now the goal will be to:
+1. show you how to `git clone` a small sized project (so not using gitlfs) like this one (`snap-cluster-setup`)
+2. learn what a [python environment](<https://csguide.cs.princeton.edu/software/virtualenv#:~:text=A%20Python%20virtual%20environment%20(venv,installed%20in%20the%20specific%20venv.>) is and create one using [conda](https://docs.conda.io/en/latest/)
+
+For 1 we will firt go to your root at `afs`. 
+We do this because `afs` is the only "distributed" file system that isn't very slow and accessible at all [Snap nodes/servers](https://ilwiki.stanford.edu/doku.php?id=start). 
+It will be similar to how we created our `.bashrc` file previous at your `afs` root directory and then soft link it at your `lfs` directory (which should be your `$HOME` path). 
+
+So cd to your `afs` root directory. 
+If you correctly edited your `.bashrc` then you should be able to do: 
+```bash
+cd $AFS
+```
+otherwise fix your `.bashrc` and do the previous command (change all `brando9` instances with your `CSID` correctly). 
+It should be equivalent to doing:
+```bash
+cd /afs/cs.stanford.edu/u/brando9
+```
+Since AFS should be point to your afs due to this command `export AFS=/afs/cs.stanford.edu/u/brando9`. 
+Sample output (understand the commands): 
+```bash
+# after sshing into a snap node or running bash on your terminal (cli)
+(evals_af) brando9@skampere1~ $
+(evals_af) brando9@skampere1~ $ realpath .
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ pwd
+/lfs/skampere1/0/brando9
+(evals_af) brando9@skampere1~ $ cd $AFS
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ pwd
+/afs/cs.stanford.edu/u/brando9
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ realpath .
+/afs/cs.stanford.edu/u/brando9
+```
+
+Now that we are at our `afs` home root directory, let's git clone this repo (later you will git clone your actual project's repo and repeat this section every time. Sorry the snap cluster is set up badly). 
+Git clone this repo with it's ssh path from the github repo and check that it was downloaded with `ls -lah` and `realpath`: 
+```bash
+cd $AFS
+git clone git@github.com:brando90/snap-cluster-setup.git
+ls -lah
+realpath snap-cluster-setup
+```
+Sample output: 
+```bash
+```
