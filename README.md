@@ -102,7 +102,7 @@ export PATH="/afs/cs/software/bin:$PATH"
 **TIP**: Ask ChatGPT what `export PATH="/afs/cs/software/bin:$PATH"` does. ChatGPT is excellent at the terminal and bash commands. Note consider adding this to your `.bashrc` for example [see this](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L24). 
 **TIP**: you might have to ssh into your node again outside of vscode for this to work if vscode is giving you permission issues or e-mail snap IT. 
 
-## Setup your .bashrc and redirect the $HOME (~) envi variable from afs to lfs 
+## Setup your .bashrc, redirect the $HOME (~) envi variable from afs to lfs and create a soft link for .bashrc (afs/.bashrc -> lfs/.bashrc)
 Rationale: [Snap has 3 file systems afs, lfs, dfs](https://ilwiki.stanford.edu/doku.php?id=hints:storefiles) (folders where your files, data and code could potentially be stored). 
 We will only be using `afs` and `lfs`. 
 `dsf` stands for distributed file system and it makes your files available with all nodes/servers/computers in the snap cluster but it's too slow to be usable (IT should have set `dfs` up properly but they did not and this is why this tutorial is long).
@@ -316,3 +316,6 @@ Both commands save any changes and then close the file.
 Conclusion: 
 This tutorial covered the basics of file editing with Vim in the terminal, including opening files, switching between Insert and Normal modes, saving changes, and exiting Vim. With these commands, you can start editing files efficiently in the terminal. 
 [Couresty of ChatGPT (GPT4)](https://chat.openai.com/c/9fbefbf9-f7c7-4e68-84de-6bbd23853a77).
+
+## Git, conda and pip install -e .
+TODO
