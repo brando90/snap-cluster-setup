@@ -166,6 +166,7 @@ vim /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
 then in `vim` press `i` to get into insert mode. 
 Then [copy paste the contents of our base `.bashrc`](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L24) file **but change everywhere the string `brando9` appears and put your `CSID`** (so read the file carefully before copy pasting). 
+Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit). 
 In particular, [note this command in your `.bashrc` file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31):
 ```bash
 # - The defaul $HOME is /afs/cs.stanford.edu/u/brando9 but since you want to work in a specific server due to otherwise conda being so hard you need to reset what home is, see lfs: https://ilwiki.stanford.edu/doku.php?id=hints:storefiles#lfs_local_server_storage  
@@ -255,93 +256,4 @@ sample output:
 ```
 make sure you understand the difference between `realpath ~/.bashrc` and `pwd ~/.bashrc`.
 
-### Setting up your bashrc file in Snap
-Therefore, the goal is create your `.bashrc` at afs (some weird Stanford where your stuff might live with limited space) and then move it to your node's lfs and have everything live at your node's lfs permentantly (or optionally soft link it from you're node's lfs).
-
-First echo `$HOME` (i.e., `~`) to figure out where your current home path is pointing too (most likely your `.bashrc` is located at `$HOME` or doesn't exist). 
-Sample output: 
-```bash
-# where is $HOME or ~ pointing too?
-brando9@mercury2:~$ echo $HOME
-/afs/cs.stanford.edu/u/brando9
-```
-So this means we need our bash configurations at `~/.bashrc` i.e., to be at `$HOME/.bashrc` (`~` means `$HOME`).
-So first let's create that file with `vi`m (see basic Vim bellow in this tutorial to know the basics or use ChatGPT):
-```bash
-# note I used the absolute path because we will have $HOME (i.e., ~) point to the local (lfs) home directory.
-cd /afs/cs.stanford.edu/u/brando9
-vim .bashrc
-```
-Now go to this https://github.com/brando90/evals-for-autoformalization/blob/main/.bashrc and copy paste it to your clip board 
-e.g., with command/control + c. 
-Now press `i` to go in vim's insert mode and paste the file as you'd normally 
-e.g., with control/command + v. 
-Read/sim through the `.bashrc` to see why it's set up the way it is.
-Then press `esc` to `:w` enter to save the file. Then press `:q` enter to exist (or `:x` enter for for save & exit).
-Note: this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
-
-Then the goal will be to have all your files live at the storage space for your local server (LFS, stands for local file server).
-Therefore, let's move this `.bashrc` to your lfs username by permentantly changing `$HOME` (`~`) and all your git clones at the home of lfs for your assinged server.
-
-
-
-
-
-
-
-
-
-#### Copy your .bashrc to your LFS
-Recall we want everything including your `.bashrc` to live at your home's username at lfs (Optional TIP: you can also have a single `.bashrc` at AFS and every node's lfs you use point to it at afs, to save time & have a single `.bashrc`).
-
-So likely `$HOME` is not pointing to your lfs username home. 
-So let's first let's make sure `$HOME` (`~`) to your permanent location of your username home at lfs.
-```bash
-# run these commands in your terminal, this will make sure $HOME (and ~) point to your lfs location for only the current bash session (to have it permanent change it has to be in the bash file .bash_profile is sourcing/running each time you start a bash session
-# -- Set up the lfs home for this bash session
-brando9@mercury2:~$ export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
-brando9@mercury2:~$ export HOME=$LOCAL_MACHINE_PWD
-
-# -- Confirm $HOME and that you're in lfs
-brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ echo $HOME
-/lfs/mercury2/0/brando9
-brando9@mercury2:/afs/cs.stanford.edu/u/brando9$ cd ~
-brando9@mercury2:~$ pwd
-/lfs/mercury2/0/brando9
-```
-the last line confirms we are at the local servers storage (called lfs).
-
-Now the goal will be have `.bash_profile` run the right bash file you have set up (in this case it's running `~/.bashrc` so we need to set that up).
-For that we can copy your `.bashrc` file in afs to your lfs location.
-Or copy paste the right contents to a new `~/.bashrc` file to your lfs user location (e.g., either from the .bashrc file I set up for you or the contents of your afs one).
-(note a 3rd option exists to soft link to the afs .bashrc, which is the one I usually use).
-To do that do this:
-```bash
-# confirm your home points to the right place
-brando9@mercury2:~$ echo $HOME
-/lfs/mercury2/0/brando9
-
-brando9@mercury2:~$ cp /afs/cs.stanford.edu/u/brando9/.bashrc ~/.bashrc
-
-# Run this to confirm you moved it!
-brando9@mercury2:~$ cat ~/.bashrc
-```
-This should copy your .bashrc file to your lfs location (and always confirm and read what your running!).
-
-But why is it that now that we login to the cluster we are in the lfs location and not afs?
-Well look at look at the .bashrc there is this line:
-```
-```bash
-# - The defaul $HOME is /afs/cs.stanford.edu/u/brando9 but since you want to work in a specific server due to otherwise conda being so hard you need to reset what home is, see lfs: https://ilwiki.stanford.edu/doku.php?id=hints:storefiles#lfs_local_server_storage  
-export LOCAL_MACHINE_PWD=$(python3 -c "import socket;hostname=socket.gethostname().split('.')[0];print('/lfs/'+str(hostname)+'/0/brando9');")
-mkdir -p $LOCAL_MACHINE_PWD
-export WANDB_DIR=$LOCAL_MACHINE_PWD
-export HOME=$LOCAL_MACHINE_PWD
-
-# - set up afs short cuts
-# since you are logged in to afs this moves you to your local computer
-cd $HOME
-
-...more code...
-```
-meaning that every time you login to the server assigned you got to your lfs directory instead of the afs home directory (since `$HOME` was changed).
+Bonus Note: this is (most likely) correct even though the wiki/docs for snap say to update `.bash.user` (but .bash.user is never sourced, I asked the it and I strongly recommend you ask too, see wrong/confusing docs if you want https://ilwiki.stanford.edu/doku.php?id=hints:enviroment but that's not what `.bash_profile` is sourcing!?).
