@@ -12,8 +12,9 @@ Other useful resources:
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
 ## Get access to snap and requesting CSID
-First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
-Request it here:  https://webdb.cs.stanford.edu/csid
+First create a CSID here and please make your CSID the same as your Stanford SUNET id. 
+Request it here:  https://webdb.cs.stanford.edu/csid and put [Michael Bernstein](https://profiles.stanford.edu/michael-bernstein) as your CS faculty sponer. 
+His e-mail is: msb@cs.stanford.edu. 
 
 To get access to snap write an e-mail with this subject:
 
