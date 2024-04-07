@@ -1,4 +1,4 @@
-# evals-for-autoformalization
+# Snap Cluster Setup
 
 ## Get Compute for your Research Project
 
@@ -11,6 +11,7 @@ Other useful resources:
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
+<<<<<<< HEAD
 ## Get access to SNAP with a CSID
 
 ### First request CSID with Michael Bersntein as sponsor 
@@ -19,6 +20,12 @@ Request it here:  https://webdb.cs.stanford.edu/csid and put Michael Bernstein a
 Note: this is different from SNAP cluster sponsor. 
 
 ### Second get acces to Snap
+=======
+## Get access to snap and requesting CSID
+First create a CSID here and please make your CSID the same as your Stanford SUNET id. 
+Request it here:  https://webdb.cs.stanford.edu/csid and put [Michael Bernstein](https://profiles.stanford.edu/michael-bernstein) as your CS faculty sponer. 
+His e-mail is: msb@cs.stanford.edu. 
+>>>>>>> 4c8d2c0bde4e0c6211bc55b52ae5b6c2990f4dc5
 
 To get access to snap write an e-mail with this subject:
 
