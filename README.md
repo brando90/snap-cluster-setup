@@ -11,9 +11,14 @@ Other useful resources:
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
-## Get access to snap and requesting CSID
+## Get access to SNAP with a CSID
+
+### First request CSID with Michael Bersntein as sponsor 
 First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
-Request it here:  https://webdb.cs.stanford.edu/csid
+Request it here:  https://webdb.cs.stanford.edu/csid and put Michael Bernstein as your CSID sponsor/supervisor 
+Note: this is different from SNAP cluster sponsor. 
+
+### Second get acces to Snap
 
 To get access to snap write an e-mail with this subject:
 
