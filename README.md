@@ -11,7 +11,6 @@ Other useful resources:
 - our CS 197 section channel
 - join the snap slack & ask questions there too: https://join.slack.com/t/snap-group/shared_invite/zt-1lokufgys-g6NOiK3gQi84NjIK_2dUMQ
 
-<<<<<<< HEAD
 ## Get access to SNAP with a CSID
 
 ### First request CSID with Michael Bersntein as sponsor 
@@ -20,12 +19,6 @@ Request it here:  https://webdb.cs.stanford.edu/csid and put Michael Bernstein a
 Note: this is different from SNAP cluster sponsor. 
 
 ### Second get acces to Snap
-=======
-## Get access to snap and requesting CSID
-First create a CSID here and please make your CSID the same as your Stanford SUNET id. 
-Request it here:  https://webdb.cs.stanford.edu/csid and put [Michael Bernstein](https://profiles.stanford.edu/michael-bernstein) as your CS faculty sponer. 
-His e-mail is: msb@cs.stanford.edu. 
->>>>>>> 4c8d2c0bde4e0c6211bc55b52ae5b6c2990f4dc5
 
 To get access to snap write an e-mail with this subject:
 
@@ -330,10 +323,10 @@ This tutorial covered the basics of file editing with Vim in the terminal, inclu
 [Couresty of ChatGPT (GPT4)](https://chat.openai.com/c/9fbefbf9-f7c7-4e68-84de-6bbd23853a77).
 
 ## Using git and conda environments in Snap
-At this point, you know what the environment variable `$HOME` is and it should be pointing to your node’s `lfs` home directory -- as suggested by [this .bahrc file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31) (but using your CSID).
+At this point, you know what the environment variable `$HOME` is and that yours should be pointing to your node’s `lfs` home directory -- as suggested by [this .bahrc file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31) (but using your CSID).
 
 Now the goal will be to:
-1. show you how to `git clone` a small sized project (so not using gitlfs) like this one (`snap-cluster-setup`)
+1. show you how to `git clone` (optionally git fork) a small sized project (so not using `gitlfs`, that would most likely create issues with AFS's storage limit) like [this one (`snap-cluster-setup`)](https://github.com/brando90/snap-cluster-setup)
 2. learn what a [python environment](<https://csguide.cs.princeton.edu/software/virtualenv#:~:text=A%20Python%20virtual%20environment%20(venv,installed%20in%20the%20specific%20venv.>) is and create one using [conda](https://docs.conda.io/en/latest/)
 
 For 1 we will firt go to your root at `afs`. 
