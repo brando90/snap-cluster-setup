@@ -460,5 +460,9 @@ What is the difference? Use the `man` command or `help` flag to learn more about
 This sanity checks that your `snap-cluster-setup` indeed is locacted at your root `afs` but a soft link is at your root `lfs` path. 
 This should convince you by looking where `.bashrc` points too and where your github repo called `snap-cluster-setup` points too. 
 
-Q: same Q as with pwd realpath .bashrc
-Q: reflect sanity checks always, understand what your doing. -->
+Note: you have to repeat the above ach time you set up a new github repo in SNAP. 
+This is because you have not cloned the repo to `afs` to be shared accross all the SNAP nodes. 
+In addition `afs` is small (but fast) and `dfs` is useless in this cluster sadly, so we put the code in `afs` so it's shared accross all nodes and not use `dfs`. 
+
+### Conda in lfs (not afs!)
+TODO
