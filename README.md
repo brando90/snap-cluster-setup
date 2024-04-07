@@ -464,5 +464,5 @@ Note: you have to repeat the above ach time you set up a new github repo in SNAP
 This is because you have not cloned the repo to `afs` to be shared accross all the SNAP nodes. 
 In addition `afs` is small (but fast) and `dfs` is useless in this cluster sadly, so we put the code in `afs` so it's shared accross all nodes and not use `dfs`. 
 
-### Conda in lfs (not afs!)
+### Python envs with Conda in lfs (not afs!)
 TODO
