@@ -418,14 +418,9 @@ Sample output:
 /afs/cs.stanford.edu/u/brando9/snap-cluster-setup
 ```
 
-### Create a soft lift for your cloned github project
-Now we will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file). 
-
-
-<!-- 
-
-Now we will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file). 
-Run and understand these commands (and only run the next command until the previous one is outputting correct strings): 
+### Create a soft link for your cloned github project (lfs -> afs)
+We will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file).
+Run one command at a time and see output (we strongly suggest against running command blindly, e.g., if one doesn't work, then how will you fix it if you don't know what you've run so far?):
 ```bash
 echo $HOME
 # cd ~ 
@@ -436,8 +431,8 @@ ls -lah
 pwd $HOME/snap-cluster-setup
 realpath $HOME/snap-cluster-setup
 ```
-Tip: to learn, re-run the pwd command with `~`, instead of `$HOME`. What happens?
-
+(Tip: to learn about the equivalence of `~` and `$HOME`, re-run the `pwd` command with `~` instead of `$HOME`. 
+What happens?)
 Sample output:
 ```bash
 (evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ echo $HOME
@@ -459,7 +454,11 @@ lrwxrwxrwx   1 brando9 root   49 Apr  3 11:02 snap-cluster-setup -> /afs/cs.stan
 (evals_af) brando9@skampere1~ $ realpath $HOME/snap-cluster-setup
 /afs/cs.stanford.edu/u/brando9/snap-cluster-setup
 ```
+Tip: `ls` is a very useful command. What is is? Try `ls` vs `ls -l` vs `ls -la` vs `ls -lah`. 
+What is the difference? Use the `man` command or `help` flag to learn more about it.
+
 This sanity checks that your `snap-cluster-setup` indeed is locacted at your root `afs` but a soft link is at your root `lfs` path. 
 This should convince you by looking where `.bashrc` points too and where your github repo called `snap-cluster-setup` points too. 
+
 Q: same Q as with pwd realpath .bashrc
 Q: reflect sanity checks always, understand what your doing. -->
