@@ -1,8 +1,8 @@
-# Snap Cluster Setup
+# SNAP Cluster Setup
 
 ## Get Compute for your Research Project
 
-### Snap Cluster Important References & Help/Support
+### SNAP Cluster Important References & Help/Support
 Always use the original documentation or wiki for each cluster: https://ilwiki.stanford.edu/doku.php?id=start -- your **snap bible**.
 Other useful resources:
 - Support IT for snap: il-action@cs.stanford.edu (don't be shy to ask them question or help for SNAP.)
@@ -18,20 +18,20 @@ First create a CSID here and  please make your CSID the same as your Stanford SU
 Request it here:  https://webdb.cs.stanford.edu/csid and put Michael Bernstein as your CSID sponsor/supervisor 
 Note: this is different from SNAP cluster sponsor. 
 
-### Second get acces to Snap
+### Second get acces to SNAP
 
 To get access to snap write an e-mail with this subject:
 
-> Access Request Snap Cluster Working With Brando Miranda CS197 for <full_name> <CSID>  <SUNET>
+> Access Request SNAP Cluster Working With Brando Miranda CS197 for <full_name> <CSID>  <SUNET>
 
 For example: 
 
-> Access Request Snap Cluster Working With Brando Miranda CS197 for Brando Miranda brando9 brando9$ 
+> Access Request SNAP Cluster Working With Brando Miranda CS197 for Brando Miranda brando9 brando9$ 
 
 and sent it to
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
-- [Snap cluster IT](https://ilwiki.stanford.edu/doku.php?id=start): il-action@cs.stanford.edu
+- [SNAP cluster IT](https://ilwiki.stanford.edu/doku.php?id=start): il-action@cs.stanford.edu
 - Sanmi Koyejo: sanmi@stanford.edu
 
 Once you get access to it you will be able to login to the cluster via the ssh command in the terminal (cli) and vscode.
@@ -100,7 +100,7 @@ Background process pid is: 4145964
 ```
 Note: this might look slightly different if you already set up your `.bashrc` file. 
 
-**Tip**: If the `reauth `command doesn't work do or/and e-mail the [Snap cluster IT](https://ilwiki.stanford.edu/doku.php?id=start) il-action@cs.stanford.edu:
+**Tip**: If the `reauth `command doesn't work do or/and e-mail the [SNAP cluster IT](https://ilwiki.stanford.edu/doku.php?id=start) il-action@cs.stanford.edu:
 ```bash
 export PATH="/afs/cs/software/bin:$PATH"
 ```
@@ -108,7 +108,7 @@ export PATH="/afs/cs/software/bin:$PATH"
 **TIP**: you might have to ssh into your node again outside of vscode for this to work if vscode is giving you permission issues or e-mail snap IT. 
 
 ## Setup your .bashrc, redirect the $HOME (~) envi variable from afs to lfs and create a soft link for .bashrc (afs/.bashrc -> lfs/.bashrc)
-Rationale: [Snap has 3 file systems afs, lfs, dfs](https://ilwiki.stanford.edu/doku.php?id=hints:storefiles) (folders where your files, data and code could potentially be stored). 
+Rationale: [SNAP has 3 file systems afs, lfs, dfs](https://ilwiki.stanford.edu/doku.php?id=hints:storefiles) (folders where your files, data and code could potentially be stored). 
 We will only be using `afs` and `lfs`. 
 `dsf` stands for distributed file system and it makes your files available with all nodes/servers/computers in the snap cluster but it's too slow to be usable (IT should have set `dfs` up properly but they did not and this is why this tutorial is long).
 So what we will do is put your code `afs` and create a soft link to it in `lfs`.
@@ -322,28 +322,30 @@ Conclusion:
 This tutorial covered the basics of file editing with Vim in the terminal, including opening files, switching between Insert and Normal modes, saving changes, and exiting Vim. With these commands, you can start editing files efficiently in the terminal. 
 [Couresty of ChatGPT (GPT4)](https://chat.openai.com/c/9fbefbf9-f7c7-4e68-84de-6bbd23853a77).
 
-## Using git and conda environments in Snap
+## Using git and conda environments in SNAP
 At this point, you know what the environment variable `$HOME` is and that yours should be pointing to your node’s `lfs` home directory -- as suggested by [this .bahrc file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31) (but using your CSID).
 
 Now the goal will be to:
-1. show you how to `git clone` (optionally git fork) a small sized project (so not using `gitlfs`, that would most likely create issues with AFS's storage limit) like [this one (`snap-cluster-setup`)](https://github.com/brando90/snap-cluster-setup)
+1. show you how to `git clone` (optionally git fork this repo) a small sized git project (so not using `gitlfs`, that would most likely create issues with AFS's storage limit) like [this one (`snap-cluster-setup`)](https://github.com/brando90/snap-cluster-setup)
 2. learn what a [python environment](<https://csguide.cs.princeton.edu/software/virtualenv#:~:text=A%20Python%20virtual%20environment%20(venv,installed%20in%20the%20specific%20venv.>) is and create one using [conda](https://docs.conda.io/en/latest/)
 
-For 1 we will firt go to your root at `afs`. 
-We do this because `afs` is the only "distributed" file system that isn't very slow and accessible at all [Snap nodes/servers](https://ilwiki.stanford.edu/doku.php?id=start). 
-It will be similar to how we created our `.bashrc` file previous at your `afs` root directory and then soft link it at your `lfs` directory (which should be your `$HOME` path). 
+For step 1 we will first go to your `afs` home root path. 
+We do this because `afs` is the only "distributed" file system that isn't very slow and that **is** accessible at all [SNAP nodes/servers](https://ilwiki.stanford.edu/doku.php?id=start). 
+It will be similar to how we created our `.bashrc` file previously at your `afs` root directory and then soft link it at your `lfs` directory (which should be your `$HOME` path). 
+The main difference is that instead of soft linking a file, we will soft linke a directory. 
 
-So cd to your `afs` root directory. 
-If you correctly edited your `.bashrc` then you should be able to do: 
+So `cd` to your `afs` root directory. 
+If you correctly edited your `.bashrc` then you should be able to do to move to your `afs` root: 
 ```bash
 cd $AFS
 ```
-otherwise fix your `.bashrc` and do the previous command (change all `brando9` instances with your `CSID` correctly). 
-It should be equivalent to doing:
+tip: do `echo $AFS` or to any environment variable to see the contents of them!).
+If that didn't work, fix your `.bashrc` and do the previous command (e.g., make sure `.bashrc` exports `$AFS`, change all `brando9` instances with your `CSID`, and potentially see the original `.bashrc` if something doesn't work or even start with a new `.bashrc` again.
+Note, `cd $AFS` should be equivalent to doing (with your `CSID`):
 ```bash
 cd /afs/cs.stanford.edu/u/brando9
 ```
-Since AFS should be point to your afs due to this command `export AFS=/afs/cs.stanford.edu/u/brando9`. 
+Since AFS should be point to your afs due to this command `export AFS=/afs/cs.stanford.edu/u/brando9` in the `.bashrc`. 
 Sample output (understand the commands): 
 ```bash
 # after sshing into a snap node or running bash on your terminal (cli)
@@ -359,8 +361,12 @@ Sample output (understand the commands):
 /afs/cs.stanford.edu/u/brando9
 ```
 
-Now that we are at our `afs` home root directory, let's git clone this repo (later you will git clone your actual project's repo and repeat this section every time. Sorry the snap cluster is set up badly). 
-Git clone this repo with it's ssh path from the github repo and check that it was downloaded with `ls -lah` and `realpath`: 
+Now that we are at our `afs` home root directory, let's git clone this repo (or ideally your git fork). 
+This step is really showing you to git clone any github repo to your `afs` (npte: later you will git clone your actual project's repo and repeat cloning it to your afs every time you have a new repo you want to use for snap.
+Note: if you're following this setup, since we are using `lfs` due to storage issues with `afs` you will need to set up a new conda env each time use a new node, although the repo might be available already).
+
+Git clone this repo with using ssh path from the github repo option and check that it was downloaded with `ls -lah` and `realpath`
+e.g.,: 
 ```bash
 cd $AFS
 git clone git@github.com:brando90/snap-cluster-setup.git
@@ -393,6 +399,30 @@ drwxr-xr-x  5 brando9 users 2.0K Apr  3 16:50 snap-cluster-setup
 ```
 Note that since you are at your root `afs`, the `.bashrc` file is not a soft link. 
 Your `snap-cluster-setup` should also **not** be a soft link at your root `afs` directory. 
+Verify that with `realpath` (and not `pwd`):
+```bash
+pwd .bashrc
+realpath .bashrc
+pwd snap-cluster-setup/
+realpath snap-cluster-setup/
+```
+Sample output:
+```bash
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ pwd .bashrc
+/afs/cs.stanford.edu/u/brando9
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ realpath .bashrc
+/afs/cs.stanford.edu/u/brando9/.bashrc
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ pwd snap-cluster-setup/
+/afs/cs.stanford.edu/u/brando9
+(evals_af) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ realpath snap-cluster-setup/
+/afs/cs.stanford.edu/u/brando9/snap-cluster-setup
+```
+
+### Create a soft lift for your cloned github project
+Now we will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file). 
+
+
+<!-- 
 
 Now we will create a soft link as we previously did in your home `lfs` path for the github project you just cloned, and santiy check it is a soft link (similar to your `.bashrc` file). 
 Run and understand these commands (and only run the next command until the previous one is outputting correct strings): 
@@ -432,4 +462,4 @@ lrwxrwxrwx   1 brando9 root   49 Apr  3 11:02 snap-cluster-setup -> /afs/cs.stan
 This sanity checks that your `snap-cluster-setup` indeed is locacted at your root `afs` but a soft link is at your root `lfs` path. 
 This should convince you by looking where `.bashrc` points too and where your github repo called `snap-cluster-setup` points too. 
 Q: same Q as with pwd realpath .bashrc
-Q: reflect sanity checks always, understand what your doing.
+Q: reflect sanity checks always, understand what your doing. -->

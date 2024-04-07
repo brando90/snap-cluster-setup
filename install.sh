@@ -9,10 +9,13 @@ conda info -e
 # - activate conda
 conda update
 pip install --upgrade pip
-conda create -n evals_af python=3.10
-conda activate evals_af
+conda create -n snap_cluster_setup python=3.9
+# 3.9 due to vllm
+conda activate snap_cluster_setup
 # conda deactivate
-#conda remove --name maf --all
+#conda remove --name snap_cluster_setup --all
+
+#~/miniconda/envs/snap_cluster_setup
 
 # - install this library
 cd /afs/cs.stanford.edu/u/brando9/
