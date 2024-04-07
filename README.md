@@ -1,4 +1,4 @@
-# evals-for-autoformalization
+# Snap Cluster Setup
 
 ## Get Compute for your Research Project
 
