@@ -1,5 +1,7 @@
 # SNAP Cluster Setup
 
+If you want to do this tutorial with active reflections in the style of a assignment see this: https://docs.google.com/document/d/1k3d3_AOp-Y22L-GbgHivDqKe9r9LC5nscaIzbm3LWYc/edit?usp=sharing
+
 ## Get Compute for your Research Project
 
 ### SNAP Cluster Important References & Help/Support
