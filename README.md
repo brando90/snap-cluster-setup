@@ -660,3 +660,7 @@ Requirement already satisfied: smmap<6,>=3.0.1 in ./miniconda/envs/snap_cluster_
 ```
 Note: to remove a conda env do `conda remove --name snap_cluster_setup --all`, careful!
 Note: sometimes you might have to do `pip3`, not sure why pip is inconsistent. 
+
+## Setting up a python project and using an editable pip installation (pip install -e .)
+At this point, you know what the environment variable $HOME is, and it is pointing to your/any node’s lfs path as suggested by this .bahrc file (but using your CSID instead of Brando’s). In addition, you have created a fork of the snap-cluster-setup github repo in your afs root, and made sure you have a soft link in your lfs pointing to the afs path of the github repo. You also created a conda environment in your lfs (NOT your afs). You also know why we put large storage things (like conda installations and data or models) in your working node’s lfs and not lfs or afs (if not review it here).
+
