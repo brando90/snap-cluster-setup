@@ -465,4 +465,198 @@ This is because you have not cloned the repo to `afs` to be shared accross all t
 In addition `afs` is small (but fast) and `dfs` is useless in this cluster sadly, so we put the code in `afs` so it's shared accross all nodes and not use `dfs`. 
 
 ### Python envs with Conda in lfs (not afs!)
-TODO
+When you have python projects, they usually have libraries they depend on. 
+These are called depedencies (Google it to learn more!). 
+So that these depedency installations for different projects in the same machine do not conflict we have different "<https://csguide.cs.princeton.edu/software/virtualenv#:~:text=A%20Python%20virtual%20environment%20(venv,installed%20in%20the%20specific%20venv.>) is and create one using [conda](https://docs.conda.io/en/latest/)" (also called conda environments or [virtual environments](https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv)). 
+Approximately, these are different locations in your system will your the installations for each project and setting up usually "secret" enviornment variable depending what depedency management system you are using e.g., conda or virtual env or poetry etc. 
+This is usually specific for each programming langauge you use (e.g., pip, conda for python, opam for coq, etc.) so it's often hard to remember the details and often people learn one setup and re-use it all the time. 
+
+For snap we will use conda. 
+First check if you have conda in your cli by doing
+```bash
+which conda 
+```
+Pro Tip: if you are using vscode make sure your vscode is pointing to the python or conda env you want for your project, usually you set it up at the bottom right in vscode. 
+Sample output:
+```bash
+(base) brando9@skampere1~ $ which conda
+/lfs/skampere1/0/brando9/miniconda/bin/conda
+```
+Tip: a nice sanity check is check which binary the default/system is using. Usually by doing conda deactivate and then which python in the cli. 
+
+If the previous command doesn't work then we will have to **locally** install conda (i.e., you will install conda in lfs by putting it's binary in a location you have permission to use).  
+When you have a cluster usually the system admins install software you need and usually you do not have sudo priviledges (google that or do `man sudo` t learn!). 
+Otherwise a trick to go around it is to install locally as we are about to do (but it's not usually recommended). 
+Install conda (and update pip) if it's missing by running the following commands (**do not run them blindly, see the output before proceeding to the next one**):
+```bash
+echo $HOME
+cd $HOME
+
+# -- Install miniconda
+# get conda from the web
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+# source conda with the bash command and put the installation at $HOME/miniconda
+bash $HOME/miniconda.sh -b -p $HOME/miniconda
+# activate conda
+source $HOME/miniconda/bin/activate
+
+# - Set up conda
+conda init
+conda init bash
+conda install conda-build
+conda update -n base -c defaults conda
+conda update conda
+
+# - Make sure pip is up to date
+pip install --upgrade pip
+pip3 install --upgrade pip
+which pip
+which pip3
+
+# - Restart your bash terminal
+bash
+```
+The previous commands take a while so instead I will only demonstrate two commands to check if conda was installed right. 
+Make sure you have a fresh `bash` terminal (understand the commands):
+```bash
+# which conda binary are we using?
+which conda
+# which python binary are we using?
+which python
+# which conda envs do we have?
+conda info -e
+```
+sample output:
+```bash
+(base) brando9@skampere1~ $ which conda
+/lfs/skampere1/0/brando9/miniconda/bin/conda
+(base) brando9@skampere1~ $ which python
+/lfs/skampere1/0/brando9/miniconda/bin/python
+(base) brando9@skampere1~ $ conda info -e
+# conda environments:
+#
+base                  *  /lfs/skampere1/0/brando9/miniconda
+beyond_scale             /lfs/skampere1/0/brando9/miniconda/envs/beyond_scale
+evaporate                /lfs/skampere1/0/brando9/miniconda/envs/evaporate
+lean4ai                  /lfs/skampere1/0/brando9/miniconda/envs/lean4ai
+maf                      /lfs/skampere1/0/brando9/miniconda/envs/maf
+my_env                   /lfs/skampere1/0/brando9/miniconda/envs/my_env
+olympus                  /lfs/skampere1/0/brando9/miniconda/envs/olympus
+pred_llm_evals_env       /lfs/skampere1/0/brando9/miniconda/envs/pred_llm_evals_env
+putnam_math              /lfs/skampere1/0/brando9/miniconda/envs/putnam_math
+snap_cluster_setup       /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup
+```
+
+It would be ideal to create a single conda env for each project and put it in afs so that all nodes can use all the code for your github project **and** it's depedencies too. 
+Unfortuantely, installing depedencies usually takes a lot of space. 
+Thus we will install conda and create a conda env for each github project with it's installed depedencies in each node's lfs. 
+Thus, create a new conda env for this `snap-cluster-setup` tutorial:
+```bash
+# - check envs
+conda info -e
+
+# - activate conda
+conda update
+pip install --upgrade pip
+
+# - create conda env (note: vllm has issues with 3.10 so we are using 3.9)
+conda create -n snap_cluster_setup python=3.9
+
+# - activate your conda env
+conda activate snap_cluster_setup
+
+# - wandb
+pip install --upgrade pip
+pip install wandb
+pip install wandb --upgrade
+```
+Note: I try to use pip as much as I can instead of conda to install my packages (or be consistent with which one I use, but sometimes you will have to combine each one since package management and installation can be tricky and hacky. Welcome to the real world!).
+Sample output:
+```bash
+(base) brando9@skampere1~ $ conda create -n snap_cluster_setup python=3.9
+Retrieving notices: ...working... done
+Channels:
+ - defaults
+Platform: linux-64
+Collecting package metadata (repodata.json): done
+Solving environment: done
+
+## Package Plan ##
+
+  environment location: /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup
+
+  added / updated specs:
+    - python=3.9
+
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      pkgs/main/linux-64::_libgcc_mutex-0.1-main 
+  _openmp_mutex      pkgs/main/linux-64::_openmp_mutex-5.1-1_gnu 
+  ca-certificates    pkgs/main/linux-64::ca-certificates-2024.3.11-h06a4308_0 
+  ld_impl_linux-64   pkgs/main/linux-64::ld_impl_linux-64-2.38-h1181459_1 
+  libffi             pkgs/main/linux-64::libffi-3.4.4-h6a678d5_0 
+  libgcc-ng          pkgs/main/linux-64::libgcc-ng-11.2.0-h1234567_1 
+  libgomp            pkgs/main/linux-64::libgomp-11.2.0-h1234567_1 
+  libstdcxx-ng       pkgs/main/linux-64::libstdcxx-ng-11.2.0-h1234567_1 
+  ncurses            pkgs/main/linux-64::ncurses-6.4-h6a678d5_0 
+  openssl            pkgs/main/linux-64::openssl-3.0.13-h7f8727e_0 
+  pip                pkgs/main/linux-64::pip-23.3.1-py39h06a4308_0 
+  python             pkgs/main/linux-64::python-3.9.19-h955ad1f_0 
+  readline           pkgs/main/linux-64::readline-8.2-h5eee18b_0 
+  setuptools         pkgs/main/linux-64::setuptools-68.2.2-py39h06a4308_0 
+  sqlite             pkgs/main/linux-64::sqlite-3.41.2-h5eee18b_0 
+  tk                 pkgs/main/linux-64::tk-8.6.12-h1ccaba5_0 
+  tzdata             pkgs/main/noarch::tzdata-2024a-h04d1e81_0 
+  wheel              pkgs/main/linux-64::wheel-0.41.2-py39h06a4308_0 
+  xz                 pkgs/main/linux-64::xz-5.4.6-h5eee18b_0 
+  zlib               pkgs/main/linux-64::zlib-1.2.13-h5eee18b_0 
+
+
+Proceed ([y]/n)? y
+
+
+Downloading and Extracting Packages:
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+#
+# To activate this environment, use
+#
+#     $ conda activate snap_cluster_setup
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+(base) brando9@skampere1~ $ conda activate snap_cluster_setup
+(snap_cluster_setup) brando9@skampere1~ $ which python
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/bin/python
+(snap_cluster_setup) brando9@skampere1~ $ pip install --upgrade pip
+Requirement already satisfied: pip in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (24.0)
+
+(snap_cluster_setup) brando9@skampere1~ $ pip install wandb
+Requirement already satisfied: wandb in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (0.16.6)
+Requirement already satisfied: Click!=8.0.0,>=7.1 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (8.1.7)
+Requirement already satisfied: GitPython!=3.1.29,>=1.0.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (3.1.43)
+Requirement already satisfied: requests<3,>=2.0.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (2.31.0)
+Requirement already satisfied: psutil>=5.0.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (5.9.8)
+Requirement already satisfied: sentry-sdk>=1.0.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (1.44.1)
+Requirement already satisfied: docker-pycreds>=0.4.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (0.4.0)
+Requirement already satisfied: PyYAML in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (6.0.1)
+Requirement already satisfied: setproctitle in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (1.3.3)
+Requirement already satisfied: setuptools in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (68.2.2)
+Requirement already satisfied: appdirs>=1.4.3 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (1.4.4)
+Requirement already satisfied: typing-extensions in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (4.11.0)
+Requirement already satisfied: protobuf!=4.21.0,<5,>=3.15.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb) (4.25.3)
+Requirement already satisfied: six>=1.4.0 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from docker-pycreds>=0.4.0->wandb) (1.16.0)
+Requirement already satisfied: gitdb<5,>=4.0.1 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from GitPython!=3.1.29,>=1.0.0->wandb) (4.0.11)
+Requirement already satisfied: charset-normalizer<4,>=2 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests<3,>=2.0.0->wandb) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests<3,>=2.0.0->wandb) (3.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests<3,>=2.0.0->wandb) (2.2.1)
+Requirement already satisfied: certifi>=2017.4.17 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests<3,>=2.0.0->wandb) (2024.2.2)
+Requirement already satisfied: smmap<6,>=3.0.1 in ./miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from gitdb<5,>=4.0.1->GitPython!=3.1.29,>=1.0.0->wandb) (5.0.1)
+```
+Note: to remove a conda env do `conda remove --name snap_cluster_setup --all`, careful!
+Note: sometimes you might have to do `pip3`, not sure why pip is inconsistent. 
