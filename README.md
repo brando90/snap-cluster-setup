@@ -1272,3 +1272,83 @@ Prompt: 'The capital of France is', Generated text: ' known as the “Proud Fren
 Prompt: 'The future of AI is', Generated text: ' literally in danger of being taken by any other company.\nAgreed. '
 Time taken: 8.17 seconds, or 0.14 minutes, or 0.00 hours.
 ```
+Note: inspect the `test_vllm.py` file, and note vscode might complain it's not installed. I think this happens because it's such optimized code that it's not quite installed in the "standard pytorch way" e.g., the binaries are stored instead of the stnadard pytorch bytes (not sure).
+
+It is often that you are sharing GPUs with other. 
+Usually people share GPUs (or compute) with the [slurm workload manger](https://slurm.schedmd.com/documentation.html). 
+But in the SNAP cluster we loging to nodes directly. 
+Therefore, you might need to make sure the right GPU is available e.g., "righ" meaning one with enough memory for example. 
+For that one can do `nvia-smi`. 
+Do nvidia-smi:
+```bash
+nvidia-smi
+nvcc --version
+```
+Sample output:
+```bash
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ nvidia-smi
+Mon Apr  8 20:02:00 2024       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.54.03              Driver Version: 535.54.03    CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  | 00000000:07:00.0 Off |                    0 |
+| N/A   31C    P0              64W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  | 00000000:0A:00.0 Off |                    0 |
+| N/A   29C    P0              67W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   2  NVIDIA A100-SXM4-80GB          On  | 00000000:44:00.0 Off |                    0 |
+| N/A   29C    P0              66W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   3  NVIDIA A100-SXM4-80GB          On  | 00000000:4A:00.0 Off |                    0 |
+| N/A   33C    P0              65W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   4  NVIDIA A100-SXM4-80GB          On  | 00000000:84:00.0 Off |                    0 |
+| N/A   33C    P0              64W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   5  NVIDIA A100-SXM4-80GB          On  | 00000000:8A:00.0 Off |                    0 |
+| N/A   28C    P0              61W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   6  NVIDIA A100-SXM4-80GB          On  | 00000000:C0:00.0 Off |                    0 |
+| N/A   29C    P0              64W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+|   7  NVIDIA A100-SXM4-80GB          On  | 00000000:C3:00.0 Off |                    0 |
+| N/A   31C    P0              62W / 350W |      4MiB / 81920MiB |      0%      Default |
+|                                         |                      |             Disabled |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ nvcc --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2022 NVIDIA Corporation
+Built on Tue_May__3_18:49:52_PDT_2022
+Cuda compilation tools, release 11.7, V11.7.64
+Build cuda_11.7.r11.7/compiler.31294372_0
+```
+The last command is for:
+> The command nvcc --version is used to check the version of the NVIDIA CUDA Compiler (NVCC) installed on your system.
+To change gpu you can do it with the following env variable:
+```bash
+export $CUDA_VISIBLE_DEVICES=1
+```
+for multiple:
+```bash
+CUDA_VISIBLE_DEVICES=0,7
+```
