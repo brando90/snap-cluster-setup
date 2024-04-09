@@ -83,47 +83,40 @@ setup(
         'networkx>=2.5',
         'scipy',
         'scikit-learn',
-        # 'lark-parser',
+        'lark-parser',
         'tensorboard',
         'pandas',
         'progressbar2',
-        'transformers',
-        'datasets',
         'requests',
         'aiohttp',
         'numpy',
         'plotly',
         'wandb',
         'matplotlib',
-        'statsmodels',
-        'seaborn',
-        'pyyaml',
+        # 'statsmodels'
+        # 'statsmodels==0.12.2'
+        # 'statsmodels==0.13.5'
+        # - later check why we are not installing it...
+        # 'seaborn'
+        # 'nltk'
+        'twine',
 
-        'torch',
-        'torchvision',
-        'torchaudio',
+        # 'torch',
+        # 'torchvision',
+        # 'torchaudio',
+
         # 'fairseq',
 
-        # - jax, seperate since it reqs gpu so maybe special jax cmds have to be used? (like in pytorch sometimes)
-        'jax',
-
-        # - fine-tuning imports
-        #!pip install -q -U trl transformers accelerate git+https://github.com/huggingface/peft.git
-        #!pip install -q datasets bitsandbytes einops wandb
-        # pip install -e .
         # 'trl',
         # 'transformers', # already above
-        'accelerate',
+        # 'accelerate',
         # 'peft',
-        'sentencepiece',  # llama2
-        
-        'zstandard', # for the proofpile2 ref: https://huggingface.co/datasets/EleutherAI/proof-pile-2
 
-        # 'datasets'
-        'bitsandbytes',
-        'bnb', 
+        # 'datasets',
+        # 'bitsandbytes',
         # 'einops',
-        # 'wandb'
+
+        # 'vllm'
     ]
 )
 

@@ -1217,3 +1217,9 @@ Time taken: 0.00 seconds, or 0.00 minutes, or 0.00 hours.
 This is where you learn that imports "run" the code they import and that `__name__ == "__main__":` is the code that is run only when you explicitly run this file. 
 This python specific. 
 I personally use  [`__name__ == "__main__":`](https://www.google.com/search?q=what+is+__name__+%3D%3D+__main__+in+python&rlz=1C5CHFA_enUS741US741&oq=what+is+__name__+in+python&gs_lcrp=EgZjaHJvbWUqCAgDEAAYFhgeMgkIABBFGDkYgAQyCAgBEAAYFhgeMggIAhAAGBYYHjIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMggICBAAGBYYHjIICAkQABgWGB7SAQg2MzUwajBqN6gCALACAA&sourceid=chrome&ie=UTF-8) to put code for unit tests (but really you can do whatever you want).  
+
+
+## Installing Pytorch and Cuda
+Usually installing pytorch can be non-trivial. 
+For example, depending on other depedencies or specific python version you might need, it can lead to taking a few hours downgrading pytorch versions, cuda version, python versions etc. until the fragile depedency set up is done. 
+In this case because you likely will use the `vllm` library for fast inference with llms, it means we are forced to use `python 3.9` and **not** putting pytorch stuff in the setup.py

@@ -21,11 +21,9 @@ conda activate snap_cluster_setup
 cd /afs/cs.stanford.edu/u/brando9/
 git clone git@github.com:brando90/evals-for-autoformalization.git
 echo "---> Warning: Assumes LFS was set to $HOME" 
-ln -s /afs/cs.stanford.edu/u/brando9/evals-for-autoformalization $HOME/evals-for-autoformalization
+ln -s /afs/cs.stanford.edu/u/brando9/evals-for-autoformalization $HOME/snap-cluster-setup
 ln -s /afs/cs.stanford.edu/u/brando9/snap-cluster-setup $HOME/snap-cluster-setup
-
-pip install -e ~/evals-for-autoformalization
-#pip uninstall ~/massive-autoformalization-maf
+pip install -e ~/snap-cluster-setup
 cd ~/evals-for-autoformalization
 
 # -- Test pytorch
