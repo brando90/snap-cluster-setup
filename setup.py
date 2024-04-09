@@ -101,22 +101,22 @@ setup(
         # 'nltk'
         'twine',
 
-        # 'torch',
+        'torch==2.1.2',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
         # 'torchvision',
         # 'torchaudio',
 
         # 'fairseq',
 
         # 'trl',
-        # 'transformers', # already above
+        'transformers==4.39.2', # my gold-ai-olympiad project uses 4.39.2
         # 'accelerate',
         # 'peft',
 
-        # 'datasets',
+        'datasets==2.18.0',  # 2.18.0
         # 'bitsandbytes',
         # 'einops',
 
-        # 'vllm'
+        'vllm'
     ]
 )
 
