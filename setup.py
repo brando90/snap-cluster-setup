@@ -14,15 +14,15 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='evals-for-autoformalization',  # project name
+    name='snap-cluster-setup',  # project name
     version='0.0.1',
-    description="Evaluations for Autoformalization",
+    description="Setup for SNAP cluster",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/brando90/evals-for-autoformalization",
+    url="https://github.com/brando90/snap-cluster-setup",
     author='Brando Miranda',
     author_email='brandojazz@gmail.com',
-    python_requires='>=3.10.11',
+    python_requires='>=3.9',
     license='Apache 2.0',
 
     # ref: https://chat.openai.com/c/d0edae00-0eb2-4837-b492-df1d595b6cab

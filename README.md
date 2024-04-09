@@ -664,5 +664,556 @@ Note: to remove a conda env do `conda remove --name snap_cluster_setup --all`, c
 Note: sometimes you might have to do `pip3`, not sure why pip is inconsistent. 
 
 ## Setting up a python project and using an editable pip installation (pip install -e .)
-At this point, you know what the environment variable $HOME is, and it is pointing to your/any node’s lfs path as suggested by this .bahrc file (but using your CSID instead of Brando’s). In addition, you have created a fork of the snap-cluster-setup github repo in your afs root, and made sure you have a soft link in your lfs pointing to the afs path of the github repo. You also created a conda environment in your lfs (NOT your afs). You also know why we put large storage things (like conda installations and data or models) in your working node’s lfs and not lfs or afs (if not review it here).
+At this point, you know what the environment variable `$HOME` is, and it is pointing to your/any node’s lfs path as suggested by this .bahrc file (but using your CSID instead of Brando’s). In addition, you have created a fork of the snap-cluster-setup github repo in your afs root, and made sure you have a soft link in your lfs pointing to the afs path of the github repo. You also created a conda environment in your lfs (NOT your afs). You also know why we put large storage things (like conda installations and data or models) in your working node’s lfs and not lfs or afs (if not review it here).
 
+### Setting up a python project with setup.py and testing imports
+Every programming language has it's own way to organize installations of the project itself and it's depedencies. 
+In python usually you have one folder called `src` where the python code goes and you tell `setup.py` that it is the projects root package. 
+For details see the comments in this project [`setup.py`](https://github.com/brando90/snap-cluster-setup/blob/main/setup.py).
+In particular see the [`package_dir={'': 'src'}` line](https://github.com/brando90/snap-cluster-setup/blob/f2211e3642b5f5d495c7f8f26d6ba8f92178d4c6/setup.py#L28) and [`packages=find_packages('src')`](https://github.com/brando90/snap-cluster-setup/blob/f2211e3642b5f5d495c7f8f26d6ba8f92178d4c6/setup.py#L45) and the accompanying documentation and the [setuptools website](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-or-find-packages) to get a feel of how python packages are installed. 
+Note: one reason that file is heavily documented is because I often forget how python packages have to be install (since it's programming language depdent e.g., Coq and Lean are different).
+
+Now that you know how the `setup.p`y has to be set up for this projects source code to work and with an example of the dependencies, let’s install this code's python repo. 
+For this we will pip install this project in editable (development) mode, usually done with `pip install -e .` or `pip install -e <path_2_setup.py>` or `pip install -e $HOME/setup.py`. 
+Usually a python project is installed with `pip install <package_name>` and that install a **fixed** usually non-editable version of it. 
+If we do `pip install <package_name>` it won't work since our project has not been pushed to the internat. 
+Instead we will install locally an editable version -- **so that whenever you make code edits you run the new code**. 
+For that you will run **one** of the following editable install commands: 
+```bash
+cd <path_2_your_project_root>
+pip install -e .
+
+# OR
+pip install -e $HOME/setup.py
+
+# check it installed
+pip list | grep <name_github_repo>
+
+# check all installations
+pip list
+```
+This will install this package and all it's depedencies in the location where you installed conda (for us `~/minicoda` or sometimes in other places like `~/opt` or even `~/.minicoda` but it is conda installation dedepdent!). 
+Note: you can also check the installations conda has done so far with `conda list` (but, perhaps confusingly, we are avoiding `conda` to install).
+
+Sample output (note: I pasted the whole thing to emphasize I am reading the output, because if something does NOT isntall you usually have to fix it! e.g., a common issue is the version of pytorch or vllm and it has to be the right version according to the hardware you use and sometimes you have to manually install and unistall packages. So don't ever assume the installation instructions work for your setting!):
+```bash
+(snap_cluster_setup) brando9@skampere1~ $ cd ~/snap-cluster-setup
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ pip install -e .
+Obtaining file:///afs/cs.stanford.edu/u/brando9/snap-cluster-setup
+  Preparing metadata (setup.py) ... done
+Collecting dill (from snap-cluster-setup==0.0.1)
+  Using cached dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Collecting networkx>=2.5 (from snap-cluster-setup==0.0.1)
+  Using cached networkx-3.2.1-py3-none-any.whl.metadata (5.2 kB)
+Collecting scipy (from snap-cluster-setup==0.0.1)
+  Using cached scipy-1.13.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+Collecting scikit-learn (from snap-cluster-setup==0.0.1)
+  Using cached scikit_learn-1.4.1.post1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+Collecting tensorboard (from snap-cluster-setup==0.0.1)
+  Using cached tensorboard-2.16.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting pandas (from snap-cluster-setup==0.0.1)
+  Using cached pandas-2.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+Collecting progressbar2 (from snap-cluster-setup==0.0.1)
+  Using cached progressbar2-4.4.2-py3-none-any.whl.metadata (17 kB)
+Collecting transformers (from snap-cluster-setup==0.0.1)
+  Using cached transformers-4.39.3-py3-none-any.whl.metadata (134 kB)
+Collecting datasets (from snap-cluster-setup==0.0.1)
+  Using cached datasets-2.18.0-py3-none-any.whl.metadata (20 kB)
+Requirement already satisfied: requests in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from snap-cluster-setup==0.0.1) (2.31.0)
+Collecting aiohttp (from snap-cluster-setup==0.0.1)
+  Using cached aiohttp-3.9.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.4 kB)
+Collecting numpy (from snap-cluster-setup==0.0.1)
+  Using cached numpy-1.26.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting plotly (from snap-cluster-setup==0.0.1)
+  Using cached plotly-5.20.0-py3-none-any.whl.metadata (7.0 kB)
+Requirement already satisfied: wandb in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from snap-cluster-setup==0.0.1) (0.16.6)
+Collecting matplotlib (from snap-cluster-setup==0.0.1)
+  Using cached matplotlib-3.8.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.8 kB)
+Collecting statsmodels (from snap-cluster-setup==0.0.1)
+  Using cached statsmodels-0.14.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.5 kB)
+Collecting seaborn (from snap-cluster-setup==0.0.1)
+  Using cached seaborn-0.13.2-py3-none-any.whl.metadata (5.4 kB)
+Requirement already satisfied: pyyaml in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from snap-cluster-setup==0.0.1) (6.0.1)
+Collecting torch (from snap-cluster-setup==0.0.1)
+  Using cached torch-2.2.2-cp39-cp39-manylinux1_x86_64.whl.metadata (25 kB)
+Collecting torchvision (from snap-cluster-setup==0.0.1)
+  Using cached torchvision-0.17.2-cp39-cp39-manylinux1_x86_64.whl.metadata (6.6 kB)
+Collecting torchaudio (from snap-cluster-setup==0.0.1)
+  Using cached torchaudio-2.2.2-cp39-cp39-manylinux1_x86_64.whl.metadata (6.4 kB)
+Collecting jax (from snap-cluster-setup==0.0.1)
+  Using cached jax-0.4.26-py3-none-any.whl.metadata (23 kB)
+Collecting accelerate (from snap-cluster-setup==0.0.1)
+  Using cached accelerate-0.29.1-py3-none-any.whl.metadata (18 kB)
+Collecting sentencepiece (from snap-cluster-setup==0.0.1)
+  Using cached sentencepiece-0.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+Collecting zstandard (from snap-cluster-setup==0.0.1)
+  Using cached zstandard-0.22.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.9 kB)
+Collecting bitsandbytes (from snap-cluster-setup==0.0.1)
+  Using cached bitsandbytes-0.43.0-py3-none-manylinux_2_24_x86_64.whl.metadata (1.8 kB)
+Collecting bnb (from snap-cluster-setup==0.0.1)
+  Using cached bnb-0.3.0-py3-none-any.whl.metadata (490 bytes)
+Collecting packaging>=20.0 (from accelerate->snap-cluster-setup==0.0.1)
+  Using cached packaging-24.0-py3-none-any.whl.metadata (3.2 kB)
+Requirement already satisfied: psutil in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from accelerate->snap-cluster-setup==0.0.1) (5.9.8)
+Collecting huggingface-hub (from accelerate->snap-cluster-setup==0.0.1)
+  Using cached huggingface_hub-0.22.2-py3-none-any.whl.metadata (12 kB)
+Collecting safetensors>=0.3.1 (from accelerate->snap-cluster-setup==0.0.1)
+  Downloading safetensors-0.4.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+Collecting filelock (from torch->snap-cluster-setup==0.0.1)
+  Using cached filelock-3.13.3-py3-none-any.whl.metadata (2.8 kB)
+Requirement already satisfied: typing-extensions>=4.8.0 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from torch->snap-cluster-setup==0.0.1) (4.11.0)
+Collecting sympy (from torch->snap-cluster-setup==0.0.1)
+  Using cached sympy-1.12-py3-none-any.whl.metadata (12 kB)
+Collecting jinja2 (from torch->snap-cluster-setup==0.0.1)
+  Using cached Jinja2-3.1.3-py3-none-any.whl.metadata (3.3 kB)
+Collecting fsspec (from torch->snap-cluster-setup==0.0.1)
+  Using cached fsspec-2024.3.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting nvidia-cuda-nvrtc-cu12==12.1.105 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+Collecting nvidia-cuda-runtime-cu12==12.1.105 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+Collecting nvidia-cuda-cupti-cu12==12.1.105 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+Collecting nvidia-cudnn-cu12==8.9.2.26 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+Collecting nvidia-cublas-cu12==12.1.3.1 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+Collecting nvidia-cufft-cu12==11.0.2.54 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+Collecting nvidia-curand-cu12==10.3.2.106 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+Collecting nvidia-cusolver-cu12==11.4.5.107 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+Collecting nvidia-cusparse-cu12==12.1.0.106 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+Collecting nvidia-nccl-cu12==2.19.3 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_nccl_cu12-2.19.3-py3-none-manylinux1_x86_64.whl.metadata (1.8 kB)
+Collecting nvidia-nvtx-cu12==12.1.105 (from torch->snap-cluster-setup==0.0.1)
+  Using cached nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.7 kB)
+Collecting triton==2.2.0 (from torch->snap-cluster-setup==0.0.1)
+  Downloading triton-2.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.4 kB)
+Collecting nvidia-nvjitlink-cu12 (from nvidia-cusolver-cu12==11.4.5.107->torch->snap-cluster-setup==0.0.1)
+  Downloading nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+Collecting aiosignal>=1.1.2 (from aiohttp->snap-cluster-setup==0.0.1)
+  Using cached aiosignal-1.3.1-py3-none-any.whl.metadata (4.0 kB)
+Collecting attrs>=17.3.0 (from aiohttp->snap-cluster-setup==0.0.1)
+  Using cached attrs-23.2.0-py3-none-any.whl.metadata (9.5 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp->snap-cluster-setup==0.0.1)
+  Downloading frozenlist-1.4.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (12 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp->snap-cluster-setup==0.0.1)
+  Downloading multidict-6.0.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+Collecting yarl<2.0,>=1.0 (from aiohttp->snap-cluster-setup==0.0.1)
+  Downloading yarl-1.9.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (31 kB)
+Collecting async-timeout<5.0,>=4.0 (from aiohttp->snap-cluster-setup==0.0.1)
+  Using cached async_timeout-4.0.3-py3-none-any.whl.metadata (4.2 kB)
+Collecting attrs>=17.3.0 (from aiohttp->snap-cluster-setup==0.0.1)
+  Downloading attrs-20.3.0-py2.py3-none-any.whl.metadata (10 kB)
+Collecting click<8.0.0,>=7.1.2 (from bnb->snap-cluster-setup==0.0.1)
+  Downloading click-7.1.2-py2.py3-none-any.whl.metadata (2.9 kB)
+Collecting markdown<4.0.0,>=3.3.3 (from bnb->snap-cluster-setup==0.0.1)
+  Using cached Markdown-3.6-py3-none-any.whl.metadata (7.0 kB)
+Collecting pyyaml (from snap-cluster-setup==0.0.1)
+  Downloading PyYAML-5.4.1-cp39-cp39-manylinux1_x86_64.whl.metadata (2.1 kB)
+Collecting questionary<2.0.0,>=1.5.2 (from bnb->snap-cluster-setup==0.0.1)
+  Downloading questionary-1.10.0-py3-none-any.whl.metadata (5.7 kB)
+Collecting smart_getenv<2.0.0,>=1.1.0 (from bnb->snap-cluster-setup==0.0.1)
+  Downloading smart-getenv-1.1.0.tar.gz (5.9 kB)
+  Preparing metadata (setup.py) ... done
+Collecting pyarrow>=12.0.0 (from datasets->snap-cluster-setup==0.0.1)
+  Downloading pyarrow-15.0.2-cp39-cp39-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Collecting pyarrow-hotfix (from datasets->snap-cluster-setup==0.0.1)
+  Using cached pyarrow_hotfix-0.6-py3-none-any.whl.metadata (3.6 kB)
+Collecting tqdm>=4.62.1 (from datasets->snap-cluster-setup==0.0.1)
+  Using cached tqdm-4.66.2-py3-none-any.whl.metadata (57 kB)
+Collecting xxhash (from datasets->snap-cluster-setup==0.0.1)
+  Downloading xxhash-3.4.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (12 kB)
+Collecting multiprocess (from datasets->snap-cluster-setup==0.0.1)
+  Downloading multiprocess-0.70.16-py39-none-any.whl.metadata (7.2 kB)
+Collecting fsspec (from torch->snap-cluster-setup==0.0.1)
+  Using cached fsspec-2024.2.0-py3-none-any.whl.metadata (6.8 kB)
+Requirement already satisfied: charset-normalizer<4,>=2 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests->snap-cluster-setup==0.0.1) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests->snap-cluster-setup==0.0.1) (3.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests->snap-cluster-setup==0.0.1) (2.2.1)
+Requirement already satisfied: certifi>=2017.4.17 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from requests->snap-cluster-setup==0.0.1) (2024.2.2)
+Collecting ml-dtypes>=0.2.0 (from jax->snap-cluster-setup==0.0.1)
+  Downloading ml_dtypes-0.4.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting opt-einsum (from jax->snap-cluster-setup==0.0.1)
+  Downloading opt_einsum-3.3.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting importlib-metadata>=4.6 (from jax->snap-cluster-setup==0.0.1)
+  Using cached importlib_metadata-7.1.0-py3-none-any.whl.metadata (4.7 kB)
+Collecting contourpy>=1.0.1 (from matplotlib->snap-cluster-setup==0.0.1)
+  Downloading contourpy-1.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.8 kB)
+Collecting cycler>=0.10 (from matplotlib->snap-cluster-setup==0.0.1)
+  Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.22.0 (from matplotlib->snap-cluster-setup==0.0.1)
+  Downloading fonttools-4.51.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (159 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 159.5/159.5 kB 14.8 MB/s eta 0:00:00
+Collecting kiwisolver>=1.3.1 (from matplotlib->snap-cluster-setup==0.0.1)
+  Downloading kiwisolver-1.4.5-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (6.4 kB)
+Collecting pillow>=8 (from matplotlib->snap-cluster-setup==0.0.1)
+  Downloading pillow-10.3.0-cp39-cp39-manylinux_2_28_x86_64.whl.metadata (9.2 kB)
+Collecting pyparsing>=2.3.1 (from matplotlib->snap-cluster-setup==0.0.1)
+  Using cached pyparsing-3.1.2-py3-none-any.whl.metadata (5.1 kB)
+Collecting python-dateutil>=2.7 (from matplotlib->snap-cluster-setup==0.0.1)
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting importlib-resources>=3.2.0 (from matplotlib->snap-cluster-setup==0.0.1)
+  Downloading importlib_resources-6.4.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting pytz>=2020.1 (from pandas->snap-cluster-setup==0.0.1)
+  Using cached pytz-2024.1-py2.py3-none-any.whl.metadata (22 kB)
+Collecting tzdata>=2022.7 (from pandas->snap-cluster-setup==0.0.1)
+  Using cached tzdata-2024.1-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting tenacity>=6.2.0 (from plotly->snap-cluster-setup==0.0.1)
+  Using cached tenacity-8.2.3-py3-none-any.whl.metadata (1.0 kB)
+Collecting python-utils>=3.8.1 (from progressbar2->snap-cluster-setup==0.0.1)
+  Using cached python_utils-3.8.2-py2.py3-none-any.whl.metadata (9.7 kB)
+Collecting joblib>=1.2.0 (from scikit-learn->snap-cluster-setup==0.0.1)
+  Downloading joblib-1.4.0-py3-none-any.whl.metadata (5.4 kB)
+Collecting threadpoolctl>=2.0.0 (from scikit-learn->snap-cluster-setup==0.0.1)
+  Using cached threadpoolctl-3.4.0-py3-none-any.whl.metadata (13 kB)
+Collecting patsy>=0.5.4 (from statsmodels->snap-cluster-setup==0.0.1)
+  Downloading patsy-0.5.6-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting absl-py>=0.4 (from tensorboard->snap-cluster-setup==0.0.1)
+  Using cached absl_py-2.1.0-py3-none-any.whl.metadata (2.3 kB)
+Collecting grpcio>=1.48.2 (from tensorboard->snap-cluster-setup==0.0.1)
+  Downloading grpcio-1.62.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)
+Requirement already satisfied: protobuf!=4.24.0,>=3.19.6 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from tensorboard->snap-cluster-setup==0.0.1) (4.25.3)
+Requirement already satisfied: setuptools>=41.0.0 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from tensorboard->snap-cluster-setup==0.0.1) (68.2.2)
+Requirement already satisfied: six>1.9 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from tensorboard->snap-cluster-setup==0.0.1) (1.16.0)
+Collecting tensorboard-data-server<0.8.0,>=0.7.0 (from tensorboard->snap-cluster-setup==0.0.1)
+  Using cached tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl.metadata (1.1 kB)
+Collecting werkzeug>=1.0.1 (from tensorboard->snap-cluster-setup==0.0.1)
+  Downloading werkzeug-3.0.2-py3-none-any.whl.metadata (4.1 kB)
+Collecting regex!=2019.12.17 (from transformers->snap-cluster-setup==0.0.1)
+  Downloading regex-2023.12.25-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (40 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.9/40.9 kB 8.8 MB/s eta 0:00:00
+Collecting tokenizers<0.19,>=0.14 (from transformers->snap-cluster-setup==0.0.1)
+  Downloading tokenizers-0.15.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+Requirement already satisfied: GitPython!=3.1.29,>=1.0.0 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb->snap-cluster-setup==0.0.1) (3.1.43)
+Requirement already satisfied: sentry-sdk>=1.0.0 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb->snap-cluster-setup==0.0.1) (1.44.1)
+Requirement already satisfied: docker-pycreds>=0.4.0 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb->snap-cluster-setup==0.0.1) (0.4.0)
+Requirement already satisfied: setproctitle in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb->snap-cluster-setup==0.0.1) (1.3.3)
+Requirement already satisfied: appdirs>=1.4.3 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from wandb->snap-cluster-setup==0.0.1) (1.4.4)
+Requirement already satisfied: gitdb<5,>=4.0.1 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from GitPython!=3.1.29,>=1.0.0->wandb->snap-cluster-setup==0.0.1) (4.0.11)
+Collecting zipp>=0.5 (from importlib-metadata>=4.6->jax->snap-cluster-setup==0.0.1)
+  Using cached zipp-3.18.1-py3-none-any.whl.metadata (3.5 kB)
+Collecting prompt_toolkit<4.0,>=2.0 (from questionary<2.0.0,>=1.5.2->bnb->snap-cluster-setup==0.0.1)
+  Downloading prompt_toolkit-3.0.43-py3-none-any.whl.metadata (6.5 kB)
+Collecting MarkupSafe>=2.1.1 (from werkzeug>=1.0.1->tensorboard->snap-cluster-setup==0.0.1)
+  Downloading MarkupSafe-2.1.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.0 kB)
+Collecting mpmath>=0.19 (from sympy->torch->snap-cluster-setup==0.0.1)
+  Using cached mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Requirement already satisfied: smmap<6,>=3.0.1 in /lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages (from gitdb<5,>=4.0.1->GitPython!=3.1.29,>=1.0.0->wandb->snap-cluster-setup==0.0.1) (5.0.1)
+Collecting wcwidth (from prompt_toolkit<4.0,>=2.0->questionary<2.0.0,>=1.5.2->bnb->snap-cluster-setup==0.0.1)
+  Downloading wcwidth-0.2.13-py2.py3-none-any.whl.metadata (14 kB)
+Using cached networkx-3.2.1-py3-none-any.whl (1.6 MB)
+Downloading accelerate-0.29.1-py3-none-any.whl (297 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 297.3/297.3 kB 26.7 MB/s eta 0:00:00
+Downloading numpy-1.26.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.2/18.2 MB 95.1 MB/s eta 0:00:00
+Downloading torch-2.2.2-cp39-cp39-manylinux1_x86_64.whl (755.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 755.5/755.5 MB 8.7 MB/s eta 0:00:00
+Using cached nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl (410.6 MB)
+Using cached nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (14.1 MB)
+Using cached nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (23.7 MB)
+Using cached nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (823 kB)
+Using cached nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl (731.7 MB)
+Using cached nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl (121.6 MB)
+Using cached nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl (56.5 MB)
+Using cached nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl (124.2 MB)
+Using cached nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl (196.0 MB)
+Using cached nvidia_nccl_cu12-2.19.3-py3-none-manylinux1_x86_64.whl (166.0 MB)
+Using cached nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (99 kB)
+Downloading triton-2.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (167.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 167.9/167.9 MB 26.0 MB/s eta 0:00:00
+Downloading aiohttp-3.9.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 71.1 MB/s eta 0:00:00
+Using cached bitsandbytes-0.43.0-py3-none-manylinux_2_24_x86_64.whl (102.2 MB)
+Using cached bnb-0.3.0-py3-none-any.whl (9.7 kB)
+Downloading PyYAML-5.4.1-cp39-cp39-manylinux1_x86_64.whl (630 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 630.1/630.1 kB 60.4 MB/s eta 0:00:00
+Using cached datasets-2.18.0-py3-none-any.whl (510 kB)
+Using cached dill-0.3.8-py3-none-any.whl (116 kB)
+Downloading jax-0.4.26-py3-none-any.whl (1.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 99.0 MB/s eta 0:00:00
+Downloading scipy-1.13.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (38.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 38.6/38.6 MB 70.3 MB/s eta 0:00:00
+Downloading matplotlib-3.8.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.6/11.6 MB 122.4 MB/s eta 0:00:00
+Downloading pandas-2.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 129.5 MB/s eta 0:00:00
+Using cached plotly-5.20.0-py3-none-any.whl (15.7 MB)
+Using cached progressbar2-4.4.2-py3-none-any.whl (56 kB)
+Downloading scikit_learn-1.4.1.post1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.2/12.2 MB 103.2 MB/s eta 0:00:00
+Using cached seaborn-0.13.2-py3-none-any.whl (294 kB)
+Downloading sentencepiece-0.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 102.3 MB/s eta 0:00:00
+Downloading statsmodels-0.14.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.8/10.8 MB 112.9 MB/s eta 0:00:00
+Using cached tensorboard-2.16.2-py3-none-any.whl (5.5 MB)
+Downloading torchaudio-2.2.2-cp39-cp39-manylinux1_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 116.9 MB/s eta 0:00:00
+Downloading torchvision-0.17.2-cp39-cp39-manylinux1_x86_64.whl (6.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 93.3 MB/s eta 0:00:00
+Downloading transformers-4.39.3-py3-none-any.whl (8.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 127.6 MB/s eta 0:00:00
+Downloading zstandard-0.22.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 109.0 MB/s eta 0:00:00
+Using cached absl_py-2.1.0-py3-none-any.whl (133 kB)
+Using cached aiosignal-1.3.1-py3-none-any.whl (7.6 kB)
+Using cached async_timeout-4.0.3-py3-none-any.whl (5.7 kB)
+Using cached attrs-20.3.0-py2.py3-none-any.whl (49 kB)
+Using cached click-7.1.2-py2.py3-none-any.whl (82 kB)
+Downloading contourpy-1.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (304 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 305.0/305.0 kB 46.9 MB/s eta 0:00:00
+Using cached cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading fonttools-4.51.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.6/4.6 MB 109.0 MB/s eta 0:00:00
+Downloading frozenlist-1.4.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (240 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 240.7/240.7 kB 36.9 MB/s eta 0:00:00
+Using cached fsspec-2024.2.0-py3-none-any.whl (170 kB)
+Downloading grpcio-1.62.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 82.6 MB/s eta 0:00:00
+Using cached huggingface_hub-0.22.2-py3-none-any.whl (388 kB)
+Using cached importlib_metadata-7.1.0-py3-none-any.whl (24 kB)
+Downloading importlib_resources-6.4.0-py3-none-any.whl (38 kB)
+Downloading joblib-1.4.0-py3-none-any.whl (301 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 301.2/301.2 kB 42.9 MB/s eta 0:00:00
+Downloading kiwisolver-1.4.5-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.6/1.6 MB 76.3 MB/s eta 0:00:00
+Using cached Markdown-3.6-py3-none-any.whl (105 kB)
+Downloading ml_dtypes-0.4.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 94.5 MB/s eta 0:00:00
+Downloading multidict-6.0.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (123 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.8/123.8 kB 31.2 MB/s eta 0:00:00
+Using cached packaging-24.0-py3-none-any.whl (53 kB)
+Downloading patsy-0.5.6-py2.py3-none-any.whl (233 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 233.9/233.9 kB 37.1 MB/s eta 0:00:00
+Downloading pillow-10.3.0-cp39-cp39-manylinux_2_28_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 74.4 MB/s eta 0:00:00
+Downloading pyarrow-15.0.2-cp39-cp39-manylinux_2_28_x86_64.whl (38.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 38.3/38.3 MB 78.8 MB/s eta 0:00:00
+Using cached pyparsing-3.1.2-py3-none-any.whl (103 kB)
+Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Using cached python_utils-3.8.2-py2.py3-none-any.whl (27 kB)
+Using cached pytz-2024.1-py2.py3-none-any.whl (505 kB)
+Downloading questionary-1.10.0-py3-none-any.whl (31 kB)
+Downloading regex-2023.12.25-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (773 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 773.4/773.4 kB 67.6 MB/s eta 0:00:00
+Downloading safetensors-0.4.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 69.9 MB/s eta 0:00:00
+Using cached tenacity-8.2.3-py3-none-any.whl (24 kB)
+Using cached tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl (6.6 MB)
+Using cached threadpoolctl-3.4.0-py3-none-any.whl (17 kB)
+Downloading tokenizers-0.15.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 91.1 MB/s eta 0:00:00
+Using cached tqdm-4.66.2-py3-none-any.whl (78 kB)
+Using cached tzdata-2024.1-py2.py3-none-any.whl (345 kB)
+Downloading werkzeug-3.0.2-py3-none-any.whl (226 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 226.8/226.8 kB 46.3 MB/s eta 0:00:00
+Downloading yarl-1.9.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (304 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 304.3/304.3 kB 47.8 MB/s eta 0:00:00
+Using cached filelock-3.13.3-py3-none-any.whl (11 kB)
+Using cached Jinja2-3.1.3-py3-none-any.whl (133 kB)
+Downloading multiprocess-0.70.16-py39-none-any.whl (133 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.4/133.4 kB 25.1 MB/s eta 0:00:00
+Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
+Using cached pyarrow_hotfix-0.6-py3-none-any.whl (7.9 kB)
+Using cached sympy-1.12-py3-none-any.whl (5.7 MB)
+Downloading xxhash-3.4.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (193 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 193.8/193.8 kB 25.5 MB/s eta 0:00:00
+Downloading MarkupSafe-2.1.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (25 kB)
+Using cached mpmath-1.3.0-py3-none-any.whl (536 kB)
+Downloading prompt_toolkit-3.0.43-py3-none-any.whl (386 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 386.1/386.1 kB 42.3 MB/s eta 0:00:00
+Using cached zipp-3.18.1-py3-none-any.whl (8.2 kB)
+Downloading nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl (21.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 21.1/21.1 MB 106.8 MB/s eta 0:00:00
+Downloading wcwidth-0.2.13-py2.py3-none-any.whl (34 kB)
+Building wheels for collected packages: smart_getenv
+  Building wheel for smart_getenv (setup.py) ... done
+  Created wheel for smart_getenv: filename=smart_getenv-1.1.0-py3-none-any.whl size=6498 sha256=bdd1c1fd4a41a57f20d5cd9734404378e6d8d6eec8905220e66c11a9d9894ba9
+  Stored in directory: /lfs/skampere1/0/brando9/.cache/pip/wheels/db/ce/1d/0b27c4243219642887fcc7a7c057e0cb829f37d664fb258b1a
+Successfully built smart_getenv
+Installing collected packages: wcwidth, smart_getenv, sentencepiece, pytz, mpmath, zstandard, zipp, xxhash, tzdata, tqdm, threadpoolctl, tensorboard-data-server, tenacity, sympy, safetensors, regex, pyyaml, python-utils, python-dateutil, pyparsing, pyarrow-hotfix, prompt_toolkit, pillow, packaging, nvidia-nvtx-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufft-cu12, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, numpy, networkx, multidict, MarkupSafe, kiwisolver, joblib, grpcio, fsspec, frozenlist, fonttools, filelock, dill, cycler, click, attrs, async-timeout, absl-py, yarl, werkzeug, triton, scipy, questionary, pyarrow, progressbar2, plotly, patsy, pandas, opt-einsum, nvidia-cusparse-cu12, nvidia-cudnn-cu12, multiprocess, ml-dtypes, jinja2, importlib-resources, importlib-metadata, huggingface-hub, contourpy, aiosignal, tokenizers, statsmodels, scikit-learn, nvidia-cusolver-cu12, matplotlib, markdown, jax, aiohttp, transformers, torch, tensorboard, seaborn, bnb, torchvision, torchaudio, datasets, bitsandbytes, accelerate, snap-cluster-setup
+  Attempting uninstall: pyyaml
+    Found existing installation: PyYAML 6.0.1
+    Uninstalling PyYAML-6.0.1:
+      Successfully uninstalled PyYAML-6.0.1
+  Attempting uninstall: click
+    Found existing installation: click 8.1.7
+    Uninstalling click-8.1.7:
+      Successfully uninstalled click-8.1.7
+  Running setup.py develop for snap-cluster-setup
+Successfully installed MarkupSafe-2.1.5 absl-py-2.1.0 accelerate-0.29.1 aiohttp-3.9.3 aiosignal-1.3.1 async-timeout-4.0.3 attrs-20.3.0 bitsandbytes-0.43.0 bnb-0.3.0 click-7.1.2 contourpy-1.2.1 cycler-0.12.1 datasets-2.18.0 dill-0.3.8 filelock-3.13.3 fonttools-4.51.0 frozenlist-1.4.1 fsspec-2024.2.0 grpcio-1.62.1 huggingface-hub-0.22.2 importlib-metadata-7.1.0 importlib-resources-6.4.0 jax-0.4.26 jinja2-3.1.3 joblib-1.4.0 kiwisolver-1.4.5 markdown-3.6 matplotlib-3.8.4 ml-dtypes-0.4.0 mpmath-1.3.0 multidict-6.0.5 multiprocess-0.70.16 networkx-3.2.1 numpy-1.26.4 nvidia-cublas-cu12-12.1.3.1 nvidia-cuda-cupti-cu12-12.1.105 nvidia-cuda-nvrtc-cu12-12.1.105 nvidia-cuda-runtime-cu12-12.1.105 nvidia-cudnn-cu12-8.9.2.26 nvidia-cufft-cu12-11.0.2.54 nvidia-curand-cu12-10.3.2.106 nvidia-cusolver-cu12-11.4.5.107 nvidia-cusparse-cu12-12.1.0.106 nvidia-nccl-cu12-2.19.3 nvidia-nvjitlink-cu12-12.4.127 nvidia-nvtx-cu12-12.1.105 opt-einsum-3.3.0 packaging-24.0 pandas-2.2.1 patsy-0.5.6 pillow-10.3.0 plotly-5.20.0 progressbar2-4.4.2 prompt_toolkit-3.0.43 pyarrow-15.0.2 pyarrow-hotfix-0.6 pyparsing-3.1.2 python-dateutil-2.9.0.post0 python-utils-3.8.2 pytz-2024.1 pyyaml-5.4.1 questionary-1.10.0 regex-2023.12.25 safetensors-0.4.2 scikit-learn-1.4.1.post1 scipy-1.13.0 seaborn-0.13.2 sentencepiece-0.2.0 smart_getenv-1.1.0 snap-cluster-setup-0.0.1 statsmodels-0.14.1 sympy-1.12 tenacity-8.2.3 tensorboard-2.16.2 tensorboard-data-server-0.7.2 threadpoolctl-3.4.0 tokenizers-0.15.2 torch-2.2.2 torchaudio-2.2.2 torchvision-0.17.2 tqdm-4.66.2 transformers-4.39.3 triton-2.2.0 tzdata-2024.1 wcwidth-0.2.13 werkzeug-3.0.2 xxhash-3.4.1 yarl-1.9.4 zipp-3.18.1 zstandard-0.22.0
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ pip list | grep snap-cluster-setup
+snap-cluster-setup       0.0.1       /afs/cs.stanford.edu/u/brando9/snap-cluster-setup/src
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ pip list
+Package                  Version     Editable project location
+------------------------ ----------- -----------------------------------------------------
+absl-py                  2.1.0
+accelerate               0.29.1
+aiohttp                  3.9.3
+aiosignal                1.3.1
+appdirs                  1.4.4
+async-timeout            4.0.3
+attrs                    20.3.0
+bitsandbytes             0.43.0
+bnb                      0.3.0
+certifi                  2024.2.2
+charset-normalizer       3.3.2
+click                    7.1.2
+contourpy                1.2.1
+cycler                   0.12.1
+datasets                 2.18.0
+dill                     0.3.8
+docker-pycreds           0.4.0
+filelock                 3.13.3
+fonttools                4.51.0
+frozenlist               1.4.1
+fsspec                   2024.2.0
+gitdb                    4.0.11
+GitPython                3.1.43
+grpcio                   1.62.1
+huggingface-hub          0.22.2
+idna                     3.6
+importlib_metadata       7.1.0
+importlib_resources      6.4.0
+jax                      0.4.26
+Jinja2                   3.1.3
+joblib                   1.4.0
+kiwisolver               1.4.5
+Markdown                 3.6
+MarkupSafe               2.1.5
+matplotlib               3.8.4
+ml-dtypes                0.4.0
+mpmath                   1.3.0
+multidict                6.0.5
+multiprocess             0.70.16
+networkx                 3.2.1
+numpy                    1.26.4
+nvidia-cublas-cu12       12.1.3.1
+nvidia-cuda-cupti-cu12   12.1.105
+nvidia-cuda-nvrtc-cu12   12.1.105
+nvidia-cuda-runtime-cu12 12.1.105
+nvidia-cudnn-cu12        8.9.2.26
+nvidia-cufft-cu12        11.0.2.54
+nvidia-curand-cu12       10.3.2.106
+nvidia-cusolver-cu12     11.4.5.107
+nvidia-cusparse-cu12     12.1.0.106
+nvidia-nccl-cu12         2.19.3
+nvidia-nvjitlink-cu12    12.4.127
+nvidia-nvtx-cu12         12.1.105
+opt-einsum               3.3.0
+packaging                24.0
+pandas                   2.2.1
+patsy                    0.5.6
+pillow                   10.3.0
+pip                      24.0
+plotly                   5.20.0
+progressbar2             4.4.2
+prompt-toolkit           3.0.43
+protobuf                 4.25.3
+psutil                   5.9.8
+pyarrow                  15.0.2
+pyarrow-hotfix           0.6
+pyparsing                3.1.2
+python-dateutil          2.9.0.post0
+python-utils             3.8.2
+pytz                     2024.1
+PyYAML                   5.4.1
+questionary              1.10.0
+regex                    2023.12.25
+requests                 2.31.0
+safetensors              0.4.2
+scikit-learn             1.4.1.post1
+scipy                    1.13.0
+seaborn                  0.13.2
+sentencepiece            0.2.0
+sentry-sdk               1.44.1
+setproctitle             1.3.3
+setuptools               68.2.2
+six                      1.16.0
+smart-getenv             1.1.0
+smmap                    5.0.1
+snap-cluster-setup       0.0.1       /afs/cs.stanford.edu/u/brando9/snap-cluster-setup/src
+statsmodels              0.14.1
+sympy                    1.12
+tenacity                 8.2.3
+tensorboard              2.16.2
+tensorboard-data-server  0.7.2
+threadpoolctl            3.4.0
+tokenizers               0.15.2
+torch                    2.2.2
+torchaudio               2.2.2
+torchvision              0.17.2
+tqdm                     4.66.2
+transformers             4.39.3
+triton                   2.2.0
+typing_extensions        4.11.0
+tzdata                   2024.1
+urllib3                  2.2.1
+wandb                    0.16.6
+wcwidth                  0.2.13
+Werkzeug                 3.0.2
+wheel                    0.41.2
+xxhash                   3.4.1
+yarl                     1.9.4
+zipp                     3.18.1
+zstandard                0.22.0
+```
+Note, no errors! But the version of pytorch chaged and it is good to be aware of them or anything funny that might have happened. 
+
+Now that we pip installed this project in editable, we will play around with imports and make sure we installed our project in editable mode. 
+Fire up a [python interactive shell or REPL](https://chat.openai.com/c/0924a033-6e5f-4d5e-9c8d-cbc2c521c0cd) (REPL stands for Read-Eval-Print). 
+```bash
+python
+```
+then import the function to print hello from the `hello_world_snap.py` module in `src`:
+```bash
+from hello_world_snap import print_hello_snap
+```
+Sample output;
+```bash
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python
+Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from hello_world_snap import print_hello_snap
+>>> print_hello_snap()
+Hello, World from the Snap Cluster Setup src!
+```
+Now check that your imports work! i.e., that you can use code form another file/package:
+```bash
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python
+Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
+[GCC 11.2.0] :: Anaconda, Inc. on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from hello_world_snap import print_from_another
+>>> print_from_another()
+another
+```
+
+Now let's try the same but by running a file explicitly:
+For that we will do:
+```bash
+python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world_snap.py
+# Or when in your projects root folder usually
+python src/hello_world_snap.py
+```
+Sample output:
+```bash
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world_snap.py
+Hello, World from the Snap Cluster Setup src!
+EDIT THIS
+another
+Time taken: 0.00 seconds, or 0.00 minutes, or 0.00 hours.
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python src/hello_world_snap.py
+Hello, World from the Snap Cluster Setup src!
+EDIT THIS
+another
+Time taken: 0.00 seconds, or 0.00 minutes, or 0.00 hours.
+```
+This is where you learn that imports "run" the code they import and that `__name__ == "__main__":` is the code that is run only when you explicitly run this file. 
+This python specific. 
+I personally use  [`__name__ == "__main__":`](https://www.google.com/search?q=what+is+__name__+%3D%3D+__main__+in+python&rlz=1C5CHFA_enUS741US741&oq=what+is+__name__+in+python&gs_lcrp=EgZjaHJvbWUqCAgDEAAYFhgeMgkIABBFGDkYgAQyCAgBEAAYFhgeMggIAhAAGBYYHjIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMggICBAAGBYYHjIICAkQABgWGB7SAQg2MzUwajBqN6gCALACAA&sourceid=chrome&ie=UTF-8) to put code for unit tests (but really you can do whatever you want).  
