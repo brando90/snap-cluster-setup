@@ -1166,9 +1166,9 @@ Fire up a [python interactive shell or REPL](https://chat.openai.com/c/0924a033-
 ```bash
 python
 ```
-then import the function to print hello from the `hello_world_snap.py` module in `src`:
+then import the function to print hello from the `hello_world.py` module in `src`:
 ```bash
-from hello_world_snap import print_hello_snap
+from hello_world import print_hello_snap
 ```
 Sample output;
 ```bash
@@ -1176,7 +1176,7 @@ Sample output;
 Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
 [GCC 11.2.0] :: Anaconda, Inc. on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> from hello_world_snap import print_hello_snap
+>>> from hello_world import print_hello_snap
 >>> print_hello_snap()
 Hello, World from the Snap Cluster Setup src!
 ```
@@ -1186,7 +1186,7 @@ Now check that your imports work! i.e., that you can use code form another file/
 Python 3.9.19 (main, Mar 21 2024, 17:11:28) 
 [GCC 11.2.0] :: Anaconda, Inc. on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> from hello_world_snap import print_from_another
+>>> from hello_world import print_from_another
 >>> print_from_another()
 another
 ```
@@ -1194,18 +1194,18 @@ another
 Now let's try the same but by running a file explicitly:
 For that we will do:
 ```bash
-python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world_snap.py
+python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world.py
 # Or when in your projects root folder usually
-python src/hello_world_snap.py
+python src/hello_world.py
 ```
 Sample output:
 ```bash
-(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world_snap.py
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python /lfs/skampere1/0/brando9/snap-cluster-setup/src/hello_world.py
 Hello, World from the Snap Cluster Setup src!
 EDIT THIS
 another
 Time taken: 0.00 seconds, or 0.00 minutes, or 0.00 hours.
-(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python src/hello_world_snap.py
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python src/hello_world.py
 Hello, World from the Snap Cluster Setup src!
 EDIT THIS
 another
@@ -1331,7 +1331,7 @@ Mon Apr  8 20:02:00 2024
 +---------------------------------------------------------------------------------------+
 | Processes:                                                                            |
 |  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
-|        ID   ID                                                             Usage      |
+|        ID   ID                                                             Usage      uname -a|
 |=======================================================================================|
 |  No running processes found                                                           |
 +---------------------------------------------------------------------------------------+
@@ -1351,4 +1351,49 @@ export $CUDA_VISIBLE_DEVICES=1
 for multiple:
 ```bash
 CUDA_VISIBLE_DEVICES=0,7
+```
+Tip: as reference, I always suggest to at least skim the suggested ways to use resources according to the admins/"official wiki" of the compute cluster you're using -- in this case [skim the suggested way to use GPUs in SNAP](https://ilwiki.stanford.edu/doku.php?id=hints:gpu).
+
+## Long running jobs in SNAP and fine-tuning GPT2
+Usually one of the reasons to use a compute cluster, is to dispatch/run long running jobs. 
+In a standard cluster (note SNAP's set up is not standard) one usually [uses a workload manager like slurm is more standard](https://slurm.schedmd.com/documentation.html).
+This workload manger (e.g., slurm) usually has commands like `srun` or `sbatch` to run an interactive job and a long running background job respectively. 
+We will mimic these slurm commands and run them manually. 
+The standard workflow in slurm is:
+
+1. ssh/login into the ("non compute") head node (where your code lies in). You do not run real jobs here, it's only for scheduling the jobs with slurm.
+2. get your script, data, command etc. ready and ask slurm to run it (`srun` if you need a cli terminal to interact with your job e.g., to get a gpu for debugging or `sbatch` to run a long running job)
+
+In SNAP we will do the following:
+
+1. Since we can ssh directly into **compute nodes** (e.g., with GPUS) -- we don't need `srun`
+2. For long running jobs we will use (kerberos) `tmux` to run (because that is [the recommended way to do it in SNAP](https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs))
+
+Note: usually the system admins set up slurm so that you minimally have to worry about the file system (afs, lfs, dfs). 
+It usually "just works". If not, they tell you how to take care of it and it's only difficult/extra work if you use a lot of storage or many files (or file descriptors).
+
+### Interactive "job" in SNAP
+You should be logged in to a (compute) node already. 
+In this case when you ran GPU commands in the python shell previously is the essence of a interactive job! 
+You get a node + GPU and you are aple to interact with it. 
+Now we will expand that so that you run GPT2 fine tunning with Hugging Face (HF). 
+For that make sure you check which GPU is free and then set up which GPU you want:
+```bash
+nvidia-smi
+# I saw the output and all gpus were free so I choose any gpu
+export CUDA_VISIBLE_DEVICES=0
+```
+Tip: never run commands blindly or they will fail and you won't be able to debug them. 
+Tip: do you know what `CUDA_VISIBLE_DEVICES` is for? 
+
+Now let's run a small training run for GPT2 small. 
+We are doing small to avoid memory issues, which is a common problem in LLM projects and one that eventually you need to know how to solve 
+(according to the reqs for your project! e.g., many many options, some open problems; larger gpu, use fsdp, use lora, use qlora, hf accelerate, deep speed. 
+Feel free to Google them if you are curious, but you will use them as your requirement for your project need them):
+```bash
+
+```
+Sample output:
+```bash
+
 ```
