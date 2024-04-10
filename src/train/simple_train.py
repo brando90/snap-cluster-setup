@@ -46,9 +46,9 @@ def preprocess_function_proofnet(examples: Dict[str, list], tokenizer: GPT2Token
 
 def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2", 
                             path: str = "hoskinson-center/proofnet",
-                            output_dir_val: str = '$HOME/tmp/proofnet/validation',
-                            output_dir_test: str = '$HOME/tmp/proofnet/test',
-                            path_to_save_model: Optional[str] = None,  # suggested path: '$HOME/tmp/proofnet/model'
+                            output_dir_val: str = '~/tmp/proofnet/validation',
+                            output_dir_test: str = '~/tmp/proofnet/test',
+                            path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
                             num_train_epochs: int = 3,
                             per_device_train_batch_size: Optional[int] = 2,
                             per_device_eval_batch_size: Optional[int] = 2,
