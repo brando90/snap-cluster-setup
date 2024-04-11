@@ -1389,11 +1389,36 @@ Tip: do you know what `CUDA_VISIBLE_DEVICES` is for?
 Now let's run a small training run for GPT2 small. 
 We are doing small to avoid memory issues, which is a common problem in LLM projects and one that eventually you need to know how to solve 
 (according to the reqs for your project! e.g., many many options, some open problems; larger gpu, use fsdp, use lora, use qlora, hf accelerate, deep speed. 
-Feel free to Google them if you are curious, but you will use them as your requirement for your project need them):
+Feel free to Google them if you are curious, but you will use them as your requirement for your project need them).
+Using the code from your fork, run: 
 ```bash
-
+python ~/snap-cluster-setup/src/train/simple_train.py 
+# or CUDA_VISIBLE_DEVICES=0 python ~/snap-cluster-setup/src/train/simple_train.py 
 ```
 Sample output:
 ```bash
-
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python ~/snap-cluster-setup/src/train/simple_train.py 
+tokenizer.pad_token='<|endoftext|>'
+block_size=1024
+Number of parameters: 124439808
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+{'train_runtime': 4.4686, 'train_samples_per_second': 41.4, 'train_steps_per_second': 10.294, 'train_loss': 2.902917944866678, 'epoch': 0.99}                                                                                                                                                                                                                                                       
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 46/46 [00:04<00:00, 10.30it/s]
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:00<00:00, 28.52it/s]
+Eval metrics hoskinson-center_proofnet  test Unknown_Eval_Max_Samples: metrics={'eval_loss': 2.3169755935668945, 'eval_runtime': 0.8879, 'eval_samples_per_second': 209.491, 'eval_steps_per_second': 27.031, 'perplexity': 10.144945422979891}
+***** eval_hoskinson-center_proofnet__test_Unknown_Eval_Max_Samples metrics *****
+  eval_loss               =      2.317
+  eval_runtime            = 0:00:00.88
+  eval_samples_per_second =    209.491
+  eval_steps_per_second   =     27.031
+  perplexity              =    10.1449
+path='hoskinson-center/proofnet' split=test results={'eval_loss': 2.3169755935668945, 'eval_runtime': 0.8879, 'eval_samples_per_second': 209.491, 'eval_steps_per_second': 27.031, 'perplexity': 10.144945422979891}
+Time taken: 12.64 seconds, or 0.21 minutes, or 0.00 hours.
 ```

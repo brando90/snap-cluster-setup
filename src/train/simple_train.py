@@ -3,16 +3,16 @@ import numpy as np
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, TrainingArguments, Trainer
 from datasets import load_dataset, load_metric
+import evaluate
 from typing import Dict, Tuple, Optional
 from pathlib import Path
 
-# Clear CUDA cache to free up memory
-torch.cuda.empty_cache()
+from eval.eval_utils import eval_hf
 
-# Load the accuracy metric from the datasets library
-metric = load_metric('accuracy')
 
-def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray]) -> Dict[str, float]:
+def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
+                    path: str = 'accuracy',
+                    ) -> Dict[str, float]:
     """
     Compute the accuracy of the model.
 
@@ -21,10 +21,13 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray]) -> Dict[str, float
 
     Returns:
     A dictionary with the accuracy score.
+    
+    TODO: document properly what accuracy is. Is it tfa, ara, exact string match, avg acc (wrt length etc.) ref: https://huggingface.co/spaces/evaluate-metric/accuracy
     """
-    predictions, labels = eval_pred
+    metric = evaluate.load(path=path)   # load metric from file or hf
+    predictions, references = eval_pred
     predictions = np.argmax(predictions, axis=1)
-    return metric.compute(predictions=predictions, references=labels)
+    return metric.compute(predictions=predictions, references=references)
 
 def preprocess_function_proofnet(examples: Dict[str, list], tokenizer: GPT2Tokenizer) -> Dict[str, torch.Tensor]:
     """
@@ -46,10 +49,11 @@ def preprocess_function_proofnet(examples: Dict[str, list], tokenizer: GPT2Token
 
 def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2", 
                             path: str = "hoskinson-center/proofnet",
-                            output_dir_val: str = '~/tmp/proofnet/validation',
+                            output_dir_train: str = '~/tmp/proofnet/train',
+                            output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
                             output_dir_test: str = '~/tmp/proofnet/test',
                             path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-                            num_train_epochs: int = 3,
+                            num_train_epochs: int = 1,
                             per_device_train_batch_size: Optional[int] = 2,
                             per_device_eval_batch_size: Optional[int] = 2,
                             save_total_limit: Optional[int] = None,
@@ -61,6 +65,7 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
                             gradient_checkpointing: Optional[bool] = False,
                             # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
                             # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
+                            report_to: str = 'none'
                     ) -> None:
     """
     Set up the environment, preprocess the dataset, and train the model.
@@ -70,6 +75,9 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
     model_name: The name of the model.
     dataset_path: The path to the dataset.
     """
+    # Clear CUDA cache to free up memory
+    torch.cuda.empty_cache()
+
     # Load tokenizer and model
     if pretrained_model_name_or_path == "gpt2":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
@@ -83,6 +91,9 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
         model = model.to(device)
         block_size: int = tokenizer.model_max_length
         print(f'{block_size=}')
+    else:
+        raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
+    print("Number of parameters:", sum(p.numel() for p in model.parameters()))
 
     # Load the dataset
     dataset_val = load_dataset(path, split='validation')
@@ -95,10 +106,10 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
         test_dataset = dataset_test.map(lambda examples: preprocess_function(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
 
     # Training arguments
-    output_dir_val: Path = Path(output_dir_val).expanduser()
-    output_dir_val.mkdir(parents=True, exist_ok=True)
+    output_dir_train: Path = Path(output_dir_train).expanduser()
+    output_dir_train.mkdir(parents=True, exist_ok=True)
     training_args = TrainingArguments(
-        output_dir=output_dir_val,
+        output_dir=output_dir_train,
         evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
         gradient_accumulation_steps=gradient_accumulation_steps,  # based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
         gradient_checkpointing = gradient_checkpointing,  # TODO depending on hardware set to true?
@@ -112,6 +123,7 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
         optim=optim,
         # lr_scheduler_type=lr_scheduler_type  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         # warmup_ratio=warmup_ratio,
+        report_to = report_to,  # options I recommend: 'none', 'wandb'
         fp16=False,  # never ever set to True
         bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
     )
@@ -129,19 +141,17 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
     trainer.train()
 
     # Evaluate the model
-    output_dir_test: Path = Path(output_dir_test).expanduser()
-    output_dir_test.mkdir(parents=True, exist_ok=True)
-    # Later, you decide to change the evaluation strategy
-    training_args.evaluation_strategy = 'epoch'  # "epoch"`: Evaluation is done at the end of each epoch.
-    results = trainer.evaluate(test_dataset)
-    print(results)
+    if output_dir_test is not None:
+        output_dir_test: Path = Path(output_dir_test).expanduser()
+        output_dir_test.mkdir(parents=True, exist_ok=True)
+        eval_args = TrainingArguments(output_dir=output_dir_test, fp16=False, bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8, report_to=report_to)
+        trainer = Trainer(model=model, args=eval_args, train_dataset=None, eval_dataset=test_dataset)
+        # results: dict[str, float] = trainer.evaluate(test_dataset)
+        results: dict[str, float] = eval_hf(trainer, name='', path=path, split='test', eval_dataset=test_dataset)
+        print(f'{path=} split=test {results=}')
 
     # Save the trained model
     if path_to_save_model is not None:
-        path_to_save_model: Path = Path(path_to_save_model).expanduser()
-        output_dir_test.mkdir(parents=True, exist_ok=True)
-        # Later, you decide to change the evaluation strategy
-        training_args.evaluation_strategy = 'epoch'  # "epoch"`: Evaluation is done at the end of each epoch.
         model.save_pretrained(path_to_save_model)
 
 def main() -> None:

@@ -79,6 +79,7 @@ setup(
 
     # for pytorch see doc string at the top of file
     install_requires=[
+        'fire',
         'dill',
         'networkx>=2.5',
         'scipy',
@@ -108,15 +109,15 @@ setup(
         # 'fairseq',
 
         # 'trl',
-        'transformers==4.39.2', # my gold-ai-olympiad project uses 4.39.2
-        # 'accelerate',
+        'transformers==4.39.2',
+        'accelerate==0.29.2',
         # 'peft',
-
-        'datasets==2.18.0',  # 2.18.0
-        # 'bitsandbytes',
+        'datasets==2.18.0',  
+        'evaluate==0.4.1', 
+        'bitsandbytes== 0.43.0',
         # 'einops',
 
-        'vllm'
+        'vllm==0.4.0.post1', # my gold-ai-olympiad project uses 0.4.0.post1 ref: https://github.com/vllm-project/vllm/issues/2747
     ]
 )
 
