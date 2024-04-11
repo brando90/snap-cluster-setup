@@ -1560,7 +1560,7 @@ wandb: Find logs at: /lfs/skampere1/0/brando9/wandb/run-20240410_181121-deik32un
 
 
 
-## Killing Process in snap
+## Killing Process in SNAP (e.g., kill VSCODE in SNAP)
 Sometimes you might need to kill vscode processes so that vscode does not lose the kerberos authentication it needs. Some useful commands I run **very carefully** e.g., if you have a job running, it might kill it!
 ```bash
 # kill vscode
