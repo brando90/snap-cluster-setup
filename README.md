@@ -1546,21 +1546,148 @@ wandb: Synced 7 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other fil
 wandb: Find logs at: /lfs/skampere1/0/brando9/wandb/run-20240410_181121-deik32un/logs
 ```
 
+### Background/long lived job in SNAP
+First read [long lived jobs in SNAP](https://ilwiki.stanford.edu/doku.php?id=hints:long-jobs).
+
+Now we will train small GPT2 for a longer time using krbtmux/tmux. 
+First open krbtmux and run reauth and type your password:
+```bash
+krbtmux
+reauth
+```
+reauth is a SNAP specific command so that any process (inside bash or a cli or tmux) has the kerberos ticket renewed so that it can it's not killed. 
+Sample output:
+```bash
+brando9@skampere1:/afs/cs.stanford.edu/u/brando9/snap-cluster-setup$ 
+```
+Since this opens a fresh like (multiplexed) cli we need to re activate your bash settings (see why SNAP is annoying?!):
+```bash
+source $AFS/.bash_profile
+# or type bash
+```
+Sample output:
+```bash
+brando9@skampere1:/afs/cs.stanford.edu/u/brando9/snap-cluster-setup$ bash
+
+EnvironmentNameNotFound: Could not find conda environment: evals_af
+You can list all discoverable environments with `conda info --envs`.
 
 
+ln: failed to create symbolic link '/lfs/skampere1/0/brando9/iit-term-synthesis': File exists
+(base) brando9@skampere1~ $ reauth
+Password for brando9: 
+Background process pid is: 1198383
+```
 
 
+If you notice I made a [`main_krbtmux.sh` file](https://github.com/brando90/snap-cluster-setup/blob/main/main_krbtmux.sh). 
+This is so that it's easier to run long lived jobs. 
+Now use it to run a long lived job training GPT2 (for say 10 epochs, edit your github's fork to change that):
+```bash
+bash ~/snap-cluster-setup/main_krbtmux.sh
+# or source ~/snap-cluster-setup/main_krbtmux.sh
+# or python ~/snap-cluster-setup/src/train/simple_train.py after you set up bash and conda and your gpu, see the main_krbtmux.sh file! that's why I made it to automate the borning things
+```
+Tip: you might have to set the cuda visible devices manually depending on what is free or what you need. 
+
+Sample output:
+```bash
+(base) brando9@skampere1~ $ bash ~/snap-cluster-setup/main_krbtmux.sh
+
+EnvironmentNameNotFound: Could not find conda environment: evals_af
+You can list all discoverable environments with `conda info --envs`.
 
 
+ln: failed to create symbolic link '/lfs/skampere1/0/brando9/iit-term-synthesis': File exists
+CUDA_VISIBLE_DEVICES = 0
+tokenizer.pad_token='<|endoftext|>'
+block_size=1024
+Number of parameters: 124439808
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: brando. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.16.6
+wandb: Run data is saved locally in /lfs/skampere1/0/brando9/wandb/run-20240410_192505-t5pg9q3o
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run jolly-forest-8
+wandb: ⭐️ View project at https://wandb.ai/brando/huggingface
+wandb: 🚀 View run at https://wandb.ai/brando/huggingface/runs/t5pg9q3o
+{'loss': 4.0951, 'grad_norm': 15.34875202178955, 'learning_rate': 4.9782608695652176e-05, 'epoch': 0.02}                                                                                                                                                                                                                                                                                            
+{'loss': 2.7984, 'grad_norm': 9.243730545043945, 'learning_rate': 4e-05, 'epoch': 0.99}                                                                                                                                                                                                                                                                                                             
+{'loss': 2.0728, 'grad_norm': 11.679845809936523, 'learning_rate': 2.9782608695652175e-05, 'epoch': 2.0}                                                                                                                                                                                                                                                                                            
+{'loss': 1.8794, 'grad_norm': 7.380716800689697, 'learning_rate': 1.9782608695652176e-05, 'epoch': 2.99}                                                                                                                                                                                                                                                                                            
+{'loss': 1.7264, 'grad_norm': 10.552717208862305, 'learning_rate': 9.565217391304349e-06, 'epoch': 4.0}                                                                                                                                                                                                                                                                                             
+{'loss': 1.6644, 'grad_norm': 8.1737060546875, 'learning_rate': 0.0, 'epoch': 4.95}                                                                                                                                                                                                                                                                                                                 
+{'train_runtime': 24.0418, 'train_samples_per_second': 38.475, 'train_steps_per_second': 9.567, 'train_loss': 2.035966329989226, 'epoch': 4.95}                                                                                                                                                                                                                                                     
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 230/230 [00:18<00:00, 12.31it/s]
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:00<00:00, 27.82it/s]
+Eval metrics hoskinson-center_proofnet  test Unknown_Eval_Max_Samples: metrics={'eval_loss': 1.7542803287506104, 'eval_runtime': 0.8845, 'eval_samples_per_second': 210.294, 'eval_steps_per_second': 27.135, 'perplexity': 5.779287058236344}
+***** eval_hoskinson-center_proofnet__test_Unknown_Eval_Max_Samples metrics *****
+  eval_loss               =     1.7543
+  eval_runtime            = 0:00:00.88
+  eval_samples_per_second =    210.294
+  eval_steps_per_second   =     27.135
+  perplexity              =     5.7793
+path='hoskinson-center/proofnet' split=test results={'eval_loss': 1.7542803287506104, 'eval_runtime': 0.8845, 'eval_samples_per_second': 210.294, 'eval_steps_per_second': 27.135, 'perplexity': 5.779287058236344}
+Time taken: 32.63 seconds, or 0.54 minutes, or 0.01 hours.
+wandb: \ 0.023 MB of 0.048 MB uploaded
+wandb: Run history:
+wandb:               eval/loss ▁
+wandb:            eval/runtime ▁
+wandb: eval/samples_per_second ▁
+wandb:   eval/steps_per_second ▁
+wandb:             train/epoch ▁▂▄▅▇██
+wandb:       train/global_step ▁▂▄▅▇██▁
+wandb:         train/grad_norm █▃▅▁▄▂
+wandb:     train/learning_rate █▇▅▄▂▁
+wandb:              train/loss █▄▂▂▁▁
+wandb: 
+wandb: Run summary:
+wandb:                eval/loss 1.75428
+wandb:             eval/runtime 0.8845
+wandb:  eval/samples_per_second 210.294
+wandb:    eval/steps_per_second 27.135
+wandb:               total_flos 239343501312000.0
+wandb:              train/epoch 4.95
+wandb:        train/global_step 0
+wandb:          train/grad_norm 8.17371
+wandb:      train/learning_rate 0.0
+wandb:               train/loss 1.6644
+wandb:               train_loss 2.03597
+wandb:            train_runtime 24.0418
+wandb: train_samples_per_second 38.475
+wandb:   train_steps_per_second 9.567
+wandb: 
+wandb: 🚀 View run jolly-forest-8 at: https://wandb.ai/brando/huggingface/runs/t5pg9q3o
+wandb: ⭐️ View project at: https://wandb.ai/brando/huggingface
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 1 other file(s)
+wandb: Find logs at: ./wandb/run-20240410_192505-t5pg9q3o/logs
+```
+Tip: todo: allows mouse scrolling `tput rmcupa` in tmux, help, can't remember why I use this command!
 
+### Discussion of pros cons of slurm vs SNAP
+Pros of SNAP's setup:
+- you can run jobs for months without having to worry about the sys admins limits on `sbatch` commands
+  - but no guarantees it won't fail for some random (hardware) reason!
+Cons:
+- very complicated e.g., afs vs lfs vs dfs and too many things you have to manually do like:
+  - gpu selection, manually running background jobs with (hacked) tmux sessions, reauth shouldn't exist etc.
 
+Pros of slurm setup:
+- sys admins do all the dirty work
+Cons of slurm setup:
+- only one I personally know of is that it's hard to by pass the "let me run a job for X months"
+  - but your labmates might get mad anyway...and ping you.
+  
+In either case the sys admins have control of what you can install, so SNAP's set up doesn't even provide that advantage e.g., use the `module avail` command and Google what it is and why sys admins want it like that. 
 
-
-
-
-
-
-## Killing Process in SNAP (e.g., kill VSCODE in SNAP)
+## Killing Process in SNAP (kill vsoce in SNAP)
 Sometimes you might need to kill vscode processes so that vscode does not lose the kerberos authentication it needs. Some useful commands I run **very carefully** e.g., if you have a job running, it might kill it!
 ```bash
 # kill vscode
