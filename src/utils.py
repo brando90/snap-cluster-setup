@@ -456,6 +456,12 @@ def collate_fn_train_only_first_eos_token_mask_everything_after_it(data: list[di
 
 # -- load data sets
 
+def get_data_set_args(path: str) -> tuple:
+    if path == 'all_ai4m_datasets_v0':
+        return get_ai4m_v0()
+    else:  
+        raise ValueError(f"Path {path} not supported.")
+
 def get_ai4m_v0():
     """
     ref: https://huggingface.co/AI4M
