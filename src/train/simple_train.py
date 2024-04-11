@@ -53,7 +53,7 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
                             output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
                             output_dir_test: str = '~/tmp/proofnet/test',
                             path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-                            num_train_epochs: int = 1,
+                            num_train_epochs: int = 5,
                             per_device_train_batch_size: Optional[int] = 2,
                             per_device_eval_batch_size: Optional[int] = 2,
                             save_total_limit: Optional[int] = None,
@@ -65,7 +65,7 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
                             gradient_checkpointing: Optional[bool] = False,
                             # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
                             # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-                            report_to: str = 'none'
+                            report_to: str = 'wandb',
                     ) -> None:
     """
     Set up the environment, preprocess the dataset, and train the model.
@@ -121,6 +121,8 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
         num_train_epochs=num_train_epochs,
         max_grad_norm=max_grad_norm,
         optim=optim,
+        logging_first_step=True,
+        logging_strategy='epoch',
         # lr_scheduler_type=lr_scheduler_type  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         # warmup_ratio=warmup_ratio,
         report_to = report_to,  # options I recommend: 'none', 'wandb'

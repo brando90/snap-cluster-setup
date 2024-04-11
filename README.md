@@ -1422,3 +1422,158 @@ Eval metrics hoskinson-center_proofnet  test Unknown_Eval_Max_Samples: metrics={
 path='hoskinson-center/proofnet' split=test results={'eval_loss': 2.3169755935668945, 'eval_runtime': 0.8879, 'eval_samples_per_second': 209.491, 'eval_steps_per_second': 27.031, 'perplexity': 10.144945422979891}
 Time taken: 12.64 seconds, or 0.21 minutes, or 0.00 hours.
 ```
+
+
+Now edit your gpt2 small file to use wandb and to train for more epochs:
+```bash
+CUDA_VISIBLE_DEVICES=0 python ~/snap-cluster-setup/src/train/simple_train.py
+```
+Sample output:
+```bash
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python ~/snap-cluster-setup/src/train/simple_train.py 
+tokenizer.pad_token='<|endoftext|>'
+block_size=1024
+Number of parameters: 124439808
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: brando. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.16.6
+wandb: Run data is saved locally in /lfs/skampere1/0/brando9/wandb/run-20240410_180758-7tns0d5y
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run morning-music-5
+wandb: ⭐️ View project at https://wandb.ai/brando/huggingface
+wandb: 🚀 View run at https://wandb.ai/brando/huggingface/runs/7tns0d5y
+{'train_runtime': 9.9081, 'train_samples_per_second': 18.672, 'train_steps_per_second': 4.643, 'train_loss': 2.902917944866678, 'epoch': 0.99}                                                                                                                                                                                                                                                      
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 46/46 [00:04<00:00, 10.46it/s]
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:00<00:00, 28.45it/s]
+Eval metrics hoskinson-center_proofnet  test Unknown_Eval_Max_Samples: metrics={'eval_loss': 2.3169755935668945, 'eval_runtime': 0.886, 'eval_samples_per_second': 209.933, 'eval_steps_per_second': 27.088, 'perplexity': 10.144945422979891}
+***** eval_hoskinson-center_proofnet__test_Unknown_Eval_Max_Samples metrics *****
+  eval_loss               =      2.317
+  eval_runtime            = 0:00:00.88
+  eval_samples_per_second =    209.933
+  eval_steps_per_second   =     27.088
+  perplexity              =    10.1449
+path='hoskinson-center/proofnet' split=test results={'eval_loss': 2.3169755935668945, 'eval_runtime': 0.886, 'eval_samples_per_second': 209.933, 'eval_steps_per_second': 27.088, 'perplexity': 10.144945422979891}
+Time taken: 18.53 seconds, or 0.31 minutes, or 0.01 hours.
+wandb: | 0.037 MB of 0.037 MB uploaded
+wandb: Run history:
+wandb:               eval/loss ▁
+wandb:            eval/runtime ▁
+wandb: eval/samples_per_second ▁
+wandb:   eval/steps_per_second ▁
+wandb:             train/epoch ▁
+wandb:       train/global_step █▁
+wandb: 
+wandb: Run summary:
+wandb:                eval/loss 2.31698
+wandb:             eval/runtime 0.886
+wandb:  eval/samples_per_second 209.933
+wandb:    eval/steps_per_second 27.088
+wandb:               total_flos 48077733888000.0
+wandb:              train/epoch 0.99
+wandb:        train/global_step 0
+wandb:               train_loss 2.90292
+wandb:            train_runtime 9.9081
+wandb: train_samples_per_second 18.672
+wandb:   train_steps_per_second 4.643
+wandb: 
+wandb: 🚀 View run morning-music-5 at: https://wandb.ai/brando/huggingface/runs/7tns0d5y
+wandb: ⭐️ View project at: https://wandb.ai/brando/huggingface
+wandb: Synced 7 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /lfs/skampere1/0/brando9/wandb/run-20240410_180758-7tns0d5y/logs
+(snap_cluster_setup) brando9@skampere1~/snap-cluster-setup $ python ~/snap-cluster-setup/src/train/simple_train.py 
+tokenizer.pad_token='<|endoftext|>'
+block_size=1024
+Number of parameters: 124439808
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+wandb: Currently logged in as: brando. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.16.6
+wandb: Run data is saved locally in /lfs/skampere1/0/brando9/wandb/run-20240410_181121-deik32un
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run comic-bird-6
+wandb: ⭐️ View project at https://wandb.ai/brando/huggingface
+wandb: 🚀 View run at https://wandb.ai/brando/huggingface/runs/deik32un
+{'train_runtime': 24.3208, 'train_samples_per_second': 38.033, 'train_steps_per_second': 9.457, 'train_loss': 2.0359664253566576, 'epoch': 4.95}                                                                                                                                                                                                                                                    
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 230/230 [00:18<00:00, 12.21it/s]
+/lfs/skampere1/0/brando9/miniconda/envs/snap_cluster_setup/lib/python3.9/site-packages/accelerate/accelerator.py:436: FutureWarning: Passing the following arguments to `Accelerator` is deprecated and will be removed in version 1.0 of Accelerate: dict_keys(['dispatch_batches', 'split_batches', 'even_batches', 'use_seedable_sampler']). Please pass an `accelerate.DataLoaderConfiguration` instead: 
+dataloader_config = DataLoaderConfiguration(dispatch_batches=None, split_batches=False, even_batches=True, use_seedable_sampler=True)
+  warnings.warn(
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 24/24 [00:00<00:00, 28.38it/s]
+Eval metrics hoskinson-center_proofnet  test Unknown_Eval_Max_Samples: metrics={'eval_loss': 1.7542803287506104, 'eval_runtime': 0.9027, 'eval_samples_per_second': 206.051, 'eval_steps_per_second': 26.587, 'perplexity': 5.779287058236344}
+***** eval_hoskinson-center_proofnet__test_Unknown_Eval_Max_Samples metrics *****
+  eval_loss               =     1.7543
+  eval_runtime            = 0:00:00.90
+  eval_samples_per_second =    206.051
+  eval_steps_per_second   =     26.587
+  perplexity              =     5.7793
+path='hoskinson-center/proofnet' split=test results={'eval_loss': 1.7542803287506104, 'eval_runtime': 0.9027, 'eval_samples_per_second': 206.051, 'eval_steps_per_second': 26.587, 'perplexity': 5.779287058236344}
+Time taken: 33.09 seconds, or 0.55 minutes, or 0.01 hours.
+wandb: | 0.024 MB of 0.045 MB uploaded
+wandb: Run history:
+wandb:               eval/loss ▁
+wandb:            eval/runtime ▁
+wandb: eval/samples_per_second ▁
+wandb:   eval/steps_per_second ▁
+wandb:             train/epoch ▁
+wandb:       train/global_step █▁
+wandb: 
+wandb: Run summary:
+wandb:                eval/loss 1.75428
+wandb:             eval/runtime 0.9027
+wandb:  eval/samples_per_second 206.051
+wandb:    eval/steps_per_second 26.587
+wandb:               total_flos 239343501312000.0
+wandb:              train/epoch 4.95
+wandb:        train/global_step 0
+wandb:               train_loss 2.03597
+wandb:            train_runtime 24.3208
+wandb: train_samples_per_second 38.033
+wandb:   train_steps_per_second 9.457
+wandb: 
+wandb: 🚀 View run comic-bird-6 at: https://wandb.ai/brando/huggingface/runs/deik32un
+wandb: ⭐️ View project at: https://wandb.ai/brando/huggingface
+wandb: Synced 7 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /lfs/skampere1/0/brando9/wandb/run-20240410_181121-deik32un/logs
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Killing Process in snap
+Sometimes you might need to kill vscode processes so that vscode does not lose the kerberos authentication it needs. Some useful commands I run **very carefully** e.g., if you have a job running, it might kill it!
+```bash
+# kill vscode
+# https://chat.openai.com/c/a114f637-cfb7-4515-afe8-6590d0ce9c78
+
+ps -f -u brando9
+
+pkill -f 'code-server'
+pkill -f 'vscode-remote'
+pkill -f code-insiders-f
+pgrep -f 'code|code-insiders|vscode' | xargs -r kill
+
+
+kills all my processes:
+pkill -f 'brando9' || pgrep -f 'brando9' | xargs -r kill
+```
