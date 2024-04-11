@@ -441,3 +441,7 @@ Research/Notebooks
 
 #Docker result files
 Results/
+
+
+# 
+.vscode/
