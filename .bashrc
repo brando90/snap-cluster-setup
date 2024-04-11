@@ -18,6 +18,7 @@
 # note: the cuda and conda versions you need might depend on the specific server since the specific cuda version might only work for the gpu that server has
 
 # ---- Brando's scaffold .bashrc file ----
+# this approximately sources the sys admin's .bashrc located at /afs/cs/etc/skel/.bashrc
 # since snap is set up badly and it needs the reauth command to re-authenticate randomly somtimes, you need to make sure reauth cmd is available
 export PATH="/afs/cs/software/bin:$PATH"
 # 

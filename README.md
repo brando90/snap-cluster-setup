@@ -34,7 +34,7 @@ and sent it to
 - Eric Pineda: eric.pineda@stanford.edu
 - Brando Miranda: brando9@stanford.edu
 - [SNAP cluster IT](https://ilwiki.stanford.edu/doku.php?id=start): il-action@cs.stanford.edu
-- Sanmi Koyejo: sanmi@stanford.edu
+<!-- - Sanmi Koyejo: sanmi@stanford.edu -->
 
 Once you get access to it you will be able to login to the cluster via the ssh command in the terminal (cli) and vscode.
 
@@ -127,7 +127,7 @@ Usually the linux terminal (e.g. `bash`) runs ("sources") `.bash_profile` to set
 This command usually sets up your environment variables for your terminal (e.g., current `bash` session) by running commands you specify in that file. 
 In particular, it sets up [environment variables](https://www.google.com/search?q=environment+variables&rlz=1C5CHFA_enUS741US741&oq=environment+variab&gs_lcrp=EgZjaHJvbWUqDQgAEAAYgwEYsQMYgAQyDQgAEAAYgwEYsQMYgAQyBwgBEAAYgAQyBwgCEAAYgAQyBwgDEAAYgAQyBggEEEUYOTIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCDQ0MjVqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8), which are terminal/cli variables that point to important locations in the node/computer so that everything works! 
 Now, let's inspect your `.bash_profile`. 
-For that we need to go to first go to `/afs/cs.stanford.edu/u/brando9` with the `cd` command and then we can display the contents of the file with `cat`:
+For that you need to `/afs/cs.stanford.edu/u/<CSID>` with the `cd` command and then we can display the contents of the file with `cat` (always make sure you understand the commands you're running & read the output):
 ```bash
 # ... AFTER sshing to a SNAP node
 (evals_af) brando9@skampere1~ $
@@ -148,7 +148,18 @@ if [ -f ~/.bashrc ]; then
 fi
 ```
 In this specific `.bash_profile` runs ("sources") another file called `.bashrc`. 
-Since `.bash_profile` runs/sources your `.bashrc` file each time you ssh/login to snap we will put our personal configurations for SNAP in our `.bashrc` located at `~/.bashrc` (note: `~` is the same as `$HOME` and points to your local path) i.e., that is the meaning of `. ~/.bashrc`. 
+If you yours runs `~/.bashrc.user` (which is a very non-standard setup), then change your `.bash_profile` to be the same as the one above with `vim`. If you need to do that do:
+```bash
+vim .bash_profile
+```
+This open the file. Then move to the line you want to edit. 
+Then type `i` in `vim`. Then you are now in insert mode. 
+Then change the line `	. ~/.bashrc` to `	. ~/.bashrc` (note the indentation). 
+Then do `:w` followed by `:q` (or `:wq` or `:x`) which tells vim to save your changes and exit `vim`. 
+Make sure you know the basics of `vim` even if you use vscode with the remote ssh extension (we will cover the basic of vim bellow and we do recommend vscode with the ssh extension). 
+Make sure you understand why you are doing this. 
+You are doing this so that `.bash_profile` runs **your** configurations of bash each time you start a bash session in the terminal.  
+Now, since `.bash_profile` runs/sources your `.bashrc` file each time you ssh/login to snap we will put our personal configurations for SNAP in our `.bashrc` located at `~/.bashrc` (note: `~` is the same as `$HOME` and points to your local path) i.e., that is the meaning of `. ~/.bashrc`. 
 
 The plan is to:
   1. put `.bashrc` in `afs` since `afs` is accessible via all nodes (to manage a single version for all SNAP nodes)
