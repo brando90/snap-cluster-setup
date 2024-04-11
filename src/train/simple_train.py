@@ -48,13 +48,13 @@ def preprocess_function_proofnet(examples: Dict[str, list], tokenizer: GPT2Token
     model_inputs["labels"] = labels
     return model_inputs
 
-def setup_and_train_big_modol(pretrained_model_name_or_path: str = "mistralai/Mistral-7B-Instruct-v0.2",
+def setup_and_train_big_model(pretrained_model_name_or_path: str = "mistralai/Mistral-7B-Instruct-v0.2",
                             path: str = "all_ai4m_datasets_v0",
                             path_test: str = "hoskinson-center/proofnet",
                             output_dir_train: str = '~/tmp/all_ai4m_datasets_v0/train',
                             output_dir_test: str = '~/tmp/all_ai4m_datasets_v0/eval/proofnet/test',
                             path_to_save_model: Optional[str] = '~/tmp/all_ai4m_datasets_v0/model',  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-                            max_steps: int = 50,
+                            max_steps: int = 2,
                             per_device_train_batch_size: Optional[int] = 2,
                             per_device_eval_batch_size: Optional[int] = 1,
                             save_total_limit: Optional[int] = None,
@@ -69,6 +69,7 @@ def setup_and_train_big_modol(pretrained_model_name_or_path: str = "mistralai/Mi
                             evaluation_strategy='no',
                             eval_steps = None,  # TODO
                             report_to: str = 'none',
+                            block_size: int = 4096,  # TODO we need to move away from block size training to respecting sentences
                     ) -> None:
     # Clear CUDA cache to free up memory
     torch.cuda.empty_cache()
@@ -77,9 +78,9 @@ def setup_and_train_big_modol(pretrained_model_name_or_path: str = "mistralai/Mi
     model, tokenizer = load_model_block_size(pretrained_model_name_or_path, verbose=True)
 
     # Load the dataset
-    path, name, data_files, split = get_data_set_args(path)
-    train_dataset = load_dataset_block_size(path, name, data_files, split)
-    dataset_test = load_dataset(path_test, split='test')  #TODO block size vs non, matters?
+    path, name, data_files, split, streaming = get_data_set_args(path)
+    train_dataset = load_dataset_block_size(tokenizer, block_size, path, name, data_files, split, streaming)
+    test_dataset = load_dataset(path_test, split='test')  #TODO block size vs non, matters?
 
     # Preprocess the dataset
     if path == "hoskinson-center/proofnet":
@@ -258,7 +259,7 @@ def main() -> None:
     Main function to execute the model training and evaluation.
     """
     # setup_and_train_proofnet()
-    setup_and_train_big_modol()
+    setup_and_train_big_model()
 
 if __name__ == "__main__":
     import time

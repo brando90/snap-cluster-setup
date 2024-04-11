@@ -5,7 +5,7 @@ import torch
 from itertools import chain
 import math
 import random
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
 import torch
 
@@ -101,6 +101,28 @@ def view_exs_iterable_dataset(dataset_split, num_exs=10):
     if num_exs == 0:
       break
 
+def get_weight_norms(model: torch.nn.Module, verbose: bool = False) -> None:
+    """
+    Prints the L1 norm of the weights of each module in the given PyTorch model.
+
+    Args:
+    model (nn.Module): The PyTorch model whose weight norms are to be printed.
+
+    Returns:
+    None
+    """
+    total_weight_norm: float = 0.0
+    for name, module in model.named_modules():
+        # Check if the module has the 'weight' attribute
+        if hasattr(module, 'weight') and isinstance(module.weight, torch.Tensor):
+            # Calculate the L1 norm of the weights
+            w_norm: float = module.weight.norm(1).item()
+            total_weight_norm += w_norm
+            if verbose:
+                print(f"Norm of weights in module {name}: {w_norm}")
+    return total_weight_norm
+
+
 def get_num_steps():
     # dataset_size: int = int(1.5e12)  # TODO, doesn't seem easy to solve. Either count all the sequennces/rows or have the meta data have this. Or make this number huge. 
     # dataset_size: int = train_dataset.num_rows
@@ -112,7 +134,7 @@ def get_num_steps():
 
 def print_model_info(model,  # TODO type me
                      tokenizer,  # TODO type me
-                     output_dir,
+                     output_dir = None,
                      ):
     print("Number of parameters:", sum(p.numel() for p in model.parameters()))
     print(f"Total weight norm: {get_weight_norms(model)=}")
@@ -122,7 +144,7 @@ def print_model_info(model,  # TODO type me
     # Sanity check -- is loss random? lnV = -ln(1/V) = -ln(1/50257) = 10.82 since CE = avg_i v_i * ln(1/p_i) but only one token is right so vi = 1 for some i so CE = ln(1/p_i)
     print(f'vocab_size: {len(tokenizer)=} \nExpected random loss: {math.log(len(tokenizer))=}')
     print(f"CUDA version: {torch.version.cuda=}")
-    print(f'{output_dir=}')
+    print(f'{output_dir=}') if output_dir is not None else None
     try:
         print(f'{tokenizer.pad_token=} {tokenizer.eos_token_id=}')
     except:
@@ -191,7 +213,7 @@ def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
     else:
         raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
     if verbose:
-        print_model_info(model)
+        print_model_info(model, tokenizer)
     return model, tokenizer
 
 def raw_dataset_2_lm_data(raw_dataset, 
@@ -466,18 +488,19 @@ def get_ai4m_v0():
     """
     ref: https://huggingface.co/AI4M
     """
+    streaming = True
     path, name, data_files, split = ['UDACA/AF'], [None], [None], ['train']
     # TODO: put AI4M/mma-dataset in the path
-    return path, name, data_files, split
+    return path, name, data_files, split, streaming
 
 
 def load_dataset_block_size(tokenizer,
                     block_size: int,
-                    streaming: bool = True,
                     path: list[str] = ['UDACA/AF'],  # TODO figure this out
                     name: list[str] = [None], # TODO figure this out
                     data_files: list[str] = [None], # TODO figure this out
-                    split: str = 'train', # TODO figure this out
+                    split: list[str] = ['train'], # TODO figure this out
+                    streaming: bool = True,
                     ):
     """
     path, name, data_files, split = ['UDACA/AF'], [None], [None], ['train']
@@ -505,8 +528,13 @@ def compute_metrics(eval_preds):
     preds = preds[:, :-1].reshape(-1)
     return metric.compute(predictions=preds, references=labels)
 
-def eval_hf(trainer: Trainer, path: str, name: str, split: str, max_eval_samples: Any = 'Unknown_Eval_Max_Samples',):
-    metrics = trainer.evaluate()
+def eval_hf(trainer: Trainer, 
+            path: str, name: str, 
+            split: str, 
+            eval_dataset = None,  # provide eval data set to overwrite it
+            max_eval_samples: Any = 'Unknown_Eval_Max_Samples',
+            ) -> Dict[str, float]:
+    metrics: Dict[str, float] = trainer.evaluate(eval_dataset)
     try:
         perplexity = math.exp(metrics["eval_loss"])
     except OverflowError:
