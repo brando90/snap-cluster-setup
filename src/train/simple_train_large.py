@@ -2,15 +2,15 @@ import os
 import numpy as np
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, TrainingArguments, Trainer
+import evaluate
+
 from datasets import load_dataset, load_metric
 from typing import Dict, Tuple, Optional
 from pathlib import Path
-import evaluate
 
 from utils import eval_hf, get_ai4m_v0, get_data_set_args, load_dataset_block_size
 
 from utils import load_model_block_size
-
 
 def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
                     path: str = 'accuracy',
@@ -31,7 +31,7 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
     predictions = np.argmax(predictions, axis=1)
     return metric.compute(predictions=predictions, references=references)
 
-def preprocess_function_proofnet_simple(examples: Dict[str, list], tokenizer: GPT2Tokenizer, max_length: int = 512) -> Dict[str, torch.Tensor]:
+def preprocess_function_proofnet(examples: Dict[str, list], tokenizer: GPT2Tokenizer) -> Dict[str, torch.Tensor]:
     """
     Preprocess the input data for the proofnet dataset.
 
@@ -43,92 +43,82 @@ def preprocess_function_proofnet_simple(examples: Dict[str, list], tokenizer: GP
     The processed model inputs.
     """
     inputs = [f"{examples['nl_statement'][i]}{tokenizer.eos_token}{examples['formal_statement'][i]}" for i in range(len(examples['nl_statement']))]
-    model_inputs = tokenizer(inputs, max_length=max_length, padding="max_length", truncation=True, return_tensors="pt")
+    model_inputs = tokenizer(inputs, max_length=512, padding="max_length", truncation=True, return_tensors="pt")
     labels = model_inputs.input_ids.clone()
     labels[labels == tokenizer.pad_token_id] = -100
     model_inputs["labels"] = labels
     return model_inputs
 
-def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2", 
-                            path: str = "hoskinson-center/proofnet",
-                            output_dir_train: str = '~/tmp/proofnet/train',
-                            output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
-                            output_dir_test: str = '~/tmp/proofnet/test',
-                            path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-                            num_train_epochs: int = 5,
+def setup_and_train_big_model(
+                            # pretrained_model_name_or_path: str = "mistralai/Mistral-7B-Instruct-v0.2",
+                            pretrained_model_name_or_path: str = "gpt2",
+                            path: str = "all_ai4m_datasets_v0",
+                            path_test: str = "hoskinson-center/proofnet",
+                            output_dir_train: str = '~/tmp/all_ai4m_datasets_v0/train',
+                            output_dir_test: str = '~/tmp/all_ai4m_datasets_v0/eval/proofnet/test',
+                            path_to_save_model: Optional[str] = '~/tmp/all_ai4m_datasets_v0/model',  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
+                            max_steps: int = 2,
                             per_device_train_batch_size: Optional[int] = 2,
-                            per_device_eval_batch_size: Optional[int] = 2,
+                            per_device_eval_batch_size: Optional[int] = 1,
                             save_total_limit: Optional[int] = None,
                             learning_rate: float = 5e-5,
                             weight_decay: float = 0.01,
                             max_grad_norm: float = 1.0, 
                             optim='paged_adamw_32bit',
-                            gradient_accumulation_steps = 2, # see: based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
-                            gradient_checkpointing: Optional[bool] = False,
-                            # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-                            # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-                            report_to: str = 'none',  # recommended values 'wandb' or `none`
+                            gradient_accumulation_steps = 8, # see: based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
+                            gradient_checkpointing: Optional[bool] = True,  # If True, use gradient checkpointing to save memory at the expense of slower backward pass.
+                            lr_scheduler_type='cosine',
+                            warmup_ratio=0.01,
+                            evaluation_strategy='no',
+                            eval_steps = None,  # TODO
+                            report_to: str = 'none',
+                            block_size: int = 4096,  # TODO we need to move away from block size training to respecting sentences
                     ) -> None:
-    """
-    Set up the environment, preprocess the dataset, and train the model.
-
-    Args:
-    tokenizer_name: The name of the tokenizer.
-    model_name: The name of the model.
-    dataset_path: The path to the dataset.
-    """
     # Clear CUDA cache to free up memory
     torch.cuda.empty_cache()
 
     # Load tokenizer and model
-    if pretrained_model_name_or_path == "gpt2":
-        tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
-        # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-        if tokenizer.pad_token_id is None:
-            tokenizer.pad_token = tokenizer.eos_token
-            print(f'{tokenizer.pad_token=}')
-        model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
-        # model.resize_token_embeddings(len(tokenizer))  # leaving for reference, not needed since pad = eos for us
-        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
-        model = model.to(device)
-        block_size: int = tokenizer.model_max_length
-        print(f'{block_size=}')
-    else:
-        raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
-    print("Number of parameters:", sum(p.numel() for p in model.parameters()))
+    model, tokenizer = load_model_block_size(pretrained_model_name_or_path, verbose=True)
 
     # Load the dataset
-    dataset_val = load_dataset(path, split='validation')
-    dataset_test = load_dataset(path, split='test')
+    path, name, data_files, split, streaming = get_data_set_args(path)
+    # from train.simple_train import preprocess_function_proofnet_simple
+    # train_dataset = load_dataset(path="hoskinson-center/proofnet", split='validation').map(lambda examples: preprocess_function_proofnet_simple(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
+    train_dataset = load_dataset_block_size(tokenizer, block_size, path, name, data_files, split, streaming)
+    test_dataset = load_dataset(path_test, split='test')  #TODO block size vs non, matters?
 
     # Preprocess the dataset
     if path == "hoskinson-center/proofnet":
-        preprocess_function = preprocess_function_proofnet_simple
+        preprocess_function = preprocess_function_proofnet
         # note: text field is usually more common!
-        val_dataset = dataset_val.map(lambda examples: preprocess_function(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
-        test_dataset = dataset_test.map(lambda examples: preprocess_function(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
+        # val_dataset = val_dataset.map(lambda examples: preprocess_function(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
+        test_dataset = test_dataset.map(lambda examples: preprocess_function(examples, tokenizer), batched=True, remove_columns=["nl_statement", "formal_statement"])
 
     # Training arguments
     output_dir_train: Path = Path(output_dir_train).expanduser()
     output_dir_train.mkdir(parents=True, exist_ok=True)
     training_args = TrainingArguments(
         output_dir=output_dir_train,
-        evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
+        max_steps=max_steps,
+        evaluation_strategy=evaluation_strategy,  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
         gradient_accumulation_steps=gradient_accumulation_steps,  # based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
         gradient_checkpointing = gradient_checkpointing,  # TODO depending on hardware set to true?
         learning_rate=learning_rate,
         per_device_train_batch_size=per_device_train_batch_size,
         per_device_eval_batch_size=per_device_eval_batch_size,
         weight_decay=weight_decay,
+        save_steps=max_steps//3,  # alpaca does 2000, other defaults were 500
         save_total_limit=save_total_limit,
-        num_train_epochs=num_train_epochs,
         max_grad_norm=max_grad_norm,
         optim=optim,
+        logging_dir=output_dir_train / 'logs',
         logging_first_step=True,
-        logging_strategy='epoch',
-        # lr_scheduler_type=lr_scheduler_type  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-        # warmup_ratio=warmup_ratio,
-        report_to = report_to,  # options I recommend: 'none', 'wandb'
+        logging_strategy='steps',
+        eval_steps = eval_steps,
+        remove_unused_columns=False,  # TODO don't get why https://stackoverflow.com/questions/76879872/how-to-use-huggingface-hf-trainer-train-with-custom-collate-function/76929999#76929999 , https://claude.ai/chat/475a4638-cee3-4ce0-af64-c8b8d1dc0d90
+        lr_scheduler_type=lr_scheduler_type,
+        warmup_ratio=warmup_ratio,
+        report_to = report_to,  # options I recommend: 'none' or 'wandb'
         fp16=False,  # never ever set to True
         bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
     )
@@ -137,8 +127,8 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=val_dataset,
-        eval_dataset=test_dataset,
+        train_dataset=train_dataset,
+        eval_dataset=test_dataset,  # None or eval strategy says 'no' is training args
         tokenizer=tokenizer,
         compute_metrics=compute_metrics
     )
@@ -163,7 +153,7 @@ def main() -> None:
     """
     Main function to execute the model training and evaluation.
     """
-    setup_and_train_proofnet()
+    setup_and_train_big_model()
 
 if __name__ == "__main__":
     import time

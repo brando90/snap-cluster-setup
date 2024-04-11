@@ -224,37 +224,11 @@ def raw_dataset_2_lm_data(raw_dataset,
                           debug: bool = False, 
                           streaming: bool = True,
                           batch_size: int = 2,
-                          fromat: str = 'torch',
+                          format: str = 'torch',
                           ):
     """ Get lm data set but note it uses the grou_texts function which concatenates all tests into a single sequence according to block size (some seq length e.g., max seq length)."""
-    raw_dataset = raw_dataset.with_format(fromat)
-    remove_columns = get_column_names(raw_dataset, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
-    # - Get tokenized train data set
-    # Note: Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
-    tokenize_function = lambda examples: tokenizer(examples[desired_dataset_column])
-    tokenized_train_datasets = raw_dataset.map(tokenize_function, batched=True, remove_columns=remove_columns)
-    _group_texts = lambda examples : group_texts(examples, block_size)
-    # - Get actual data set for lm training (in this case each seq is of length block_size, no need to worry about pad = eos since we are filling each sequence)
-    lm_dataset = tokenized_train_datasets.map(_group_texts, batched=True)
-    if debug:
-        batch = get_data_from_hf_dataset(lm_dataset, streaming=streaming, batch_size=batch_size)
-        print(f'{len(next(iter(batch))["input_ids"])=}')
-        assert all(len(data_dict['input_ids']) == block_size for data_dict in iter(batch)), f'Error, some seq in batch are not of length {block_size}'
-    return lm_dataset
-
-def raw_dataset_2_lm_data(raw_dataset, 
-                          tokenizer, 
-                          block_size: int, 
-                          desired_dataset_column: str = 'text',
-                          method_to_remove_columns: str = 'keys',
-                          debug: bool = False, 
-                          streaming: bool = True,
-                          batch_size: int = 2,
-                          fromat: str = 'torch',
-                          ):
-    """ Get lm data set but note it uses the grou_texts function which concatenates all tests into a single sequence according to block size (some seq length e.g., max seq length)."""
-    raw_dataset = raw_dataset.with_format(fromat)
-    remove_columns = get_column_names(raw_dataset, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
+    raw_dataset = raw_dataset.with_format(format)
+    remove_columns = get_column_names(raw_dataset, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs during training when HF "vectorizes/stacks" tensors during training
     # - Get tokenized train data set
     # Note: Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
     tokenize_function = lambda examples: tokenizer(examples[desired_dataset_column])
@@ -511,7 +485,6 @@ def load_dataset_block_size(tokenizer,
     # - Get raw train data set
     raw_train_datasets = interleave_datasets(train_datasets, probabilities)
     lm_train_dataset = raw_dataset_2_lm_data(raw_train_datasets, tokenizer, block_size)
-    train_dataset = lm_train_dataset
     # lm_train_dataset = lm_train_dataset.take(num_rows_according_to_tok_count)  # not using get_data_from_hf_dataset because we don't know if it respect getting the first n rows
     return lm_train_dataset
 

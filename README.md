@@ -173,7 +173,13 @@ This culminates in you putting your `.bashrc` file in exactly this path:
 Let's do setps 1, 2, 3. 
 
 Now we are doing 1 and 2 in one shot in `.bashrc`. 
-First create a file `.bashrc` at `/afs/cs.stanford.edu/u/<YOUR_CSID>/` with (if it doesn't exist already, if it does exit remove it's contents, you will change it):
+Remove the sym link to the system admins `.bashrc` (always understand the commands you're running and read the output):
+```bash
+rm .bashrc
+```
+This should resolve any permissions issues. 
+<!-- https://piazza.com/class/lurxqr2yufy3bk/post/10 -->
+Then create a file `.bashrc` at `/afs/cs.stanford.edu/u/<YOUR_CSID>/` with (if it doesn't exist already, if it does exit remove it's contents, you will change it):
 ```bash
 touch /afs/cs.stanford.edu/u/<YOUR_CSID>/.bashrc
 ```
