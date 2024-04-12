@@ -124,6 +124,9 @@ Now that you understand the rationale, so background on how starting a terminal 
 Every time one logins into a snap node/server (or creates a new linux terminal with the `bash` cli command), the terminal (cli) needs to configure your unix/linux environment (the set of variables that hold important paths so that the terminal/cli "works as expected" e.g., standard commands/execuatable binaries are found like `python`, `ls`, `cd`, `echo`, `pwd`, `cat`, `vim` etc. or environment variables like `$HOME`, `$PATH`, etc. have the right content)
 
 Usually the linux terminal (e.g. `bash`) runs ("sources") `.bash_profile` to set up your linux environment before providing the bash/cli/terminal session (where you write commands). 
+In the SNAP cluster, the system admins have their `.bash_profile` located at your root's `afs`. 
+More precisely, you will have a (sym) link called `.bash_profile` that points to the system adimns file at `/afs/cs/etc/skel/.bash_profile`. 
+This file is ran each time you ssh/log in or you run `bash` in SNAP. 
 This command usually sets up your environment variables for your terminal (e.g., current `bash` session) by running commands you specify in that file. 
 In particular, it sets up [environment variables](https://www.google.com/search?q=environment+variables&rlz=1C5CHFA_enUS741US741&oq=environment+variab&gs_lcrp=EgZjaHJvbWUqDQgAEAAYgwEYsQMYgAQyDQgAEAAYgwEYsQMYgAQyBwgBEAAYgAQyBwgCEAAYgAQyBwgDEAAYgAQyBggEEEUYOTIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCDQ0MjVqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8), which are terminal/cli variables that point to important locations in the node/computer so that everything works! 
 Now, let's inspect your `.bash_profile`. 
