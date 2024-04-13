@@ -1724,3 +1724,83 @@ pgrep -f 'code|code-insiders|vscode' | xargs -r kill
 kills all my processes:
 pkill -f 'brando9' || pgrep -f 'brando9' | xargs -r kill
 ```
+
+## Check Disk Size
+To see the disk space of the current path/dir you can do:
+```bash
+du -sh
+```
+sample output:
+```bash
+(base) brando9@skampere1/afs/cs.stanford.edu/u/brando9 $ du -sh .
+4.6G    .
+```
+To find size of all files and dirs at `.` do:
+```
+du -sh * .[!.]*
+```
+Note: .[!.]*: This is a pattern that matches hidden files and directories in the current directory, excluding the special directories . and ...
+
+Ref: handy [claude Opus 2024 april 14](https://claude.ai/chat/97ea37ad-7446-48c1-814a-0d44a713d7b4).
+
+## Gitlfs
+First if you are in SNAP, to make sure `afs` is not overwhelmed do:
+```bash
+git config --global lfs.storage ~/.cache/git-lfs
+```
+This makes sure that the large files (e.g., the image files) to be tracked by git lfs are not tracked in your github repo, where we usually store the git repo in SNAP. 
+We do this since your `afs` directory is available on all nodes and it's fast so **only** the code can be there. 
+But the large files might still be needed. For that the previous command puts the git lfs files in `lfs` and since we made sure `$HOME` (`~`) points to your lfs home directory path where is storage.
+
+Now to initialize git lfs do:
+```bash
+git lfs install
+```
+This will trakc the large files in a remote directory in the remove and in the local at `~/.cache/git-lfs`.
+Every file type you want to associate with Git LFS will need to be added with git lfs track. 
+To track all image files with Git LFS, you can use the git lfs track command followed by the file patterns for common image file extensions. Here's an example command that tracks several popular image file formats:
+```bash
+git lfs track "*.jpg" "*.jpeg" "*.png" "*.gif" "*.psd" "*.tiff" "*.bmp" "*.svg" "*.eps" "*.webp"
+```
+It creates a `.gitattributes` file that tracks git lfs tracked files. 
+If you want to then commit them you do:
+```bash
+git commit -m "Convert image files to Git LFS"
+```
+But if you did a "mistake" and had already pushed them, you can do:
+```bash
+git lfs migrate import --include="*.jpg,*.jpeg,*.png,*.gif,*.psd,*.tiff,*.bmp,*.svg,*.eps,*.webp"
+# if it worked, then do:
+git push
+```
+check if this fixed it with:
+```bash
+git lfs status
+git status
+```
+this should show no issues with either normal code vs the git lfs tracked files.
+
+Ref: 
+  - ref: https://docs.github.com/en/repositories/working-with-files/managing-large-files/configuring-git-large-file-storage 
+
+## Undo last git commit & add (safely)
+To undo the last git commit that hasn't been pushed to a remote repository, you can use the git reset command. Here's how you can do it:
+```bash
+git reset --soft HEAD~1
+```
+Explanation:
+- `git reset` is the command used to undo commits.
+- The `--soft` option moves the branch pointer back to the previous commit, but keeps the changes from the last commit in the staging area. 
+This means that the changes from the last commit will still be present in your working directory and staged for the next commit.
+-`HEAD~1` refers to the commit that is one before the current `HEAD`. This effectively undoes the last commit.
+Sample output:
+```bash
+(base) brando9@skampere1/afs/cs.stanford.edu/u/brando9/gold-ai-olympiad $ git reset --soft HEAD~1
+(base) brando9@skampere1/afs/cs.stanford.edu/u/brando9/gold-ai-olympiad $ 
+```
+Ref: handy claude [reference in the context of git lfs](https://claude.ai/chat/97ea37ad-7446-48c1-814a-0d44a713d7b4).
+
+To undo last `git add .` do:
+```bash
+git restore --staged .
+```
