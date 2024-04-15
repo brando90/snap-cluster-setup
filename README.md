@@ -348,7 +348,7 @@ This tutorial covered the basics of file editing with Vim in the terminal, inclu
 At this point, you know what the environment variable `$HOME` is and that yours should be pointing to your node’s `lfs` home directory -- as suggested by [this .bahrc file](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc#L43C1-L47C31) (but using your CSID).
 
 Now the goal will be to:
-1. show you how to `git clone` (optionally git fork this repo) a small sized git project (so not using `gitlfs`, that would most likely create issues with AFS's storage limit) like [this one (`snap-cluster-setup`)](https://github.com/brando90/snap-cluster-setup)
+1. show you how to `git clone` (from your git fork of this repo) a small sized git project (so not using `gitlfs`, that would most likely create issues with AFS's storage limit) like [this one (`snap-cluster-setup`)](https://github.com/brando90/snap-cluster-setup)
 2. learn what a [python environment](<https://csguide.cs.princeton.edu/software/virtualenv#:~:text=A%20Python%20virtual%20environment%20(venv,installed%20in%20the%20specific%20venv.>) is and create one using [conda](https://docs.conda.io/en/latest/)
 
 For step 1 we will first go to your `afs` home root path. 
@@ -383,7 +383,8 @@ Sample output (understand the commands):
 /afs/cs.stanford.edu/u/brando9
 ```
 
-Now that we are at our `afs` home root directory, let's git clone this repo (or ideally your git fork). 
+Now that we are at our `afs` home root directory, let's git clone your git fork.
+First git fork this repo using the github UI (likely best option is to Google this or ChatGPT it). 
 This step is really showing you to git clone any github repo to your `afs` (npte: later you will git clone your actual project's repo and repeat cloning it to your afs every time you have a new repo you want to use for snap.
 Note: if you're following this setup, since we are using `lfs` due to storage issues with `afs` you will need to set up a new conda env each time use a new node, although the repo might be available already).
 
