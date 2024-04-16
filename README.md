@@ -1805,3 +1805,68 @@ To undo last `git add .` do:
 ```bash
 git restore --staged .
 ```
+
+## VScode code workspace files
+You can [put your vscode files in AFS and symlink them to all nodes](https://chat.openai.com/c/8a3ad71e-48af-456a-ac3e-1029afc184bb) e.g.,
+```bash
+# Set the AFS environment variable if it is not already set
+export AFS="/afs/cs.stanford.edu/u/brando9"
+
+# Move and rename the VS Code workspaces to the AFS directory, and create symbolic links in the home directory
+mv "$HOME/vscode.beyond-scale-language-data-diversity.ampere1.code-workspace" "$AFS/vscode.beyond-scale-language-data-diversity.code-workspace"
+ln -s "$AFS/vscode.beyond-scale-language-data-diversity.code-workspace" "$HOME/vscode.beyond-scale-language-data-diversity.code-workspace"
+
+mv "$HOME/vscode.gold-ai-olympiad.afs_snap.code-workspace" "$AFS/vscode.gold-ai-olympiad.code-workspace"
+ln -s "$AFS/vscode.gold-ai-olympiad.code-workspace" "$HOME/vscode.gold-ai-olympiad.code-workspace"
+
+mv "$HOME/vscode.evaporate.skampere1.code-workspace" "$AFS/vscode.evaporate.code-workspace"
+ln -s "$AFS/vscode.evaporate.code-workspace" "$HOME/vscode.evaporate.code-workspace"
+
+mv "$HOME/vscode.lean4ai.skampere1.code-workspace" "$AFS/vscode.lean4ai.code-workspace"
+ln -s "$AFS/vscode.lean4ai.code-workspace" "$HOME/vscode.lean4ai.code-workspace"
+
+mv "$HOME/vscode.snap-cluster-setup.code-workspace" "$AFS/vscode.snap-cluster-setup.code-workspace"
+ln -s "$AFS/vscode.snap-cluster-setup.code-workspace" "$HOME/vscode.snap-cluster-setup.code-workspace"
+
+mv "$HOME/vscode.maf_data.creating_data_math_training.skamapere1.code-workspace" "$AFS/vscode.maf_data.creating_data_math_training.code-workspace"
+ln -s "$AFS/vscode.maf_data.creating_data_math_training.code-workspace" "$HOME/vscode.maf_data.creating_data_math_training.code-workspace"
+
+mv "$HOME/vscode.maf_data.training_af_model.skampere1.code-workspace" "$AFS/vscode.maf_data.training_af_model.code-workspace"
+ln -s "$AFS/vscode.maf_data.training_af_model.code-workspace" "$HOME/vscode.maf_data.training_af_model.code-workspace"
+
+mv "$HOME/vscode.math_evaporate.skampere1.code-workspace" "$AFS/vscode.math_evaporate.code-workspace"
+ln -s "$AFS/vscode.math_evaporate.code-workspace" "$HOME/vscode.math_evaporate.code-workspace"
+
+mv "$HOME/vscode.beyond-scale-language-data-diversity.skampere1.code-workspace" "$AFS/vscode.beyond-scale-language-data-diversity.code-workspace"
+ln -s "$AFS/vscode.beyond-scale-language-data-diversity.code-workspace" "$HOME/vscode.beyond-scale-language-data-diversity.code-workspace"
+```
+this is because the vscode file looks as follows:
+```bash
+(gold_ai_olympiad) (base) brando9@ampere1:~$ cat vscode.beyond-scale-language-data-diversity.ampere1.code-workspace
+{
+        "folders": [
+                {
+                        "path": "beyond-scale-language-data-diversity"
+                },
+                {
+                        "path": "massive-autoformalization-maf"
+                },
+                {
+                        "path": "data/maf_data"
+                },
+                {
+                        "path": "evals-for-autoformalization"
+                },
+                {
+                        "path": "ultimate-anatome"
+                },
+                {
+                        "path": "ultimate-utils"
+                },
+                {
+                        "path": "data"
+                }
+        ],
+        "settings": {}
+```
+which means it's relative to `$HOME` most likely. 
