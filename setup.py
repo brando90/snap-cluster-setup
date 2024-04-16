@@ -135,6 +135,7 @@ setup(
         'bitsandbytes== 0.43.0',
         # 'einops',
         'vllm==0.4.0.post1', # my gold-ai-olympiad project uses 0.4.0.post1 ref: https://github.com/vllm-project/vllm/issues/2747
+        # pip install -q -U google-generativeai
     ]
 )
 

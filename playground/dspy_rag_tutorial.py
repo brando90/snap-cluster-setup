@@ -4,8 +4,8 @@ from dspy.teleprompt import BootstrapFewShot
 
 def main():
     # Setting up the language model (LM) and retrieval model (RM)
-    lm = dspy.OpenAI(model='gpt-3.5-turbo')
-    # lm = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
+    # lm = dspy.OpenAI(model='gpt-3.5-turbo')
+    lm = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
     colbertv2_wiki17_abstracts = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
     dspy.settings.configure(lm=lm, rm=colbertv2_wiki17_abstracts)
 
