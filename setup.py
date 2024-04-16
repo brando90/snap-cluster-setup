@@ -102,12 +102,29 @@ setup(
         # 'nltk'
         'twine',
 
-        'torch==2.1.2',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # # mercury: https://github.com/vllm-project/vllm/issues/2747
+        # 'dspy-ai',
+        # # 'torch==2.1.2+cu118',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # 'torch==2.2.2',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # # 'torchvision',
+        # # 'torchaudio',
+        # # 'trl',
+        # 'transformers',
+        # 'accelerate',
+        # # 'peft',
+        # # 'datasets==2.18.0', 
+        # 'datasets',  
+        # 'evaluate', 
+        # 'bitsandbytes',
+        # # 'einops',
+        # # 'vllm==0.4.0.post1', # my gold-ai-olympiad project uses 0.4.0.post1 ref: https://github.com/vllm-project/vllm/issues/2747
+
+        # ampere
+        'dspy-ai',
+        # 'torch==2.1.2+cu118',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        'torch==2.1.2',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
         # 'torchvision',
         # 'torchaudio',
-
-        # 'fairseq',
-
         # 'trl',
         'transformers==4.39.2',
         'accelerate==0.29.2',
@@ -117,7 +134,6 @@ setup(
         'evaluate==0.4.1', 
         'bitsandbytes== 0.43.0',
         # 'einops',
-
         'vllm==0.4.0.post1', # my gold-ai-olympiad project uses 0.4.0.post1 ref: https://github.com/vllm-project/vllm/issues/2747
     ]
 )

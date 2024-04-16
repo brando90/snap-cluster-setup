@@ -11,4 +11,6 @@ echo CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES
 
 # -- Run
 python ~/snap-cluster-setup/src/train/simple_train.py
-python ~/snap-cluster-setup/src/train/simple_train_train.py
+# python ~/snap-cluster-setup/src/train/simple_train_train.py
+CUDA_VISIBLE_DEVICES=5 python src/test_vllm.py 
+CUDA_VISIBLE_DEVICES=5 python playground/dspy_rag_tutorial.py 

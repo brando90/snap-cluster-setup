@@ -4,9 +4,10 @@ from dspy.teleprompt import BootstrapFewShot
 
 def main():
     # Setting up the language model (LM) and retrieval model (RM)
-    turbo = dspy.OpenAI(model='gpt-3.5-turbo')
+    lm = dspy.OpenAI(model='gpt-3.5-turbo')
+    # lm = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
     colbertv2_wiki17_abstracts = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
-    dspy.settings.configure(lm=turbo, rm=colbertv2_wiki17_abstracts)
+    dspy.settings.configure(lm=lm, rm=colbertv2_wiki17_abstracts)
 
     # Loading the HotPotQA dataset
     dataset = HotPotQA(train_seed=1, train_size=20, eval_seed=2023, dev_size=50, test_size=0)
