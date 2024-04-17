@@ -1445,7 +1445,7 @@ Time taken: 12.64 seconds, or 0.21 minutes, or 0.00 hours.
 ```
 
 
-Now edit your gpt2 small file to use wandb and to train for more epochs:
+Now edit your gpt2 small file to use wandb by changing the `report_to` string from `none` to `wandb`, and to train for more epochs:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python ~/snap-cluster-setup/src/train/simple_train.py
 ```
@@ -1805,6 +1805,11 @@ To undo last `git add .` do:
 ```bash
 git restore --staged .
 ```
+
+## SSH
+If you cannot do git push to your own repo it means you have not uploaded your ssh keys to your github settings to your github account. 
+For that do go to your keys settings in github: https://github.com/settings/keys and follow their instructions there. 
+e.g., https://docs.github.com/authentication/connecting-to-github-with-ssh
 
 ## VScode code workspace files
 You can [put your vscode files in AFS and symlink them to all nodes](https://chat.openai.com/c/8a3ad71e-48af-456a-ac3e-1029afc184bb) e.g.,
