@@ -1904,7 +1904,11 @@ export PATH="$VENV_PATH/bin:$PATH"
 ```
 at the end of your `.bashrc` file.
 
-To uninstall Poetry, simply delete the entire `$VENV_PATH` directory.
+To uninstall Poetry, simply delete the entire `$VENV_PATH` directory:
+```bash
+# uninstall Poetry
+rm -rf $VENV_PATH
+```
 
 ref: [venv](https://docs.python.org/3/library/venv.html)
 Ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
