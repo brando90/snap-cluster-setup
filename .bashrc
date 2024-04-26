@@ -118,3 +118,9 @@ export OPENAI_KEY='your_openai_key_here'
 export CUDA_VISIBLE_DEVICES=5
 export LEAST_GPU_ID=$(nvidia-smi --query-gpu=memory.used --format=csv,nounits,noheader | awk '{print NR-1 " " $1}' | sort -nk2 | head -n1 | cut -d' ' -f1)
 export CUDA_VISIBLE_DEVICES=$LEAST_GPU_ID
+
+# -- poetry, see: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+# assumes mkdir $HOME/.virtualenvs has been ran
+export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
+# assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+export PATH="$VENV_PATH/bin:$PATH"
