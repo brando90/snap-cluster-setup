@@ -587,11 +587,6 @@ conda create -n snap_cluster_setup python=3.9
 
 # - activate your conda env
 conda activate snap_cluster_setup
-
-# - wandb
-pip install --upgrade pip
-pip install wandb
-pip install wandb --upgrade
 ```
 Note: I try to use pip as much as I can instead of conda to install my packages (or be consistent with which one I use, but sometimes you will have to combine each one since package management and installation can be tricky and hacky. Welcome to the real world!).
 Sample output:
@@ -1870,3 +1865,33 @@ this is because the vscode file looks as follows:
         "settings": {}
 ```
 which means it's relative to `$HOME` most likely. 
+
+## Poetry
+Official reference for installing manually: https://python-poetry.org/docs/#installing-manually
+Ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
+
+Poetry can be installed manually using pip and the venv module. 
+```bash
+# check your %HOME (~) points to lfs
+echo $HOME 
+
+# If the virtual env folder doesn't exist create it (note $HOME should point to your lfs)
+mkdir $HOME/.virtualenvs
+
+# The variable $VENV_PATH will be used to indicate the path at which the virtual environment was created.
+export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
+
+# Create a virtual environment at the specified path (python3 -m uses python's way to execute modules without needing to know their location, in this case we use the venv, virtualenv, one to create a virtual env at $VENV_PATH)
+python3 -m venv $VENV_PATH
+
+# Upgrade pip and setuptools within the virtual environment
+$VENV_PATH/bin/pip install -U pip setuptools
+
+# Install poetry within the virtual environment
+$VENV_PATH/bin/pip install poetry
+```
+Poetry will be available at `$VENV_PATH/bin/poetry` and can be invoked directly or symlinked elsewhere.
+
+To uninstall Poetry, simply delete the entire `$VENV_PATH` directory.
+
+ref: [venv](https://docs.python.org/3/library/venv.html)
