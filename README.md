@@ -1440,7 +1440,7 @@ Time taken: 12.64 seconds, or 0.21 minutes, or 0.00 hours.
 ```
 
 
-Now edit your gpt2 small file to use wandb by changing the `report_to` string from `none` to `wandb`, and to train for more epochs:
+Now edit your gpt2 small file to use wandb and to train for more epochs:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python ~/snap-cluster-setup/src/train/simple_train.py
 ```
@@ -1801,11 +1801,6 @@ To undo last `git add .` do:
 git restore --staged .
 ```
 
-## SSH
-If you cannot do git push to your own repo it means you have not uploaded your ssh keys to your github settings to your github account. 
-For that do go to your keys settings in github: https://github.com/settings/keys and follow their instructions there. 
-e.g., https://docs.github.com/authentication/connecting-to-github-with-ssh
-
 ## VScode code workspace files
 You can [put your vscode files in AFS and symlink them to all nodes](https://chat.openai.com/c/8a3ad71e-48af-456a-ac3e-1029afc184bb) e.g.,
 ```bash
@@ -1873,9 +1868,9 @@ which means it's relative to `$HOME` most likely.
 
 ## Poetry
 Official reference for installing manually: https://python-poetry.org/docs/#installing-manually
-Ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
 
-Poetry can be installed manually using pip and the venv module. 
+So that poetry's own depedencies don't get accidentally overwritten, you need to install poetry in a virtual env. 
+Thus, to install Poetry manually in a virtual env using pip and the venv module with python, do: 
 ```bash
 # check your %HOME (~) points to lfs
 echo $HOME 
@@ -1883,7 +1878,7 @@ echo $HOME
 # If the virtual env folder doesn't exist create it (note $HOME should point to your lfs)
 mkdir $HOME/.virtualenvs
 
-# The variable $VENV_PATH will be used to indicate the path at which the virtual environment was created.
+# Set the python virtual env that will hold poetry
 export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
 
 # Create a virtual environment at the specified path (python3 -m uses python's way to execute modules without needing to know their location, in this case we use the venv, virtualenv, one to create a virtual env at $VENV_PATH)
@@ -1895,8 +1890,21 @@ $VENV_PATH/bin/pip install -U pip setuptools
 # Install poetry within the virtual environment
 $VENV_PATH/bin/pip install poetry
 ```
-Poetry will be available at `$VENV_PATH/bin/poetry` and can be invoked directly or symlinked elsewhere.
+Poetry will be available at `$VENV_PATH/bin/poetry`, but to have it the `poetry` command available without the full path, add the virtual env's path to you `$PATH` env:
+```bash
+export PATH="$VENV_PATH/bin:$PATH"
+```
+Alternatively, add
+```bash
+# -- poetry, see: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+# assumes mkdir $HOME/.virtualenvs has been ran
+export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
+# assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+export PATH="$VENV_PATH/bin:$PATH"
+```
+at the end of your `.bashrc` file.
 
 To uninstall Poetry, simply delete the entire `$VENV_PATH` directory.
 
 ref: [venv](https://docs.python.org/3/library/venv.html)
+Ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
