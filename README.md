@@ -1911,4 +1911,59 @@ rm -rf $VENV_PATH
 ```
 
 ref: [venv](https://docs.python.org/3/library/venv.html)
-Ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
+ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
+ref: chat that got us here: https://chat.openai.com/c/9f4f25f6-fbce-445c-8955-ce0b9bc5ab6f
+
+# Git Submodules
+
+If you have not added the submodules to your `.gitmodules` files, you can do it as follows:
+```bash
+# -- add the following modules to your .gitsubmodule file
+git submodule add -f -b hdb --name meta-dataset git@github.com:brando90/meta-dataset.git meta-dataset/
+```
+Then to initialize the git submodules so that git can keep track of the submodules being used do:
+```bash
+# - initialize the git submodules by preparing the git repository, but it does not clone or fetch them, just init's git's internal configs
+git submodule init
+```
+Then to clone, fetch & update the code do (and also initilize anything you might have forgotten that is specificed in the `.gitmodules` file):
+```bash
+# - initialize the git submodules so that git can track them and then the update clone/fetches & updates the submodules
+git submodule update --init
+```
+
+# Lean in SNAP
+You will need a small tool called `elan` will handle updating Lean according to the needs of your current project. 
+Install it with:
+```bash
+# this special version is needed in SNAP because of $HOME points to lfs and elan detects that it seems
+curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+```
+Sample output:
+```bash
+(base) brando9@ampere1~/PyPantograph $ curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+info: downloading installer
+warning: $HOME differs from euid-obtained home directory: you may be using sudo
+info: syncing channel updates for 'stable'
+info: latest update on stable, lean version v4.7.0
+info: downloading component 'lean'
+info: installing component 'lean'
+info: default toolchain set to 'stable'
+
+  stable installed - Lean (version 4.7.0, x86_64-unknown-linux-gnu, commit 6fce8f7d5cd1, Release)
+```
+Sanity check the hidden repo's the lean devs mention are there:
+```bash
+(base) brando9@ampere1~/PyPantograph $ ls $HOME/.elan
+bin  env  settings.toml  tmp  toolchains  update-hashes
+```
+and (will be there but needs to go in your `.bashrc`):
+```bash
+(base) brando9@ampere1~/PyPantograph $ cat $HOME/.profile
+
+export PATH="$HOME/.elan/bin:$PATH"
+```
+and in SNAP it seems you have to manually add the above export to your `.bashrc` manually. 
+Note, the default `.bashrc` I provide should already have it. 
+
+ref: https://leanprover-community.github.io/install/linux.html
