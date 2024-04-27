@@ -1939,6 +1939,7 @@ Install it with:
 # this special version is needed in SNAP because of $HOME points to lfs and elan detects that it seems
 curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
 ```
+
 Sample output:
 ```bash
 (base) brando9@ampere1~/PyPantograph $ curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
@@ -1952,6 +1953,7 @@ info: default toolchain set to 'stable'
 
   stable installed - Lean (version 4.7.0, x86_64-unknown-linux-gnu, commit 6fce8f7d5cd1, Release)
 ```
+
 Sanity check the hidden repo's the lean devs mention are there:
 ```bash
 (base) brando9@ampere1~/PyPantograph $ ls $HOME/.elan
@@ -1965,5 +1967,7 @@ export PATH="$HOME/.elan/bin:$PATH"
 ```
 and in SNAP it seems you have to manually add the above export to your `.bashrc` manually. 
 Note, the default `.bashrc` I provide should already have it. 
+
+Then you can check if it worked by installing [PyPentograph](https://github.com/lenianiva/PyPantograph).
 
 ref: https://leanprover-community.github.io/install/linux.html

@@ -124,3 +124,6 @@ export CUDA_VISIBLE_DEVICES=$LEAST_GPU_ID
 export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
 # assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
 export PATH="$VENV_PATH/bin:$PATH"
+
+# -- Lean, ref: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#lean-in-snap
+export PATH="$HOME/.elan/bin:$PATH"
