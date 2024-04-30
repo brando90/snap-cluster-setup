@@ -18,7 +18,8 @@
 # note: the cuda and conda versions you need might depend on the specific server since the specific cuda version might only work for the gpu that server has
 
 # ---- Brando's scaffold .bashrc file ----
-# this approximately sources the sys admin's .bashrc located at /afs/cs/etc/skel/.bashrc
+
+# - Approximately source the sys admin's .bashrc (located at /afs/cs/etc/skel/.bashrc)
 # since snap is set up badly and it needs the reauth command to re-authenticate randomly somtimes, you need to make sure reauth cmd is available
 export PATH="/afs/cs/software/bin:$PATH"
 # 
@@ -54,60 +55,28 @@ export TEMP=$HOME
 export AFS=/afs/cs.stanford.edu/u/brando9
 export DFS=/dfs/scratch0/brando9/
 
-# -- Conda needs to be set up first before you can test the gpu & the right pytorch version has to be installed e.g., see: https://github.com/brando90/ultimate-utils/blob/45d8b2f47ace4d09ea63fe7cca7a7822b3af2961/sh_files_repo/download_and_install_conda.sh#L1C1-L31C32
-# conda magic, unsure if needed but leaving here
-# # >>> conda initialize >>>
-# # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('$LOCAL_MACHINE_PWD/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "$LOCAL_MACHINE_PWD/miniconda3/etc/profile.d/conda.sh" ]; then
-#         . "$LOCAL_MACHINE_PWD/miniconda3/etc/profile.d/conda.sh"
-#     else
-#         export PATH="$LOCAL_MACHINE_PWD/miniconda3/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
-# # <<< conda initialize <<<
-# put conda in PATH env where to find executable commands (so conda coommand works)
-export PATH="$HOME/miniconda/bin:$PATH"
-# activates base to test things
-source $HOME/miniconda/bin/activate
-# Check if Conda is not installed. HAS TO GO AFTER EXPORT AND SOURCE CONDA PREV CMDS
-if ! which conda > /dev/null; then
-    echo "Conda is not installed. Most likely you will need to install conda in your node's lsf given afs is too small and dfs is too slow. See for an example: https://github.com/brando90/evals-for-autoformalization/tree/main?tab=readme-ov-file#install-conda"
-fi
-conda activate snap_cluster_setup
+# - prompt colours
+BLACK='\e[0;30m'
+RED='\e[0;31m'
+GREEN='\e[0;32m'
+BROWN='\e[0;33m'
+BLUE='\e[0;34m'
+PURPLE='\e[0;35m'
+CYAN='\e[0;36m'
+LIGHT_GREY='\e[0;37m'
+DARK_GREY='\e[1;30m'
+LIGHT_RED='\e[1;31m'
+LIGHT_GREEN='\e[1;32m'
+YELLOW='\e[1;33m'
+LIGHT_BLUE='\e[1;34m'
+LIGHT_PURPLE='\e[1;35m'
+LIGHT_CYAN='\e[1;36m'
+WHITE='\e[1;37m'
 
-# Note: since each server has a specific GPU you might have to set up a seperate conda env and cuda driver, but I think this works for all snap servers (tested on mercercy1, mercuery2, hyperturning1, skampere1)
-# Check if the hostname is X, Y, Z to activate the right conda env with the right pytorch version for the current cuda driver
-if [[ $(hostname) == "mercury1.stanford.edu" ]]; then
-    # 
-    # install the right version of pytorch compatible with cuda 11.7
-    # pip3 install torch torchvision torchaudio
-    # pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
-    export CUDA_VISIBLE_DEVICES=0
-    export PATH=/usr/local/cuda-11.7/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
-    conda activate my_env
-else
-    # install the right version of pytorch compatible with cuda 11.7
-    # pip3 install torch torchvision torchaudio
-    # pip install torch==2.0.1+cu117 -f https://download.pytorch.org/whl/cu117/torch_stable.html
-    export CUDA_VISIBLE_DEVICES=0 
-    export PATH=/usr/local/cuda-11.7/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
-    conda activate base
-fi
+BACK_DEFAULT_COLOR='\e[m'
 
-# -- Optionally test pytorch with a gpu
-# nvcc -V
-# python -c "import torch; print(torch.randn(2, 4).to('cuda') @ torch.randn(4, 1).to('cuda'));"
-# - https://ilwiki.stanford.edu/doku.php?id=hints:gpu
-# export CUDA_VISIBLE_DEVICES=0
-# export PATH=/usr/local/cuda-11.7/bin:$PATH
-# export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+HOST_PART='$(hostname | cut -d. -f1)'
+export PS1="\[$LIGHT_GREY\]\u@$HOST_PART\[$LIGHT_GREEN\]\w\[$LIGHT_GREY\] \$ \[$LIGHT_CYAN\]"
 
 # -- If you use wandb you might need this:
 export WANDB_API_KEY=TODO
@@ -119,11 +88,39 @@ export CUDA_VISIBLE_DEVICES=5
 export LEAST_GPU_ID=$(nvidia-smi --query-gpu=memory.used --format=csv,nounits,noheader | awk '{print NR-1 " " $1}' | sort -nk2 | head -n1 | cut -d' ' -f1)
 export CUDA_VISIBLE_DEVICES=$LEAST_GPU_ID
 
-# -- poetry, see: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+# -- Lean, ref: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#lean-in-snap
+export PATH="$HOME/.elan/bin:$PATH"
+
+# # not needed, if issues see: https://ilwiki.stanford.edu/doku.php?id=hints:gpu
+# export PATH=/usr/local/cuda-11.7/bin:$PATH
+# export LD_LIBRARY_PATH=/usr/local/cuda-11.7/lib64:$LD_LIBRARY_PATH
+
+# -- poetry, we are setting up poetry before conda so that we don't accidentally use poetry's python version, see: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
 # assumes mkdir $HOME/.virtualenvs has been ran
 export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
 # assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
 export PATH="$VENV_PATH/bin:$PATH"
 
-# -- Lean, ref: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#lean-in-snap
-export PATH="$HOME/.elan/bin:$PATH"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('$HOME/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$HOME/miniconda/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniconda/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/miniconda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+# very similar to the conda init code above, will leave it out since snap seems to be working e.g., it can find conda command just fine with the above code, note above code **does** have to be at the end
+# export PATH="$HOME/miniconda/bin:$PATH"
+
+# activates the conda base env
+source $HOME/miniconda/bin/activate
+
+# activate snap_cluster_setup default conda env
+conda activate snap_cluster_setup_py311

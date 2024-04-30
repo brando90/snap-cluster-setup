@@ -1867,6 +1867,8 @@ this is because the vscode file looks as follows:
 which means it's relative to `$HOME` most likely. 
 
 ## Poetry
+
+### Manual Installation of Poetry in SNAP
 Official reference for installing manually: https://python-poetry.org/docs/#installing-manually
 
 So that poetry's own depedencies don't get accidentally overwritten, you need to install poetry in a virtual env. 
@@ -1890,19 +1892,32 @@ $VENV_PATH/bin/pip install -U pip setuptools
 # Install poetry within the virtual environment
 $VENV_PATH/bin/pip install poetry
 ```
-Poetry will be available at `$VENV_PATH/bin/poetry`, but to have it the `poetry` command available without the full path, add the virtual env's path to you `$PATH` env:
+Poetry will be available at `$VENV_PATH/bin/poetry`, but to have the `poetry` command available without using the full path, add the virtual env's path to you `$PATH` env:
 ```bash
+# WARNING: put this export command before conda does the same thing, so that this path is not used by accident over your conda's python env
 export PATH="$VENV_PATH/bin:$PATH"
 ```
-Alternatively, add
+Ideally (especially if you are using conda), the following commands have to be placed carefully in your `.bashrc` file:
 ```bash
-# -- poetry, see: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
-# assumes mkdir $HOME/.virtualenvs has been ran
+# create env for the virtual env that will have the poetry command (note: assumes `mkdir $HOME/.virtualenvs` has been ran)
 export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
-# assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
+# careful running the export bellow, it will put it in front of your conda path if you are using conda and you won't use your conda env's python
 export PATH="$VENV_PATH/bin:$PATH"
 ```
-at the end of your `.bashrc` file.
+In particular, you need to put it before your export for your conda env ([see our `.bashrc`](https://github.com/brando90/snap-cluster-setup/blob/main/.bashrc) for an example)
+In particular note how `export PATH="$VENV_PATH/bin:$PATH"` is before any of the following commands:
+```bash
+# dummy .bashrc file
+
+# exports to make the poetry command available goes first
+export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
+export PATH="$VENV_PATH/bin:$PATH"
+
+# export to make conda work (assuming that's what you want to use)
+export PATH="$HOME/miniconda/bin:$PATH"
+source $HOME/miniconda/bin/activate
+conda activate snap_cluster_setup
+```
 
 To uninstall Poetry, simply delete the entire `$VENV_PATH` directory:
 ```bash
@@ -1913,6 +1928,17 @@ rm -rf $VENV_PATH
 ref: [venv](https://docs.python.org/3/library/venv.html)
 ref: SNAP cluster tutorial for venv https://ilwiki.stanford.edu/doku.php?id=hints:virtualenv
 ref: chat that got us here: https://chat.openai.com/c/9f4f25f6-fbce-445c-8955-ce0b9bc5ab6f
+
+### Poetry depedencies
+TODO
+
+ref: https://chat.openai.com/c/e01336a7-6f67-4cd2-b6cd-09b8ee8aef5a
+
+### Poetry development/editable install of your Project
+TODO
+
+ref: https://chat.openai.com/c/e01336a7-6f67-4cd2-b6cd-09b8ee8aef5a
+ 
 
 # Git Submodules
 
@@ -1926,7 +1952,7 @@ Then to initialize the git submodules so that git can keep track of the submodul
 # - initialize the git submodules by preparing the git repository, but it does not clone or fetch them, just init's git's internal configs
 git submodule init
 ```
-Then to clone, fetch & update the code do (and also initilize anything you might have forgotten that is specificed in the `.gitmodules` file):
+Then to clone, fetch & update the submodules code (and also initilize anything you might have forgotten that is specificed in the `.gitmodules` file):
 ```bash
 # - initialize the git submodules so that git can track them and then the update clone/fetches & updates the submodules
 git submodule update --init
@@ -1954,19 +1980,19 @@ info: default toolchain set to 'stable'
   stable installed - Lean (version 4.7.0, x86_64-unknown-linux-gnu, commit 6fce8f7d5cd1, Release)
 ```
 
-Sanity check the hidden repo's the lean devs mention are there:
+Let's sanity check that the hidden that Lean's `elan` tool is where we expect it to be:
 ```bash
 (base) brando9@ampere1~/PyPantograph $ ls $HOME/.elan
 bin  env  settings.toml  tmp  toolchains  update-hashes
 ```
-and (will be there but needs to go in your `.bashrc`):
+The previous curl install will also try to put put the `$HOME/.elan` hidden path in your `PATH` env variable, so that the `elan` becomes available by creating a `.profile` with the following contents:
 ```bash
 (base) brando9@ampere1~/PyPantograph $ cat $HOME/.profile
 
 export PATH="$HOME/.elan/bin:$PATH"
 ```
-and in SNAP it seems you have to manually add the above export to your `.bashrc` manually. 
-Note, the default `.bashrc` I provide should already have it. 
+However, you will need to put the above in your `.bashrc` file (e.g., at the end) if it's not already there. 
+Note: the default `.bashrc` I provide should now already have it. 
 
 Then you can check if it worked by installing [PyPentograph](https://github.com/lenianiva/PyPantograph).
 
