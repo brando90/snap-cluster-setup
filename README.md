@@ -1938,7 +1938,16 @@ ref: https://chat.openai.com/c/e01336a7-6f67-4cd2-b6cd-09b8ee8aef5a
 TODO
 
 ref: https://chat.openai.com/c/e01336a7-6f67-4cd2-b6cd-09b8ee8aef5a
- 
+
+### cheat sheet
+
+poetry build: Packages the project into distributable formats (like .whl and .tar.gz) based on the configurations set in pyproject.toml.
+poetry install: Installs the project and its dependencies into the virtual environment, creating the environment if it doesn't exist, in editable mode.
+poetry shell: Spawns a new shell with the project's virtual environment activated, making it the primary Python environment.
+poetry env use: Specifies which Python interpreter to use for the project's virtual environment, creating a new environment if the specified interpreter doesn't match any existing one.
+poetry env list: Lists all virtual environments associated with the current project, indicating which is currently activated.
+poetry show: lists and provides detailed information about each package installed in the current project's Poetry-managed virtual environment, including version numbers and descriptions.
+poetry show --tree: displays a hierarchical view of all packages installed in the project's environment, showing dependencies in a tree-like structure to illustrate their relationships
 
 # Git Submodules
 
