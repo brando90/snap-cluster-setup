@@ -124,3 +124,9 @@ source $HOME/miniconda/bin/activate
 
 # activate snap_cluster_setup default conda env
 conda activate snap_cluster_setup_py311
+
+# nvhtop: https://github.com/peci1/nvidia-htop, RS: https://discord.com/channels/488822282664280084/489073165851688960/1230951660671602818
+if ! command -v nvidia-htop.py &> /dev/null; then
+    pip install nvidia-htop
+fi
+alias nvhtop='nvidia-htop.py --color -l 100'
