@@ -21,7 +21,11 @@
 
 # - Approximately source the sys admin's .bashrc (located at /afs/cs/etc/skel/.bashrc)
 # since snap is set up badly and it needs the reauth command to re-authenticate randomly somtimes, you need to make sure reauth cmd is available
-export PATH="/afs/cs/software/bin:$PATH"
+# Check if the CS software directory is already in the PATH. If not, prepend it to access CS software tools first.
+if [[ ":$PATH:" != *":/afs/cs/software/bin:"* ]]; then
+    echo "Adding CS software tools to PATH"
+    export PATH="/afs/cs/software/bin:$PATH"
+fi
 # 
 if [ -f /etc/bashrc ]; then
         . /etc/bashrc
@@ -89,7 +93,11 @@ export LEAST_GPU_ID=$(nvidia-smi --query-gpu=memory.used --format=csv,nounits,no
 export CUDA_VISIBLE_DEVICES=$LEAST_GPU_ID
 
 # -- Lean, ref: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#lean-in-snap
-export PATH="$HOME/.elan/bin:$PATH"
+# Check if the Elan tools directory is already in the PATH. If not, prepend it to ensure Elan tools are prioritized.
+if [[ ":$PATH:" != *":$HOME/.elan/bin:"* ]]; then
+    echo "Adding Elan tools to PATH"
+    export PATH="$HOME/.elan/bin:$PATH"
+fi
 
 # # not needed, if issues see: https://ilwiki.stanford.edu/doku.php?id=hints:gpu
 # export PATH=/usr/local/cuda-11.7/bin:$PATH
@@ -99,7 +107,11 @@ export PATH="$HOME/.elan/bin:$PATH"
 # assumes mkdir $HOME/.virtualenvs has been ran
 export VENV_PATH=$HOME/.virtualenvs/venv_for_poetry
 # assume poetry has been installed as explained here: https://github.com/brando90/snap-cluster-setup?tab=readme-ov-file#poetry
-export PATH="$VENV_PATH/bin:$PATH"
+# Check if the Poetry virtual environment path is already in the PATH. If not, prepend it to ensure the Poetry environment is prioritizede. ref: https://chat.openai.com/c/500163c3-086a-426b-b5ca-ade6b4819c95, https://stackoverflow.com/questions/78427480/why-does-vscodes-integrated-terminal-ignore-conda-activate-but-respects-updates/78427525#78427525
+if [[ ":$PATH:" != *":$VENV_PATH/bin:"* ]]; then
+    echo "adding virtualenvs to path"
+    export PATH="$VENV_PATH/bin:$PATH"
+fi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -124,6 +136,7 @@ source $HOME/miniconda/bin/activate
 
 # activate snap_cluster_setup default conda env
 conda activate snap_cluster_setup_py311
+# echo $PATH | tr ':' '\n'
 
 # nvhtop: https://github.com/peci1/nvidia-htop, RS: https://discord.com/channels/488822282664280084/489073165851688960/1230951660671602818
 if ! command -v nvidia-htop.py &> /dev/null; then

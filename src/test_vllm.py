@@ -31,7 +31,8 @@ def test_vllm():
         "The capital of France is",
         "The future of AI is",
     ]
-    sampling_params = SamplingParams(temperature=0.8, top_p=0.95)
+    num_samples_per_prompt: int = 2
+    sampling_params = SamplingParams(n=num_samples_per_prompt, temperature=0.8, top_p=0.95)
 
 
     llm = LLM(model="facebook/opt-125m")
