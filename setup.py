@@ -95,6 +95,9 @@ setup(
         'wandb',
         'matplotlib',
         'nvidia-htop',
+        'openai',
+        'anthropic',
+        'jsonlines',
         # 'statsmodels'
         # 'statsmodels==0.12.2'
         # 'statsmodels==0.13.5'
@@ -136,7 +139,8 @@ setup(
         'datasets==2.14.7',  
         'evaluate==0.4.1', 
         'bitsandbytes== 0.43.0',
-        # 'einops',
+        'einops',
+        'flash-attn>=2.5.8',
         'vllm==0.4.1', # my gold-ai-olympiad project uses 0.4.0.post1 ref: https://github.com/vllm-project/vllm/issues/2747
         # pip install -q -U google-generativeai
     ]
