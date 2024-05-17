@@ -209,7 +209,7 @@ cython_debug/
 *Engine/bin/Debug/cache/data/*.zip
 */obj/*
 */bin/*
-*Data/*
+# *Data/*
 *Docker/*
 */Docker/*
 *Algorithm.Python/Lib/*
