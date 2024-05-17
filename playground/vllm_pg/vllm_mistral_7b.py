@@ -25,7 +25,7 @@ def test_vllm():
     # llm = LLM(model="facebook/opt-125m")
     llm = LLM(model="mistralai/Mistral-7B-Instruct-v0.1")
 
-    # List[Prompts] --> list[RequestOutput]  == Prompt --> RequestOutput
+    # List[Prompt] --> list[RequestOutput]  == Prompt --> RequestOutput
     outputs_for_batch_prompts: list[RequestOutput] = llm.generate(prompts, sampling_params)
     print(f'{type(outputs_for_batch_prompts)=}')
     print(f'{type(outputs_for_batch_prompts[0])=}')
