@@ -2,6 +2,7 @@ import dspy
 from dspy.datasets.gsm8k import GSM8K, gsm8k_metric
 from dspy.teleprompt import BootstrapFewShot
 from dspy.evaluate import Evaluate
+from pathlib import Path
 
 # Define the module
 class CoT(dspy.Module):
@@ -13,8 +14,13 @@ class CoT(dspy.Module):
         return self.prog(question=question)
 
 def main():
-    # Set up the LM
-    # lm = dspy.OpenAI(model='gpt-3.5-turbo-instruct', max_tokens=250)
+    # Load key string from path to file, one line
+    path = Path('~/keys/openai_api_key_brandos_koyejolab.txt').expanduser()
+    key = open("key.txt").readline().strip()
+    print(f'{key=}')
+
+    # Set up the L8ikkuM
+    lm = dspy.OpenAI(model='gpt-3.5-turbo-instruct', max_tokens=250)
     lm = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
     dspy.settings.configure(lm=lm)
 
