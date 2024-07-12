@@ -15,12 +15,12 @@ Other useful resources:
 
 ## Get access to SNAP with a CSID
 
-### First request CSID with Michael Bersntein as sponsor 
+### First request CSID 
 First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
 Request it here:  https://webdb.cs.stanford.edu/csid and 
 If you are a CS197 (only!) then:
-1. Put Michael Bernstein as your CSID sponsor/supervisor and e-mail you are doing cs197 with me.
-2. Put Sanmi Koyejo as your CSID sponor/supervisor and e-mail them you are planning to collaborate with me in research.
+1. (most likely) If you are not in CS197 with me put Sanmi Koyejo as your CSID sponor/supervisor and e-mail them you are planning to collaborate with me in research.
+2. If your are a CS197 student put Michael Bernstein as your CSID sponsor/supervisor and e-mail you are doing cs197 with me.
 Note: this is different from SNAP cluster sponso (which you email il-action@stanford.edu), but CSID is needed first. 
 
 ### Second get acces to SNAP
