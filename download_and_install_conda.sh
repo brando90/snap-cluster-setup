@@ -14,7 +14,7 @@ source $HOME/miniconda/bin/activate
 conda init
 # conda init zsh
 conda init bash
-conda install conda-build
+# conda install conda-build
 ## conda update -n base -c defaults conda ## don't think needed? only updates conda in base env?
 conda update conda -y
 
