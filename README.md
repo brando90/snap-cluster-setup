@@ -1971,7 +1971,7 @@ git submodule update --init
 ```
 
 # Lean in SNAP
-For understanding the project directories in a normal Lean project [read this](https://github.com/brando90/learning_lean?tab=readme-ov-file#main-concepts).
+For understanding the project directories in a normal Lean project [read this](https://github.com/brando90/learning_lean?tab=readme-ov-file#main-concepts) and [self-contained `install.sh` script](https://github.com/brando90/learning_lean/blob/main/install.sh).
 
 You will need a small tool called `elan` will handle updating Lean according to the needs of your current project. 
 Install it with:
