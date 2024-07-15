@@ -15,7 +15,7 @@ conda init
 # conda init zsh
 conda init bash
 conda install conda-build
-conda update -n base -c defaults conda
+# conda update -n base -c defaults conda
 conda update conda
 
 # - Create conda env
