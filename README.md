@@ -2008,6 +2008,6 @@ export PATH="$HOME/.elan/bin:$PATH"
 However, you will need to put the above in your `.bashrc` file (e.g., at the end) if it's not already there. 
 Note: the default `.bashrc` I provide should now already have it. 
 
-Then you can check if it worked by installing [PyPentograph](https://github.com/lenianiva/PyPantograph).
+Then you can check if it worked by installing [PyPantograph](https://github.com/lenianiva/PyPantograph).
 
 ref: https://leanprover-community.github.io/install/linux.html
