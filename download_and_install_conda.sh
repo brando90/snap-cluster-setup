@@ -11,7 +11,6 @@ bash $HOME/miniconda.sh -b -p $HOME/miniconda
 # activate conda
 source $HOME/miniconda/bin/activate
 # - Set up conda
-conda init
 # conda init zsh
 conda init bash
 # conda install conda-build
