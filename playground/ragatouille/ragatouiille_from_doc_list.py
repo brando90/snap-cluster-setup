@@ -1,4 +1,5 @@
 """
+This should be useful when giving full documents (e.g., Lean4 full files) to the RAGatouille model.
 ref: https://chatgpt.com/c/861cc8d2-5bfb-4a44-a8ec-307592da5927
 """
 import requests
