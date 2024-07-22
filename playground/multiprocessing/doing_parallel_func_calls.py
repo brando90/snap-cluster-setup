@@ -1,5 +1,48 @@
 #%%
 """
+Here's an example of how you can modify the worker function to log the prompt that caused the error:
+"""
+from multiprocessing import Process, Queue
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+@retry(stop=stop_after_attempt(15), wait=wait_exponential(multiplier=2, max=128))
+def dummy_api_call():
+    return 32
+
+def worker():
+    try:
+        # Perform some computation
+        result = dummy_api_call()  # Replace with your actual computation
+        # Get the shared queue
+        queue = shared_queue.get()
+        # Put the result in the queue
+        queue.put(result)
+    except Exception as e:
+        # file_with_args_caused_error.write(arg)  # write args to file that cause errors for later calling
+        print('Some arg cased an error, fix implementation to print it')
+
+if __name__ == '__main__':
+    # Create a shared queue
+    shared_queue = multiprocessing.Manager().Queue()
+
+    # Create and start multiple worker processes
+    processes = []
+    for _ in range(4):  # Adjust the number of processes as needed
+        p = Process(target=worker)
+        processes.append(p)
+        p.start()
+
+    # Wait for all processes to finish
+    for p in processes:
+        p.join()
+
+    # Retrieve and print all results from the queue
+    while not shared_queue.empty():
+        result = shared_queue.get()
+        print(f'Result: {result}')
+
+#%%
+"""
 Yes, there is a way to implement the .start() and .join() method with a Queue without passing the Queue object to each worker process. You can use a shared memory object provided by the multiprocessing module, which allows you to create a Queue that is accessible to all processes without explicitly passing it as an argument.
 """
 from multiprocessing import Process, Queue
