@@ -6,15 +6,15 @@ from multiprocessing import Process, Queue
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 @retry(stop=stop_after_attempt(15), wait=wait_exponential(multiplier=2, max=128))
-def dummy_api_call():
-    return 32
+def dummy_api_call(i):
+    return i*2
 
-def worker():
+def worker(task_idx, queue):
     try:
         # Perform some computation
-        result = dummy_api_call()  # Replace with your actual computation
+        result = dummy_api_call(task_idx)  # Replace with your actual computation
         # Get the shared queue
-        queue = shared_queue.get()
+        queue = queue.get()
         # Put the result in the queue
         queue.put(result)
     except Exception as e:
@@ -23,12 +23,12 @@ def worker():
 
 if __name__ == '__main__':
     # Create a shared queue
-    shared_queue = multiprocessing.Manager().Queue()
+    queue = multiprocessing.Manager().Queue()
 
     # Create and start multiple worker processes
     processes = []
-    for _ in range(4):  # Adjust the number of processes as needed
-        p = Process(target=worker)
+    for task_idx in range(4):  # Adjust the number of processes as needed
+        p = Process(target=worker, args=(task_idx, queue)
         processes.append(p)
         p.start()
 
@@ -40,43 +40,6 @@ if __name__ == '__main__':
     while not shared_queue.empty():
         result = shared_queue.get()
         print(f'Result: {result}')
-
-#%%
-"""
-Yes, there is a way to implement the .start() and .join() method with a Queue without passing the Queue object to each worker process. You can use a shared memory object provided by the multiprocessing module, which allows you to create a Queue that is accessible to all processes without explicitly passing it as an argument.
-"""
-from multiprocessing import Process, Queue
-
-def worker():
-    # Perform some computation
-    result = 42  # Replace with your actual computation
-
-    # Get the shared queue
-    queue = shared_queue.get()
-
-    # Put the result in the queue
-    queue.put(result)
-
-if __name__ == '__main__':
-    # Create a shared queue
-    shared_queue = multiprocessing.Manager().Queue()
-
-    # Create and start multiple worker processes
-    processes = []
-    for _ in range(4):  # Adjust the number of processes as needed
-        p = Process(target=worker)
-        processes.append(p)
-        p.start()
-
-    # Wait for all processes to finish
-    for p in processes:
-        p.join()
-
-    # Retrieve and print all results from the queue
-    while not shared_queue.empty():
-        result = shared_queue.get()
-        print(f'Result: {result}')
-
 #%%
 """
 To ensure that all processes run in parallel with futures, you can use the concurrent.futures.as_completed function. This function returns an iterator that yields the Future objects as they complete, allowing you to process the results as they become available without blocking.
