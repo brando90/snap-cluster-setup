@@ -300,7 +300,7 @@ def train():
         remove_unused_columns=False,  # TODO don't get why https://stackoverflow.com/questions/76879872/how-to-use-huggingface-hf-trainer-train-with-custom-collate-function/76929999#76929999 , https://claude.ai/chat/475a4638-cee3-4ce0-af64-c8b8d1dc0d90
         report_to=report_to,  # change to wandb!
         fp16=False,  # never ever set to True
-        bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
+        bf16=torch.cuda.is_bf16_supported(),    
     )
     print(f'{pretrained_model_name_or_path=}\n{optim=}\n{learning_rate=}')
 
