@@ -1869,6 +1869,23 @@ this is because the vscode file looks as follows:
 ```
 which means it's relative to `$HOME` most likely. 
 
+## Venv
+
+In Linux and Ubuntu (nothing else suporrted for now):
+```bash
+deactivate
+mkdir ~/.virtualenvs
+ls ~/.virtualenvs
+python3.11 -m venv ~/.virtualenvs/snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+pip install --upgrade pip
+which python
+cd ~/snap-cluster-setup 
+pip install -e .
+```
+
+ref: pyenv (for easier switch of pythonv ersion)
+
 ## Poetry
 
 ### Manual Installation of Poetry in SNAP

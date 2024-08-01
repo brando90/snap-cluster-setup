@@ -29,6 +29,7 @@ import datasets
 from datasets import load_dataset, interleave_datasets
 import torch
 from transformers import GPT2LMHeadModel, PreTrainedTokenizer, AutoTokenizer, Trainer, TrainingArguments, AutoConfig
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import math
 
@@ -176,13 +177,11 @@ def train():
     # -- Load model and tokenizer  
     print(f'{pretrained_model_name_or_path=}')
     if pretrained_model_name_or_path == 'gpt2':
-        from transformers import GPT2Tokenizer, GPT2LMHeadModel
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
             print(f'{tokenizer.pad_token=}')
-        print(f'{tokenizer.eos_token=}')
-        print(f'{tokenizer.eos_token_id=}')
+        print(f'{tokenizer.eos_token=}\n{tokenizer.eos_token_id=}')
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)

@@ -83,12 +83,11 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
     # Load tokenizer and model
     if pretrained_model_name_or_path == "gpt2":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
-        # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
             print(f'{tokenizer.pad_token=}')
+        print(f'{tokenizer.eos_token=}\n{tokenizer.eos_token_id=}')
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
-        # model.resize_token_embeddings(len(tokenizer))  # leaving for reference, not needed since pad = eos for us
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
         block_size: int = tokenizer.model_max_length

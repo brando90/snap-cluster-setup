@@ -106,11 +106,13 @@ setup(
         # 'nltk'
         'twine',
         'dspy-ai',
+        'ragatouille',
+
         'torch',
         'transformers',
         'accelerate',
         'datasets',
-        'ragatouille',
+        'bitsandbytes',
 
         # # mercury: https://github.com/vllm-project/vllm/issues/2747
         # 'dspy-ai',
