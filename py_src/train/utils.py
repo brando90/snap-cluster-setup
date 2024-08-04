@@ -363,6 +363,9 @@ def compute_metrics(eval_preds):
     return metric.compute(predictions=preds, references=labels)
 
 def eval_hf(trainer: Trainer, path: str, name: str, split: str, max_eval_samples: Any = 'Unknown_Eval_Max_Samples',):
+    """
+    Note: trainer already has test set to "eval" on. 
+    """
     metrics = trainer.evaluate()
     try:
         perplexity = math.exp(metrics["eval_loss"])

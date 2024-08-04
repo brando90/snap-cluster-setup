@@ -113,6 +113,7 @@ setup(
         'accelerate',
         'datasets',
         'bitsandbytes',
+        'evaluate',
 
         # # mercury: https://github.com/vllm-project/vllm/issues/2747
         # 'dspy-ai',

@@ -7,9 +7,10 @@ from typing import Dict, Tuple, Optional
 from pathlib import Path
 import evaluate
 
-from utils import eval_hf, get_ai4m_v0, get_data_set_args, load_dataset_block_size
+# from utils import eval_hf, get_ai4m_v0, get_data_set_args, load_dataset_block_size
+from utils import eval_hf
 
-from utils import load_model_block_size
+# from utils import load_model_block_size
 
 
 def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
@@ -151,7 +152,7 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
         eval_args = TrainingArguments(output_dir=output_dir_test, fp16=False, bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8, report_to=report_to)
         trainer = Trainer(model=model, args=eval_args, train_dataset=None, eval_dataset=test_dataset)
         # results: dict[str, float] = trainer.evaluate(test_dataset)
-        results: dict[str, float] = eval_hf(trainer, name='', path=path, split='test', eval_dataset=test_dataset)
+        results: dict[str, float] = eval_hf(trainer, name='', path=path, split='test')
         print(f'{path=} split=test {results=}')
 
     # Save the trained model
