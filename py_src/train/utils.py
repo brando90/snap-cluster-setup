@@ -20,6 +20,14 @@ from transformers import PreTrainedTokenizer, AutoTokenizer, AutoModelForCausalL
 from transformers.testing_utils import CaptureLogger
 from transformers import GPT2Tokenizer
 
+def raw_str_2_desired_autoformalization(examples, tokenizer):
+    examples: list[str] = [f"Natural language: {examples['nl_statement'][i]}\nFormal langugage: {examples['formal_statement'][i]}\n{tokenizer.eos_token}" for i in range(len(examples['nl_statement']))]
+    return {'text': examples}
+
+def raw_str_2_desired_prob_soln_putnam_math(examples, tokenizer):
+    examples: list[str] = [f"Problem: Let's think step by step. {examples['problem'][i]}\nSolution: Let's think step by step. {examples['solution'][i]}\n{tokenizer.eos_token}" for i in range(len(examples['problem']))]
+    return examples
+
 def cuda_debug():
     import torch
 
@@ -153,8 +161,8 @@ def get_size_of_seq_len(dataset_or_batch, verbose: bool = True, streaming: bool 
 
 def get_column_names(dataset, 
                     #   split: str = 'train',
-                      method: str = 'keys', 
-                      streaming: bool = True,
+                    streaming: bool,
+                    method: str = 'keys', 
                       ):
     if method == 'features':
         # column_names = list(dataset[spit].features)
@@ -168,7 +176,7 @@ def get_column_names(dataset,
     return column_names
 
 def get_data_from_hf_dataset(dataset, 
-                             streaming: bool = True, 
+                             streaming: bool, 
                              batch_size: int = 4, 
                             #  shuffle: bool= False, # shuffle is better but slower afaik
                             #  seed: int = 0, 
@@ -399,32 +407,44 @@ def eval_hf_with_subsample(path, name, split, model, tokenizer, block_size, outp
         print(print_str)
     return metrics
 
+
 def raw_ds_2_lm_ds_mask_eos_pad_toks(
         raw_dataset, 
         tokenizer, 
+        max_length: int,
 
-        desired_dataset_column: str = 'text',
-        method_to_remove_str_columns: str = 'keys',
+        raw_str_2_desired_str: Optional[callable] = None, # either return {'text': examples['text']} or preprocess str to get what you need e.g. {'text': f"[ex['nl'] ex['fl'] {tok.eos_token}]" for ex in examples}
+        desired_dataset_column: str = 'text', # good val to use if hf str ds already pre-processed for you: 'text',
+
+        method_to_remove_columns: str = 'keys',
+
+        padding: str = 'max_length',
+        truncation: bool = True, 
+        return_tensors: str = 'pt',
 
         batched: bool = True, # Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
+        streaming: bool = False,
 
         format: str = 'torch',
         # get_lm_examples_function = get_lm_examples_1st_eos_mask_remaining_eos,
         ):
     """ """
-    raw_dataset = raw_dataset.with_format(format)
+    raw_dataset = raw_dataset.with_format(format)  # annoying that return tensors in the tokenizer on it's own doesn't put it into a pt tensor, so for now we keep both.
+    
     # - Get desired str dataset
-    desired_examples_str_function = lambda examples: tokenizer(examples[desired_dataset_column])
+    # desired_examples_str_function = lambda examples: {'text': examples['text']} if raw_str_2_desired_str is not None else raw_str_2_desired_str 
+    desired_examples_str_function = lambda examples: raw_str_2_desired_autoformalization(examples, tokenizer)
     desired_examples_str_dataset = raw_dataset.map(desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
 
     # - Get tokenized data set
-    remove_str_columns = get_column_names(desired_examples_str_dataset, method_to_remove_str_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
-    tokenize_function = lambda examples: tokenizer(examples)
+    remove_str_columns = get_column_names(desired_examples_str_dataset, streaming, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
+    tokenize_function = lambda examples: tokenizer(examples[desired_dataset_column], padding=padding, max_length=max_length, truncation=truncation, return_tensors=return_tensors)
     tokenized_datasets = desired_examples_str_dataset.map(tokenize_function, batched=batched, remove_columns=remove_str_columns)
 
     # - Get lm data set
     # get_lm_examples_function = lambda examples : group_texts(examples, block_size)
-    lm_dataset = tokenized_datasets.map(get_lm_examples_1st_eos_mask_remaining_eos, batched=batched)
+    get_lm_examples_function = lambda examples : get_lm_examples_1st_eos_mask_remaining_eos(examples, tokenizer)
+    lm_dataset = tokenized_datasets.map(get_lm_examples_function, batched=batched)
     return lm_dataset
 
 def get_lm_examples_1st_eos_mask_remaining_eos(
@@ -435,8 +455,7 @@ def get_lm_examples_1st_eos_mask_remaining_eos(
         # method_to_remove_columns: str = 'keys',
 
         remove_to_long_seqs: bool = False,
-
-        format: str = 'torch',
+        # format: str = 'torch',
         ) -> dict[str, torch.Tensor]:
     """ 
     Train only on first occurence of eos. The remaining eos are masked out. If 
@@ -471,5 +490,8 @@ def get_lm_examples_1st_eos_mask_remaining_eos(
         else:
             pass # nop: no eos in seq so too long, but keep it for training anyway
     # -- Drop seqs with no eos
-    # TODO
-    return tokenized_data
+    if seqs_to_drop:
+        examples["input_ids"] = torch.stack([input_ids for idx, input_ids in enumerate(examples["input_ids"]) if idx not in seqs_to_drop])
+        examples["attention_mask"] = torch.stack([mask for idx, mask in enumerate(examples["attention_mask"]) if idx not in seqs_to_drop])
+        examples["labels"] = torch.stack([labels for idx, labels in enumerate(examples["labels"]) if idx not in seqs_to_drop])
+    return examples
