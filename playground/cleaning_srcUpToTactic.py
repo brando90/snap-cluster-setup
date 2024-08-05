@@ -1,0 +1,13 @@
+# https://chatgpt.com/c/0cc6e3f1-8a17-4cba-a984-178553fd08d2
+import re
+
+# Example text containing copyright and other content
+text = """
+/- Copyright (c) 2018 Kenny Lau. All rights reserved. Released under Apache 2.0 license as described in the file LICENSE. Authors: Kenny Lau -/ import Mathlib.Algebra.Algebra.Operations import Mathlib.Algebra.Ring.Equiv import Mathlib.Data.Nat.Choose.Sum import Mathlib.LinearAlgebra.Basis.Bilinear import Mathlib.RingTheory.Coprime.Lemmas import Mathlib.RingTheory.Ideal.Basic import Mathlib.Algebra.GroupWithZero.NonZeroDivisors #align_import ring_theory.ideal.operations from "leanprover-community/mathlib"@"e7f0ddbf65bd7181a85edb74b64bdc35ba4bdc74" /-! # More operations on modules and ideals -/ universe u v w x open BigOperators Pointwise namespace Submodule variable {R : Type u} {M : Type v} {F : Type*} {G : Type*} section CommSemiring variable [CommSemiring R] [AddCommMonoid M] [Module R M] open Pointwise instance hasSMul' : SMul (Ideal R) (Submodule R M) := ⟨Submodule.map₂ (LinearMap.lsmul R M)⟩ #align submodule.has_smul' Submodule.hasSMul' /-- This duplicates the global `smul_eq_mul`, but doesn't have to unfold anywhere near as much to apply. -/ protected theorem _root_.Ideal.smul_eq_mul (I J : Ideal R) : I • J = I * J := rfl #align ideal.smul_eq_mul Ideal.smul_eq_mul /-- `N.annihilator` is the ideal of all elements `r : R` such that `r • N = 0`. -/ def annihilator (N : Submodule R M) : Ideal R := LinearMap.ker (LinearMap.lsmul R N) #align submodule.annihilator Submodule.annihilator variable {I J : Ideal R} {N P : Submodule R M} theorem mem_annihilator {r} : r ∈ N.annihilator ↔ ∀ n ∈ N, r • n = (0 : M) := ⟨fun hr n hn => congr_arg Subtype.val (LinearMap.ext_iff.1 (LinearMap.mem_ker.1 hr) ⟨n, hn⟩), fun h => LinearMap.mem_ker.2 <| LinearMap.ext fun n => Subtype.eq <| h n.1 n.2⟩ #align submodule.mem_annihilator Submodule.mem_annihilator theorem mem_annihilator' {r} : r ∈ N.annihilator ↔ N ≤ comap (r • (LinearMap.id : M →ₗ[R] M)) ⊥ := mem_annihilator.trans ⟨fun H n hn => (mem_bot R).2 <| H n hn, fun H _ hn => (mem_bot R).1 <| H hn⟩ #align submodule.mem_annihilator' Submodule.mem_annihilator' theorem mem_annihilator_span (s : Set M) (r : R) : r ∈ (Submodule.span R s).annihilator ↔ ∀ n : s, r • (n : M) = 0 := by
+"""
+
+# Regular expression to remove the copyright notice and trailing whitespace
+# Regex explanation: '(?s)' enables '.' to match newlines, '/- ?.*?-/(\s)+': lazily matches between '/-' (with optional space) and '-/' across lines, including any following whitespace
+cleaned_text = re.sub(r'(?s)/- ?.*?-/(\s)+', '', text)
+
+print(cleaned_text)
