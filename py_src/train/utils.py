@@ -20,7 +20,7 @@ from transformers import PreTrainedTokenizer, AutoTokenizer, AutoModelForCausalL
 from transformers.testing_utils import CaptureLogger
 from transformers import GPT2Tokenizer
 
-def raw_str_2_desired_autoformalization(examples, tokenizer):
+def raw_str_2_desired_af_str(examples, tokenizer):
     examples: list[str] = [f"Natural language: {examples['nl_statement'][i]}\nFormal langugage: {examples['formal_statement'][i]}\n{tokenizer.eos_token}" for i in range(len(examples['nl_statement']))]
     return {'text': examples}
 
@@ -429,14 +429,16 @@ def raw_ds_2_lm_ds_mask_eos_pad_toks(
         # get_lm_examples_function = get_lm_examples_1st_eos_mask_remaining_eos,
         ):
     """ """
-    raw_dataset = raw_dataset.with_format(format)  # annoying that return tensors in the tokenizer on it's own doesn't put it into a pt tensor, so for now we keep both.
-    
     # - Get desired str dataset
-    # desired_examples_str_function = lambda examples: {'text': examples['text']} if raw_str_2_desired_str is not None else raw_str_2_desired_str 
-    desired_examples_str_function = lambda examples: raw_str_2_desired_autoformalization(examples, tokenizer)
-    desired_examples_str_dataset = raw_dataset.map(desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
+    if raw_str_2_desired_str is None:
+        get_desired_examples_str_function = lambda examples: {'text': examples[desired_dataset_column]} if raw_str_2_desired_str is not None else raw_str_2_desired_str 
+        desired_examples_str_dataset = raw_dataset.map(get_desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
+    else:
+        desired_examples_str_dataset = raw_dataset
+    desired_examples_str_dataset = lambda examples: raw_str_2_desired_autoformalization(examples, tokenizer)
 
     # - Get tokenized data set
+    desired_examples_str_dataset = desired_examples_str_dataset.with_format(format)  # annoying that return tensors in the tokenizer on it's own doesn't put it into a pt tensor, so for now we keep both.
     remove_str_columns = get_column_names(desired_examples_str_dataset, streaming, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
     tokenize_function = lambda examples: tokenizer(examples[desired_dataset_column], padding=padding, max_length=max_length, truncation=truncation, return_tensors=return_tensors)
     tokenized_datasets = desired_examples_str_dataset.map(tokenize_function, batched=batched, remove_columns=remove_str_columns)

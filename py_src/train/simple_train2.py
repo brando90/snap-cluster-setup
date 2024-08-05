@@ -163,9 +163,10 @@ def setup_and_train_proofnet(
     # eval_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(eval_dataset, tokenizer, max_length)
 
     # Proofnet with 1st eos token train remaining eos not train
+    from train.utils import raw_str_2_desired_af_str
     train_dataset = load_dataset(path, split='validation')
     eval_dataset = load_dataset(path, split='test')
-    train_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(train_dataset, tokenizer, max_length)
+    train_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(train_dataset, tokenizer, max_length, raw_str_2_desired_str=raw_str_2_desired_af_str)
     eval_dataset = train_dataset
 
     # Training arguments
