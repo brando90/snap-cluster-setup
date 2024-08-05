@@ -50,28 +50,33 @@ def preprocess_function_proofnet_simple(examples: Dict[str, list], tokenizer: GP
     model_inputs["labels"] = labels
     return model_inputs
 
-def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2", 
-                            path: str = "hoskinson-center/proofnet",
-                            output_dir_train: str = '~/tmp/proofnet/train',
-                            output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
-                            output_dir_test: str = '~/tmp/proofnet/test',
-                            path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-                            num_train_epochs: int = 5,
-                            per_device_train_batch_size: Optional[int] = 2,
-                            per_device_eval_batch_size: Optional[int] = 2,
-                            save_total_limit: Optional[int] = None,
-                            learning_rate: float = 5e-5,
-                            weight_decay: float = 0.01,
-                            max_grad_norm: float = 1.0, 
-                            optim='paged_adamw_32bit',
-                            gradient_accumulation_steps = 2, # see: based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
-                            gradient_checkpointing: Optional[bool] = False,
-                            # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-                            # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-                            report_to: str = 'none',  # recommended values 'wandb' or `none`
-                    ) -> None:
+def setup_and_train_proofnet(
+        # pretrained_model_name_or_path: str = "gpt2", 
+        # pretrained_model_name_or_path: str = "openai-community/gpt2-xl", 
+        pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", 
+        path: str = "hoskinson-center/proofnet",
+        output_dir_train: str = '~/tmp/proofnet/train',
+        output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
+        output_dir_test: str = '~/tmp/proofnet/test',
+        path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
+        num_train_epochs: int = 5,
+        per_device_train_batch_size: Optional[int] = 2,
+        per_device_eval_batch_size: Optional[int] = 2,
+        save_total_limit: Optional[int] = None,
+        learning_rate: float = 5e-5,
+        weight_decay: float = 0.01,
+        max_grad_norm: float = 1.0, 
+        optim='paged_adamw_32bit',
+        gradient_accumulation_steps = 2, # see: based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
+        gradient_checkpointing: Optional[bool] = False,
+        # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
+        # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
+        report_to: str = 'none',  # recommended values 'wandb' or `none`
+        ) -> None:
     """
     Set up the environment, preprocess the dataset, and train the model.
+
+    export CUDA_VISIBLE_DEVICES=7
 
     Args:
     tokenizer_name: The name of the tokenizer.
@@ -83,6 +88,17 @@ def setup_and_train_proofnet(pretrained_model_name_or_path: str = "gpt2",
 
     # Load tokenizer and model
     if pretrained_model_name_or_path == "gpt2":
+        tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
+        if tokenizer.pad_token_id is None:
+            tokenizer.pad_token = tokenizer.eos_token
+            print(f'{tokenizer.pad_token=}')
+        print(f'{tokenizer.eos_token=}\n{tokenizer.eos_token_id=}')
+        model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        block_size: int = tokenizer.model_max_length
+        print(f'{block_size=}')
+    elif pretrained_model_name_or_path == "openai-community/gpt2-xl":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token

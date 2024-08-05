@@ -124,10 +124,10 @@ def raw_dataset_2_lm_data(raw_dataset,
                           debug: bool = False, 
                           streaming: bool = True,
                           batch_size: int = 2,
-                          fromat: str = 'torch',
+                          format: str = 'torch',
                           ):
     """ Get lm data set but note it uses the grou_texts function which concatenates all tests into a single sequence according to block size (some seq length e.g., max seq length)."""
-    raw_dataset = raw_dataset.with_format(fromat)
+    raw_dataset = raw_dataset.with_format(format)
     remove_columns = get_column_names(raw_dataset, method_to_remove_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
     # - Get tokenized train data set
     # Note: Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
@@ -300,10 +300,11 @@ def group_texts_v2(examples, # if batched=True it's a dict of input_ids, attenti
     result["labels"] = result["input_ids"].copy()
     return result
 
-def collate_fn_train_only_first_eos_token_mask_everything_after_it(data: list[dict[str, str]], 
-                                                                   tokenizer: PreTrainedTokenizer, 
-                                                                   max_length: int=1024,  # GPT2 default, likely worth you change it! This default might cause bugs.
-                                                                   ) -> dict[str, torch.Tensor]:
+def collate_fn_train_only_first_eos_token_mask_everything_after_it(
+        data: list[dict[str, str]], 
+        tokenizer: PreTrainedTokenizer, 
+        max_length: int, 
+        ) -> dict[str, torch.Tensor]:
     """ Train only on first occurence of eos. The remaining eos are masked out.
 
     Sometimes the model might not have a padding token. Sometimes people set the padding token to be the eos token.
@@ -348,8 +349,6 @@ def collate_fn_train_only_first_eos_token_mask_everything_after_it(data: list[di
                 tokenized_data["labels"][idx, subsequent_eos_position] = -100
                 assert tokenized_data["labels"][idx, subsequent_eos_position] == -100, "The label for the subsequent_eos_position incorrect! Should be -100."
     return tokenized_data
-
-# -- eval code
 
 def compute_metrics(eval_preds):
     """ todo document clearly, from SS's code. """
@@ -400,175 +399,77 @@ def eval_hf_with_subsample(path, name, split, model, tokenizer, block_size, outp
         print(print_str)
     return metrics
 
-# -- unit tests -- #
+def raw_ds_2_lm_ds_mask_eos_pad_toks(
+        raw_dataset, 
+        tokenizer, 
 
-def _test_all_batches_are_size_block_size():
-    print('-- starting unit test')
-    batch_size = 4
-    # get gpt2 tokenizer
-    tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    tokenize_function = lambda examples: tokenizer(examples["text"])
-    # load c4 data set hf in streaming mode 
-    from datasets import load_dataset
-    streaming = True
-    # raw_datasets = load_dataset("c4", "en", streaming=streaming, split="train")
-    # raw_datasets = load_dataset('UDACA/PileSubsets', streaming=streaming).with_format('torch')   # this defaults to the subset 'all'
-    # raw_datasets = load_dataset('UDACA/PileSubsets', 'pubmed', split='train', streaming=streaming).with_format('torch')
-    raw_datasets = load_dataset('UDACA/PileSubsets', 'uspto', split='train', streaming=streaming).with_format('torch')
-    batch = get_data_from_hf_dataset(raw_datasets, streaming=streaming, batch_size=batch_size) 
-    # print(f'{batch=}')
-    # print(f'{next(iter(batch))=}')
-    # print(f'{next(iter(batch)).keys()}')
-    # print()
-    remove_columns = get_column_names(raw_datasets)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
+        desired_dataset_column: str = 'text',
+        method_to_remove_str_columns: str = 'keys',
 
-    # how does it know which column to tokenize? gpt4 says default is text or your tokenized function can specify it, see my lambda fun above
-    tokenized_datasets = raw_datasets.map(
-        tokenize_function,
-        batched=True,  # Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
-        remove_columns=remove_columns,
-    )
-    batch = get_data_from_hf_dataset(tokenized_datasets, streaming=streaming, batch_size=batch_size)
-    # print(f'{batch=}')
-    # print(f'{next(iter(batch))=}')
-    # print(f'{next(iter(batch)).keys()}')
-    # print()
+        batched: bool = True, # Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
 
-    _group_texts = lambda examples : group_texts(examples, block_size=tokenizer.model_max_length)
-    lm_datasets = tokenized_datasets.map(
-        _group_texts,
-        batched=True,  # Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
-    )
-    batch = get_data_from_hf_dataset(lm_datasets, streaming=streaming, batch_size=batch_size)
-    # print(f'{batch=}')
-    # print(f'{next(iter(batch))=}')
-    # print(f'{next(iter(batch)).keys()}')
-    # print()
+        format: str = 'torch',
+        # get_lm_examples_function = get_lm_examples_1st_eos_mask_remaining_eos,
+        ):
+    """ """
+    raw_dataset = raw_dataset.with_format(format)
+    # - Get desired str dataset
+    desired_examples_str_function = lambda examples: tokenizer(examples[desired_dataset_column])
+    desired_examples_str_dataset = raw_dataset.map(desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
 
-    # - Make sure all seq are of length block_size
-    batch = get_data_from_hf_dataset(lm_datasets, streaming=streaming, batch_size=batch_size)
-    for data_dict in iter(batch):
-        seq = data_dict['input_ids']
-        print(len(seq))
-    print('Success!')
+    # - Get tokenized data set
+    remove_str_columns = get_column_names(desired_examples_str_dataset, method_to_remove_str_columns)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
+    tokenize_function = lambda examples: tokenizer(examples)
+    tokenized_datasets = desired_examples_str_dataset.map(tokenize_function, batched=batched, remove_columns=remove_str_columns)
 
-def _test_train_dataset_setup_for_main_code():
-    import os
-    batch_size = 2
-    streaming = True
-    # path, name, data_files, split = ['c4'], ['en'], [None], ['train']
-    # path, name, data_files, split = ['c4', 'c4'], ['en', 'en'], [None, None], ['train', 'validation']
-    # path, name, data_files, split = ['csv'], [None], [os.path.expanduser('~/data/maf_data/maf_textbooks_csv_v1/train.csv')], ['train']
-    # path, name, data_files, split = ['suolyer/pile_pile-cc'] + ['parquet'] * 4, [None] + ['hacker_news', 'nih_exporter', 'pubmed', 'uspto'], [None] + [urls_hacker_news, urls_nih_exporter, urls_pubmed, urls_uspto], ['validation'] + ['train'] * 4
-    # path, name, data_files, split = ['UDACA/PileSubsets'], ['uspto'], [None], ['train']
-    # path, name, data_files, split = ['UDACA/PileSubsets'], ['pubmed'], [None], ['train']
-    path, name, data_files, split = ['UDACA/PileSubsets', 'UDACA/PileSubsets'], ['uspto', 'pubmed'], [None, None], ['train', 'train']
+    # - Get lm data set
+    # get_lm_examples_function = lambda examples : group_texts(examples, block_size)
+    lm_dataset = tokenized_datasets.map(get_lm_examples_1st_eos_mask_remaining_eos, batched=batched)
+    return lm_dataset
 
-    # -- Get tokenizer and model
-    # tokenizer = AutoTokenizer.from_pretrained('meta-llama/Llama-2-7b-hf', padding_side="right", use_fast=False, trust_remote_code=True, use_auth_token=True)
-    tokenizer = AutoTokenizer.from_pretrained('mistralai/Mistral-7B-v0.1', padding_side="right", use_fast=False, trust_remote_code=True, use_auth_token=True)
-    # tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    tokenize_function = lambda examples: tokenizer(examples["text"])
-    # torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float32  # if >= 8 ==> brain float 16 available or set to True if you always want fp32 
-    # model = AutoModelForCausalLM.from_pretrained('meta-llama/Llama-2-7b-hf', trust_remote_code=True, torch_dtype=torch_dtype, use_auth_token=True)
+def get_lm_examples_1st_eos_mask_remaining_eos(
+        examples,
+        tokenizer: AutoTokenizer, 
+        
+        # desired_dataset_column: str = 'text',
+        # method_to_remove_columns: str = 'keys',
 
-    # -- Get raw train data set
-    raw_train_datasets = [load_dataset(p, n, data_files=data_file, streaming=streaming, split=split).with_format("torch") for p, n, data_file, split in zip(path, name, data_files, split)]
-    probabilities = [1.0/len(raw_train_datasets) for _ in raw_train_datasets]  
-    raw_train_datasets = interleave_datasets(raw_train_datasets, probabilities)
-    # raw_train_datasets = load_dataset(path[0], name[0], data_files=data_files[0], streaming=streaming, split=split[0]).with_format("torch")
-    # raw_train_datasets = load_dataset('UDACA/PileSubsets', 'uspto', split='train', streaming=streaming).with_format('torch')
-    batch = get_data_from_hf_dataset(raw_train_datasets, streaming=streaming, batch_size=batch_size) 
-    print(f'{batch=}')
-    print(f'{next(iter(batch))=}')
-    print(f'{next(iter(batch)).keys()}')
-    print()
-    remove_columns = get_column_names(raw_train_datasets)  # remove all keys that are not tensors to avoid bugs in collate function in task2vec's pytorch data loader
+        remove_to_long_seqs: bool = False,
+
+        format: str = 'torch',
+        ) -> dict[str, torch.Tensor]:
+    """ 
+    Train only on first occurence of eos. The remaining eos are masked out. If 
+    - train up to 1st ocurrence of eos token, mask out the rest of the eos tokens.
+    - drop or not seqs that are too long, i.e., have no eos token.
     
-    # - Get tokenized train data set
-    # Note: Setting `batched=True` in the `dataset.map` function of Hugging Face's datasets library processes the data in batches rather than one item at a time, significantly speeding up the tokenization and preprocessing steps.
-    tokenized_train_datasets = raw_train_datasets.map(tokenize_function, batched=True, remove_columns=remove_columns)
-    # block_size: int = tokenizer.model_max_length
-    block_size: int = 4096
-    assert block_size != 1000000000000000019884624838656, f'Error, block_size is {block_size} which is the default value. This is likely because you are using a tokenizer that does not have a model_max_length attribute. Please set block_size to a value that makes sense for your model.'
-    _group_texts = lambda examples : group_texts_v2(examples, block_size)
-    batch = get_data_from_hf_dataset(tokenized_train_datasets, streaming=streaming, batch_size=batch_size) 
-    print(f'{batch=}')
-    print(f'{next(iter(batch))=}')
-    print(f'{next(iter(batch)).keys()}')
-    
-    # - Get data set for lm training (in this case each seq is of length block_size, no need to worry about pad = eos since we are filling each sequence)    lm_train_dataset = tokenized_train_datasets
-    lm_train_dataset = tokenized_train_datasets.map(_group_texts, batched=True)
-    batch = get_data_from_hf_dataset(lm_train_dataset, streaming=streaming, batch_size=batch_size)
-    print(f'{batch=}')
-    # - get an example for debugging
-    # batch = iter(batch)
-    # example = next(batch)
-    # print(f'{example=}')
-    # print(f'{next(iter(batch))=}')
-    print(f'{next(iter(batch)).keys()}')
-    
-    # - Make sure all seq are of length block_size
-    batch = get_data_from_hf_dataset(lm_train_dataset, streaming=streaming, batch_size=batch_size)
-    for data_dict in iter(batch):
-        seq = data_dict['input_ids']
-        print(len(seq))
-    print('Success!')
+    Assumes: pad == eos
 
-def _test_expt_planning():
-    # -- 2.5B tokens
-    num_tokens_desired: int = int(2.5e9)
-    batch_size = 32
-    num_batches = 1
-    L = 4096
-    # num_tokens_trained = max_steps * batch_size * L * num_batches
-    max_steps = num_tokens_desired / (batch_size * L * num_batches)
-    print(f'{max_steps=}')
-    # 19_073
-    # 281:07:43 --> 11 days ...
-
-    # -- 5.5M tokens
-    num_tokens_desired: int = int(5.5e6)
-    max_steps = num_tokens_desired / (batch_size * L * num_batches)
-    print(f'{max_steps=}')
-    # 42
-
-def _test_utils_padding_and_eos():
-    # GPT2 tokenizer
-    tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    block_size = 1024
-    print(f'{tokenizer.model_max_length=}')
-    print(f'{block_size=}')
-    raw_dataset = load_dataset("c4", "en", streaming=True, split="train").with_format("torch")
-    lm_dataset = raw_dataset_2_lm_data(raw_dataset, tokenizer, block_size=block_size)
-    # take a batch of size 2 and print it
-    batch = get_data_from_hf_dataset(lm_dataset, streaming=True, batch_size=2) 
-    print(f'{batch=}')
-    data_batch = next(iter(batch))
-    # todo: test that when length changes attention mask labels etc make sense
-    # todo: do we need to put eos & padding and make sure label = -1? 
-    print()
-
-def _test_log_trainer():
-    # gpt2 model
-    model = AutoModelForCausalLM.from_pretrained("gpt2")
-    model = model.to("cuda")
-    raw_dataset = load_dataset("c4", "en", streaming=True, split="train").with_format("torch")
-    eval_dataset = raw_dataset.take(2)
-    name = 'c4_fake'
-    eval_args = TrainingArguments(output_dir='.') 
-    metrics = {'eval_loss': 0.1, 'eval_runtime': 0.1, 
-               'eval_samples_per_second': 0.1, 'eval_steps_per_second': 0.1, 'perplexity': 0.1, 'name': name}
-    # trainer.save_metrics(f"eval_{name}", metrics)
-    trainer = Trainer(model=model, args=eval_args, train_dataset=None, eval_dataset=eval_dataset)
-    trainer.log_metrics(f"eval_{name}", metrics)  # display metrics
-
-if __name__ == "__main__":
-    from time import time
-    start_time = time()
-    # _test_all_batches_are_size_block_size()
-    # _test_train_dataset_setup_for_main_code()
-    # _test_expt_planning()
-    # _test_utils_padding_and_eos()
-    _test_log_trainer()
-    print(f"Done!\a Total time: {time() - start_time} seconds, or {(time() - start_time)/60} minutes. or {(time() - start_time)/60/60} hours.\a")
+    ref: https://stackoverflow.com/questions/76633368/how-does-one-set-the-pad-token-correctly-not-to-eos-during-fine-tuning-to-avoi
+    """
+    # - Get lm example
+    examples["labels"] = examples["input_ids"].clone()  # labels is hardcoded in HF so put it!
+    eos_token_id = tokenizer.eos_token_id
+    assert eos_token_id == tokenizer.pad_token_id, 'Error: pad should be eos token'
+    seqs_to_drop: list[int] = [] # store idx to drop (to long), we don't want to modify the two lists at the same time as we are looping through them
+    for idx, input_ids in enumerate(examples["input_ids"]):
+        # Find all occurrences of eos_token
+        eos_positions = (input_ids == eos_token_id).nonzero(as_tuple=True)[0]
+        if eos_positions.nelement() > 0:  # Check if eos_token is present --> if yes then make sure to trian on it then mask the remaining eos (assumes pad == eos)
+            first_eos_position = eos_positions[0]
+            examples["attention_mask"][idx, first_eos_position] = 1  # Set the mask value to 1
+            # Assert that the label for the first occurrence of eos_token is eos_token_id
+            assert examples["labels"][idx, first_eos_position] == eos_token_id, "The label for the first eos_token is incorrect!"
+            # For all subsequent occurrences of eos_token, set their labels to -100
+            for subsequent_eos_position in eos_positions[1:]:
+                examples["labels"][idx, subsequent_eos_position] = -100
+                assert examples["labels"][idx, subsequent_eos_position] == -100, "The label for the subsequent_eos_position incorrect! Should be -100."
+        elif remove_to_long_seqs:
+            assert eos_positions.nelement() == 0, 'Error: there should be no eos if this if stmt is exexuted.'
+            # record to drop this seq, has no eos so too long + flag says to drop it
+            seqs_to_drop.append(idx)
+        else:
+            pass # nop: no eos in seq so too long, but keep it for training anyway
+    # -- Drop seqs with no eos
+    # TODO
+    return tokenized_data
