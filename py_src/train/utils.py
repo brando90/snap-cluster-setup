@@ -490,6 +490,7 @@ def get_lm_examples_1st_eos_mask_remaining_eos(
             seqs_to_drop.append(idx)
         else:
             pass # nop: no eos in seq so too long, but keep it for training anyway
+    # assert len(examples["labels"]) == 0, 'Error: no labels were set'
     # -- Drop seqs with no eos
     if seqs_to_drop:
         examples["input_ids"] = torch.stack([input_ids for idx, input_ids in enumerate(examples["input_ids"]) if idx not in seqs_to_drop])
