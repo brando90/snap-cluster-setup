@@ -432,10 +432,9 @@ def raw_ds_2_lm_ds_mask_eos_pad_toks(
     # - Get desired str dataset
     if raw_str_2_desired_str is None:
         get_desired_examples_str_function = lambda examples: {'text': examples[desired_dataset_column]} if raw_str_2_desired_str is not None else raw_str_2_desired_str 
-        desired_examples_str_dataset = raw_dataset.map(get_desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
     else:
-        desired_examples_str_dataset = raw_dataset
-    desired_examples_str_dataset = lambda examples: raw_str_2_desired_autoformalization(examples, tokenizer)
+        get_desired_examples_str_function = raw_str_2_desired_str
+    desired_examples_str_dataset = raw_dataset.map(get_desired_examples_str_function, batched=batched) # note: we can't remove all str columns here or we will remove the ones we want to tokenize by accident
 
     # - Get tokenized data set
     desired_examples_str_dataset = desired_examples_str_dataset.with_format(format)  # annoying that return tensors in the tokenizer on it's own doesn't put it into a pt tensor, so for now we keep both.
