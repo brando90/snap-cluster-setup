@@ -61,18 +61,17 @@ def setup_and_train_proofnet(
         output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
         output_dir_test: str = '~/tmp/proofnet/test',
         path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
-        num_train_epochs: int = 5,
+        num_train_epochs: int = 3,
         per_device_train_batch_size: Optional[int] = 2,
         per_device_eval_batch_size: Optional[int] = 2,
-        save_total_limit: Optional[int] = None,
         learning_rate: float = 5e-5,
         weight_decay: float = 0.01,
         max_grad_norm: float = 1.0, 
+        lr_scheduler_type = 'cosine', # https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
+        warmup_ratio=0.01,  # copying alpaca for now, number of steps for a linear warmup,  https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         optim='paged_adamw_32bit',
-        gradient_accumulation_steps = 2, # see: based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
-        gradient_checkpointing: Optional[bool] = False,
-        # lr_scheduler_type='cosine',  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-        # warmup_ratio=0.01,   # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
+        gradient_accumulation_steps = 2, # Allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
+        gradient_checkpointing: Optional[bool] = True,
         report_to: str = 'none',  # recommended values 'wandb' or `none`
         ) -> None:
     """
@@ -98,8 +97,8 @@ def setup_and_train_proofnet(
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        block_size: int = tokenizer.model_max_length
-        print(f'{block_size=}')
+        max_length: int = tokenizer.model_max_length
+        print(f'{max_length=}')
     elif pretrained_model_name_or_path == "openai-community/gpt2-xl":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
         if tokenizer.pad_token_id is None:
@@ -109,8 +108,8 @@ def setup_and_train_proofnet(
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        block_size: int = tokenizer.model_max_length
-        print(f'{block_size=}') 
+        max_length: int = tokenizer.model_max_length
+        print(f'{max_length=}') 
     elif pretrained_model_name_or_path == "meta-llama/Meta-Llama-3.1-8B":
         torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
         model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype)
@@ -125,13 +124,12 @@ def setup_and_train_proofnet(
             print("Context length:", model.config.context_length)
             max_length: int = model.config.context_length
         else:
+            print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
             # max_length: int = 4096
-            # max_length: int = 8192
-            max_length: int = 128  # for debugging
+            max_length: int = 8192
+            # max_length: int = 128  # for debugging
             # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
             print(f'->{max_length=}')
-        block_size: int = max_length
-        print(f'{block_size=}')
     else:
         raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
     print("Number of parameters:", sum(p.numel() for p in model.parameters()))
@@ -169,6 +167,8 @@ def setup_and_train_proofnet(
     eval_dataset = load_dataset(path, split='test')
     train_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(train_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
     eval_dataset = train_dataset
+    print(f'->{len(train_dataset)=} {len(eval_dataset)=}')
+    # max_steps: int = (len(train_dataset) * num_train_epochs) // per_device_train_batch_size  # TODO: really?
 
     # Training arguments
     output_dir_train: Path = Path(output_dir_train).expanduser()
@@ -176,32 +176,43 @@ def setup_and_train_proofnet(
     training_args = TrainingArguments(
         output_dir=output_dir_train,
         max_steps=2,  # TODO get rid of this in favour of 1 or 2 or 3 epochs
-        evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
+        # num_train_epochs=num_train_epochs, 
         gradient_accumulation_steps=gradient_accumulation_steps,  # based on alpaca https://github.com/tatsu-lab/stanford_alpaca, allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
         gradient_checkpointing = gradient_checkpointing,  # TODO depending on hardware set to true?
-        learning_rate=learning_rate,
         per_device_train_batch_size=per_device_train_batch_size,
         per_device_eval_batch_size=per_device_eval_batch_size,
-        weight_decay=weight_decay,
-        save_total_limit=save_total_limit,
-        num_train_epochs=num_train_epochs,
-        max_grad_norm=max_grad_norm,
+        learning_rate=learning_rate,
+        weight_decay=weight_decay, 
+        max_grad_norm=max_grad_norm, # TODO once real training change?
+        lr_scheduler_type=lr_scheduler_type,  # TODO once real training change? using what I've seen most in vision 
+        warmup_ratio=warmup_ratio,
         optim=optim,
+        # logging_strategy='epoch', # TODO
+        save_steps=100, # Save checkpoint every 500 steps
+        save_total_limit=3, # save last 3
+        logging_steps=10,  # Frequency of logging steps
         logging_first_step=True,
-        logging_strategy='epoch',
-        # lr_scheduler_type=lr_scheduler_type  # TODO: https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
-        # warmup_ratio=warmup_ratio,
-        report_to = report_to,  # options I recommend: 'none', 'wandb'
+        logging_dir=output_dir_train,
+        evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
+        # evaluation_strategy="steps",  # TODO Evaluate model at specified steps
+        # eval_steps=110,  # TODO Evaluate every 100 steps
+        # remove_unused_columns=False,  # TODO https://stackoverflow.com/questions/76879872/how-to-use-huggingface-hf-trainer-train-with-custom-collate-function/76929999#76929999 , https://claude.ai/chat/475a4638-cee3-4ce0-af64-c8b8d1dc0d90
+        report_to=report_to,  # options I recommend: 'none', 'wandb'
         fp16=False,  # never ever set to True
-        bf16=torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8,  # if >= 8 ==> brain float 16 available or set to True if you always want fp32
+        bf16=torch.cuda.is_bf16_supported(),
+        # full_determinism=True,  # TODO periphery, Ensure reproducibility
+        # torchdynamo="nvfuser",  # TODO periphery, Use NVFuser backend for optimized torch operations
+        # dataloader_prefetch_factor=2,  # TODO periphery, Number of batches to prefetch
+        # dataloader_pin_memory=True,  # TODO periphery, Pin memory in data loaders for faster transfer to GPU
+        # dataloader_num_workers=16,  # TODO Number of subprocesses for data loading
     )
 
-    # Initialize the Trainer
+    # Initialize the Trainer 
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        eval_dataset=eval_dataset,  # set to None if eval is giving you memory issues
         tokenizer=tokenizer,
         compute_metrics=compute_metrics
     )
@@ -212,7 +223,7 @@ def setup_and_train_proofnet(
     if output_dir_test is not None:
         output_dir_test: Path = Path(output_dir_test).expanduser()
         output_dir_test.mkdir(parents=True, exist_ok=True)
-        eval_args = TrainingArguments(output_dir=output_dir_test, fp16=False, bf16=torch.cuda.is_bf16_supported(), report_to=report_to)
+        eval_args = TrainingArguments(output_dir=output_dir_test, per_device_eval_batch_size=per_device_eval_batch_size, fp16=False, bf16=torch.cuda.is_bf16_supported(), report_to=report_to)
         trainer = Trainer(model=model, args=eval_args, train_dataset=None, eval_dataset=eval_dataset)
         # results: dict[str, float] = trainer.evaluate(test_dataset)
         results: dict[str, float] = eval_hf(trainer, name='', path=path, split='test')
