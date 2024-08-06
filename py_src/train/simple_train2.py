@@ -60,22 +60,22 @@ def preprocess_function_proofnet_simple(examples: Dict[str, list], tokenizer: GP
 def setup_and_train_proofnet(
         # pretrained_model_name_or_path: str = "gpt2", 
         # pretrained_model_name_or_path: str = "openai-community/gpt2-xl", 
-        pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", 
+        pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
         path: str = "hoskinson-center/proofnet",
         output_dir_train: str = '~/tmp/proofnet/train',
         output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
         output_dir_test: str = '~/tmp/proofnet/test',
         path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
         num_train_epochs: int = 3,
-        per_device_train_batch_size: Optional[int] = 2,
-        per_device_eval_batch_size: Optional[int] = 2,
+        per_device_train_batch_size: Optional[int] = 1,
+        per_device_eval_batch_size: Optional[int] = 1,
         learning_rate: float = 5e-5,
         weight_decay: float = 0.01,
         max_grad_norm: float = 1.0, 
         lr_scheduler_type = 'cosine', # https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         warmup_ratio=0.01,  # copying alpaca for now, number of steps for a linear warmup,  https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         optim='paged_adamw_32bit',
-        gradient_accumulation_steps = 2, # Allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
+        gradient_accumulation_steps = 4, # Allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
         gradient_checkpointing: Optional[bool] = True,
         report_to: str = 'none',  # recommended values 'wandb' or `none`
         ) -> None:
@@ -130,8 +130,8 @@ def setup_and_train_proofnet(
             max_length: int = model.config.context_length
         else:
             print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
-            # max_length: int = 4096
-            max_length: int = 8192
+            max_length: int = 4096
+            # max_length: int = 8192
             # max_length: int = 128  # for debugging
             # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
             print(f'->{max_length=}')

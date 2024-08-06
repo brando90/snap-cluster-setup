@@ -1873,6 +1873,17 @@ which means it's relative to `$HOME` most likely.
 
 In Linux and Ubuntu (nothing else suporrted for now):
 ```bash
+# careful changes your HOME
+# sudo -i
+# sudo su
+
+apt update -y
+apt upgrade -y
+add-apt-repository ppa:deadsnakes/ppa
+apt update -y
+apt upgrade -y
+apt install python3.11 python3.11-venv python3.11-dev python3.11-distutils
+
 deactivate
 mkdir ~/.virtualenvs
 ls ~/.virtualenvs
