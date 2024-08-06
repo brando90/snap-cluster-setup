@@ -4,6 +4,10 @@
 
 Run:
 ```bash
+# if you need to kill a proc
+nvidia-smi
+kill -9 <pid>
+
 source ~/.virtualenvs/snap_cluster_setup/bin/activate
 cd ~/snap-cluster-setup
 python py_src/train/simple_train2.py

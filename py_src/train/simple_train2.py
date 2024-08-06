@@ -93,6 +93,7 @@ def setup_and_train_proofnet(
     torch.cuda.empty_cache()
 
     # Load tokenizer and model
+    print(f'->{pretrained_model_name_or_path=}')
     if pretrained_model_name_or_path == "gpt2":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
         if tokenizer.pad_token_id is None:
@@ -130,11 +131,14 @@ def setup_and_train_proofnet(
             max_length: int = model.config.context_length
         else:
             print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
-            max_length: int = 4096
-            # max_length: int = 8192
             # max_length: int = 128  # for debugging
+            max_length: int = 1024
+            # max_length: int = 1024
+            # max_length: int = 2048 
+            # max_length: int = 4096
+            # max_length: int = 8192
             # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
-            print(f'->{max_length=}')
+            print(f'-->{max_length=}')
     else:
         raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
     print("Number of parameters:", sum(p.numel() for p in model.parameters()))
