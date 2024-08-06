@@ -28,6 +28,27 @@ def raw_str_2_desired_prob_soln_putnam_math(examples, tokenizer):
     examples: list[str] = [f"Problem: Let's think step by step. {examples['problem'][i]}\nSolution: Let's think step by step. {examples['solution'][i]}\n{tokenizer.eos_token}" for i in range(len(examples['problem']))]
     return examples
 
+def preprocess_function_proofnet_simple(examples: dict[str, list], tokenizer: GPT2Tokenizer, max_length: int = 512) -> dict[str, torch.Tensor]:
+    """
+    Preprocess the input data for the proofnet dataset.
+
+    Args:
+    examples: The examples to preprocess.
+    tokenizer: The tokenizer for encoding the texts.
+
+    Returns:
+    The processed model inputs.
+    """
+    # - Get raw string ins,outs (so deal with HF data set columns at str level)
+    inputs: list[str] = [f"{examples['nl_statement'][i]}{tokenizer.eos_token}{examples['formal_statement'][i]}" for i in range(len(examples['nl_statement']))]
+    # - Get tokenized ins,outs (so remove irrelevant "string" columns to get only "tensor" relevant columns)
+    model_inputs = tokenizer(inputs, max_length=max_length, padding="max_length", truncation=True, return_tensors="pt")
+    # - Get lm ins,outs for training e.g., deal with padd, masks etc.
+    labels = model_inputs.input_ids.clone()
+    labels[labels == tokenizer.pad_token_id] = -100
+    model_inputs["labels"] = labels
+    return model_inputs
+
 def cuda_debug():
     import torch
 

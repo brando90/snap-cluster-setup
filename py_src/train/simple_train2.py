@@ -1,4 +1,5 @@
 """
+
 Refs:
     - https://claude.ai/chat/ad5c9e18-beb4-48fb-9f43-a2ba463ce158
     - https://chatgpt.com/c/349f2c8a-949e-444d-ae3c-8ca60ba77831
@@ -16,6 +17,8 @@ import evaluate
 
 from utils import eval_hf
 from utils import raw_ds_2_lm_ds_mask_eos_pad_toks
+
+from pdb import set_trace as st
 
 def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
                     path: str = 'accuracy',
@@ -36,31 +39,10 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
     predictions = np.argmax(predictions, axis=1)
     return metric.compute(predictions=predictions, references=references)
 
-def preprocess_function_proofnet_simple(examples: Dict[str, list], tokenizer: GPT2Tokenizer, max_length: int = 512) -> Dict[str, torch.Tensor]:
-    """
-    Preprocess the input data for the proofnet dataset.
-
-    Args:
-    examples: The examples to preprocess.
-    tokenizer: The tokenizer for encoding the texts.
-
-    Returns:
-    The processed model inputs.
-    """
-    # - Get raw string ins,outs (so deal with HF data set columns at str level)
-    inputs: list[str] = [f"{examples['nl_statement'][i]}{tokenizer.eos_token}{examples['formal_statement'][i]}" for i in range(len(examples['nl_statement']))]
-    # - Get tokenized ins,outs (so remove irrelevant "string" columns to get only "tensor" relevant columns)
-    model_inputs = tokenizer(inputs, max_length=max_length, padding="max_length", truncation=True, return_tensors="pt")
-    # - Get lm ins,outs for training e.g., deal with padd, masks etc.
-    labels = model_inputs.input_ids.clone()
-    labels[labels == tokenizer.pad_token_id] = -100
-    model_inputs["labels"] = labels
-    return model_inputs
-
 def setup_and_train_proofnet(
-        # pretrained_model_name_or_path: str = "gpt2", 
+        pretrained_model_name_or_path: str = "gpt2", 
         # pretrained_model_name_or_path: str = "openai-community/gpt2-xl", 
-        pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
+        # pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
         path: str = "hoskinson-center/proofnet",
         output_dir_train: str = '~/tmp/proofnet/train',
         output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
@@ -95,16 +77,21 @@ def setup_and_train_proofnet(
     # Load tokenizer and model
     print(f'->{pretrained_model_name_or_path=}')
     if pretrained_model_name_or_path == "gpt2":
-        tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
+        torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
+        # tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024) # TODO really, we need to put max_length here?
+        tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
             print(f'{tokenizer.pad_token=}')
         print(f'{tokenizer.eos_token=}\n{tokenizer.eos_token_id=}')
-        model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
+        model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        max_length: int = tokenizer.model_max_length
-        print(f'{max_length=}')
+        print(f'{device=} {torch_dtype=} Model device: {next(model.parameters()).device}')
+        # max_length: int = tokenizer.model_max_length
+        max_length: int = 2
+        print(f'{tokenizer.model_max_length=}')
+        print(f'-->{max_length=}')
     elif pretrained_model_name_or_path == "openai-community/gpt2-xl":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
         if tokenizer.pad_token_id is None:
@@ -114,8 +101,11 @@ def setup_and_train_proofnet(
         model = GPT2LMHeadModel.from_pretrained(pretrained_model_name_or_path)
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        max_length: int = tokenizer.model_max_length
-        print(f'{max_length=}') 
+        max_length: int = 128
+        # max_length: int = 256
+        # max_length: int = 512
+        # max_length: int = tokenizer.model_max_length # 1024
+        print(f'-->{max_length=}') 
     elif pretrained_model_name_or_path == "meta-llama/Meta-Llama-3.1-8B":
         torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
         model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype)
@@ -131,9 +121,10 @@ def setup_and_train_proofnet(
             max_length: int = model.config.context_length
         else:
             print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
-            # max_length: int = 128  # for debugging
+            # max_length: int = 4  # for debugging
+            max_length: int = 128  # for debugging
             # max_length: int = 256
-            max_length: int = 512
+            # max_length: int = 512
             # max_length: int = 1024
             # max_length: int = 2048 
             # max_length: int = 4096
@@ -142,6 +133,7 @@ def setup_and_train_proofnet(
             print(f'-->{max_length=}')
     else:
         raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
+    print(f'{device=} Model device: {next(model.parameters()).device}')
     print("Number of parameters:", sum(p.numel() for p in model.parameters()))
 
     # - Load the dataset
@@ -172,12 +164,15 @@ def setup_and_train_proofnet(
 
     # Proofnet with 1st eos token train remaining eos not train
     from train.utils import raw_str_2_desired_af_str
-    _raw_str_2_desired_af_str = lambda examples: raw_str_2_desired_af_str(examples, tokenizer)  # tokenizer needed to get eos tok to form right str to train on.
+    _raw_str_2_desired_af_str = lambda examples: raw_str_2_desired_af_str(examples, tokenizer)  # tokenizer needed to get eos tok to form right str to train on, max_length_not needed here.
     train_dataset = load_dataset(path, split='validation')
     eval_dataset = load_dataset(path, split='test')
     train_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(train_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
-    eval_dataset = train_dataset
-    print(f'->{len(train_dataset)=} {len(eval_dataset)=}')
+    print(f'->{len(train_dataset)=}')
+    # eval_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(eval_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
+    # print(f'->{len(eval_dataset)=}')
+    eval_dataset = None
+    # print(f'->{len(train_dataset)=} {len(eval_dataset)=}')
     # max_steps: int = (len(train_dataset) * num_train_epochs) // per_device_train_batch_size  # TODO: really?
 
     # Training arguments
@@ -203,7 +198,8 @@ def setup_and_train_proofnet(
         logging_steps=10,  # Frequency of logging steps
         logging_first_step=True,
         logging_dir=output_dir_train,
-        evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
+        # evaluation_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
+        eval_strategy='no',  # "no"`: No evaluation is done during training. no can be good to avoid memory issues.
         # evaluation_strategy="steps",  # TODO Evaluate model at specified steps
         # eval_steps=110,  # TODO Evaluate every 100 steps
         # remove_unused_columns=False,  # TODO https://stackoverflow.com/questions/76879872/how-to-use-huggingface-hf-trainer-train-with-custom-collate-function/76929999#76929999 , https://claude.ai/chat/475a4638-cee3-4ce0-af64-c8b8d1dc0d90
@@ -227,9 +223,12 @@ def setup_and_train_proofnet(
         compute_metrics=compute_metrics
     )
     # Train the model
+    # st()
     trainer.train()
+    st()
 
     # Evaluate the model
+    per_device_eval_batch_size = 1
     if output_dir_test is not None:
         output_dir_test: Path = Path(output_dir_test).expanduser()
         output_dir_test.mkdir(parents=True, exist_ok=True)
