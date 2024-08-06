@@ -132,7 +132,8 @@ def setup_and_train_proofnet(
         else:
             print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
             # max_length: int = 128  # for debugging
-            max_length: int = 1024
+            # max_length: int = 256
+            max_length: int = 512
             # max_length: int = 1024
             # max_length: int = 2048 
             # max_length: int = 4096
