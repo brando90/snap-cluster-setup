@@ -197,7 +197,7 @@ cython_debug/
 *.hex
 
 # QC Cloud Setup Bash Files
-*.sh
+# *.sh
 # Include docker launch scripts for Mac/Linux
 !run_docker.sh
 !research/run_docker_notebook.sh
