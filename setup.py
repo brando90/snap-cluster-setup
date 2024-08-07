@@ -114,6 +114,8 @@ setup(
         'datasets',
         'bitsandbytes',
         'evaluate',
+        'einops',
+        'sentencepiece',
 
         # # mercury: https://github.com/vllm-project/vllm/issues/2747
         # 'dspy-ai',

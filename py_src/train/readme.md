@@ -19,5 +19,5 @@ Run:
 ```bash
 source ~/.virtualenvs/snap_cluster_setup/bin/activate
 cd ~/snap-cluster-setup
-# accelerate launch py_src/train/simple_train2.py
+accelerate launch --config_file ~/snap-cluster-setup/configs/accelerate/ddp/ddp_config_hf_acc.yaml py_src/train/simple_train2.py  
 ```

@@ -40,9 +40,10 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
     return metric.compute(predictions=predictions, references=references)
 
 def setup_and_train_proofnet(
-        pretrained_model_name_or_path: str = "gpt2", 
+        # pretrained_model_name_or_path: str = "gpt2", 
         # pretrained_model_name_or_path: str = "openai-community/gpt2-xl", 
         # pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
+        pretrained_model_name_or_path: str = "internlm/internlm2-1_8b", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
         path: str = "hoskinson-center/proofnet",
         output_dir_train: str = '~/tmp/proofnet/train',
         output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
@@ -58,7 +59,7 @@ def setup_and_train_proofnet(
         warmup_ratio=0.01,  # copying alpaca for now, number of steps for a linear warmup,  https://discord.com/channels/879548962464493619/1227708244697284724/1227708244697284724
         optim='paged_adamw_32bit',
         gradient_accumulation_steps = 4, # Allows to process effective_batch_size = gradient_accumulation_steps * batch_size, num its to accumulate before opt update step
-        gradient_checkpointing: Optional[bool] = True,
+        gradient_checkpointing: Optional[bool] = False, # Careful with segmentation Faults https://stackoverflow.com/questions/78841125/how-to-fix-segmentation-fault-when-training-gpt-2-model-using-hugging-face-trans
         report_to: str = 'none',  # recommended values 'wandb' or `none`
         ) -> None:
     """
@@ -109,8 +110,40 @@ def setup_and_train_proofnet(
     elif pretrained_model_name_or_path == "meta-llama/Meta-Llama-3.1-8B":
         torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
         model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype)
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
         # tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", use_auth_token=True)
         tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right")
+        print(f'{tokenizer.pad_token=} {tokenizer.eos_token_id=}')
+        tokenizer.pad_token = tokenizer.eos_token if tokenizer.pad_token_id is None else tokenizer.pad_token
+        print(f'{tokenizer.pad_token=} {tokenizer.eos_token_id=}')
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        # get context length for setting max length for training
+        if hasattr(model.config, "context_length"):
+            # SEEMS IT IS NOT IN THE model.config
+            print("Context length:", model.config.context_length)
+            max_length: int = model.config.context_length
+        else:
+            print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
+            # max_length: int = 4  # for debugging
+            max_length: int = 128  # for debugging
+            # max_length: int = 256
+            # max_length: int = 512
+            # max_length: int = 1024
+            # max_length: int = 2048 
+            # max_length: int = 4096
+            # max_length: int = 8192
+            # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
+            print(f'-->{max_length=}')
+    else: 
+        print(f'{pretrained_model_name_or_path=}')
+        torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
+        model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype, trust_remote_code=True)
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        # tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", use_auth_token=True)
+        tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", trust_remote_code=True)
         print(f'{tokenizer.pad_token=} {tokenizer.eos_token_id=}')
         tokenizer.pad_token = tokenizer.eos_token if tokenizer.pad_token_id is None else tokenizer.pad_token
         print(f'{tokenizer.pad_token=} {tokenizer.eos_token_id=}')
@@ -130,9 +163,7 @@ def setup_and_train_proofnet(
             # max_length: int = 4096
             # max_length: int = 8192
             # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
-            print(f'-->{max_length=}')
-    else:
-        raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
+            print(f'-->{max_length=}') 
     print(f'{device=} Model device: {next(model.parameters()).device}')
     print("Number of parameters:", sum(p.numel() for p in model.parameters()))
 
@@ -169,9 +200,9 @@ def setup_and_train_proofnet(
     eval_dataset = load_dataset(path, split='test')
     train_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(train_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
     print(f'->{len(train_dataset)=}')
-    # eval_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(eval_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
-    # print(f'->{len(eval_dataset)=}')
-    eval_dataset = None
+    eval_dataset = raw_ds_2_lm_ds_mask_eos_pad_toks(eval_dataset, tokenizer, max_length, raw_str_2_desired_str=_raw_str_2_desired_af_str)
+    print(f'->{len(eval_dataset)=}')
+    # eval_dataset = None
     # print(f'->{len(train_dataset)=} {len(eval_dataset)=}')
     # max_steps: int = (len(train_dataset) * num_train_epochs) // per_device_train_batch_size  # TODO: really?
 
@@ -225,7 +256,7 @@ def setup_and_train_proofnet(
     # Train the model
     # st()
     trainer.train()
-    st()
+    # st()
 
     # Evaluate the model
     per_device_eval_batch_size = 1
