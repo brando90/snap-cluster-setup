@@ -4,6 +4,7 @@ Refs:
     - https://claude.ai/chat/ad5c9e18-beb4-48fb-9f43-a2ba463ce158
     - https://chatgpt.com/c/349f2c8a-949e-444d-ae3c-8ca60ba77831
 """
+import date
 import glob
 import os
 import numpy as np
@@ -45,9 +46,9 @@ def setup_and_train_proofnet(
         # pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
         pretrained_model_name_or_path: str = "internlm/internlm2-1_8b", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
         path: str = "hoskinson-center/proofnet",
-        output_dir_train: str = '~/tmp/proofnet/train',
+        output_dir_train: str = '~/runs/run_{date}/train',
         output_dir_val: Optional[str] = None,  # we are training on the val set so no val set
-        output_dir_test: str = '~/tmp/proofnet/test',
+        output_dir_test: str = '~/runs/run_{date}/test',
         path_to_save_model: Optional[str] = None,  # suggested path: '~/tmp/proofnet/model' then expanduser in py code
         num_train_epochs: int = 3,
         per_device_train_batch_size: Optional[int] = 1,
@@ -207,8 +208,11 @@ def setup_and_train_proofnet(
     # max_steps: int = (len(train_dataset) * num_train_epochs) // per_device_train_batch_size  # TODO: really?
 
     # Training arguments
-    output_dir_train: Path = Path(output_dir_train).expanduser()
+    today = date.today()
+    formatted_date: str = today.strftime("%m%d%Y") # Format the date as MMDDYYYY
+    output_dir_train: Path = Path(output_dir_train.format(date=formatted_date)).expanduser()
     output_dir_train.mkdir(parents=True, exist_ok=True)
+    print(f'{output_dir_train=}')
     training_args = TrainingArguments(
         output_dir=output_dir_train,
         max_steps=2,  # TODO get rid of this in favour of 1 or 2 or 3 epochs
@@ -261,7 +265,7 @@ def setup_and_train_proofnet(
     # Evaluate the model
     per_device_eval_batch_size = 1
     if output_dir_test is not None:
-        output_dir_test: Path = Path(output_dir_test).expanduser()
+        output_dir_test: Path = Path(output_dir_test.format(date=formatted_date)).expanduser()
         output_dir_test.mkdir(parents=True, exist_ok=True)
         eval_args = TrainingArguments(output_dir=output_dir_test, per_device_eval_batch_size=per_device_eval_batch_size, fp16=False, bf16=torch.cuda.is_bf16_supported(), report_to=report_to)
         trainer = Trainer(model=model, args=eval_args, train_dataset=None, eval_dataset=eval_dataset)
