@@ -4,7 +4,7 @@ Refs:
     - https://claude.ai/chat/ad5c9e18-beb4-48fb-9f43-a2ba463ce158
     - https://chatgpt.com/c/349f2c8a-949e-444d-ae3c-8ca60ba77831
 """
-import date
+from datetime import date
 import glob
 import os
 import numpy as np
