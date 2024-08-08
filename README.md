@@ -2040,4 +2040,16 @@ Then you can check if it worked by installing [PyPantograph](https://github.com/
 
 ref: https://leanprover-community.github.io/install/linux.html
 
-asdfadsf
+## Nvhtop - 
+
+Install the extremely lightweight (quick to install, few dependencies) pip package that is a wrapper around `nvidia-smi`.
+Do install nvidia-htop
+```bash
+pip3 install nvidia-htop
+```
+put alias `nvhotp` alias `alias nvhtop='nvidia-htop.py --color -l 100'` in `.bashrc`"
+```bash
+echo "alias nvhtop='nvidia-htop.py --color -l 100'" >> ~/.bashrc
+```
+
+ref: https://github.com/peci1/nvidia-htop
