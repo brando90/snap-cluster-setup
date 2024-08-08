@@ -4,6 +4,7 @@ Refs:
     - https://claude.ai/chat/ad5c9e18-beb4-48fb-9f43-a2ba463ce158
     - https://chatgpt.com/c/349f2c8a-949e-444d-ae3c-8ca60ba77831
 """
+import fire
 from datetime import date
 import glob
 import os
@@ -40,7 +41,7 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],
     predictions = np.argmax(predictions, axis=1)
     return metric.compute(predictions=predictions, references=references)
 
-def setup_and_train_proofnet(
+def main(
         # pretrained_model_name_or_path: str = "gpt2", 
         # pretrained_model_name_or_path: str = "openai-community/gpt2-xl", 
         # pretrained_model_name_or_path: str = "meta-llama/Meta-Llama-3.1-8B", # note: if you get RoPE error upgrade your transformers pip install --upgrade transformers lib, https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct/discussions/15
@@ -277,14 +278,9 @@ def setup_and_train_proofnet(
     if path_to_save_model is not None:
         model.save_pretrained(path_to_save_model)
 
-def main() -> None:
-    """
-    Main function to execute the model training and evaluation.
-    """
-    setup_and_train_proofnet()
 
 if __name__ == "__main__":
     import time
     start_time = time.time()
-    main()
+    fire.Fire(main)
     print(f"Time taken: {time.time() - start_time:.2f} seconds, or {(time.time() - start_time) / 60:.2f} minutes, or {(time.time() - start_time) / 3600:.2f} hours.\a")
