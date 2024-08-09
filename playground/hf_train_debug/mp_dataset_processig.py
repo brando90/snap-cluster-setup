@@ -1,5 +1,7 @@
 """
 
+TODO: perhaps later have accelerate ddp, fsdp for this (to see if num_proc interferes with procs in ddp)
+
 ref: https://chatgpt.com/c/6e4de8fb-272f-41ae-a468-7162fe03aaad
 """
 import time
