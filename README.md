@@ -587,6 +587,7 @@ pip install --upgrade pip
 
 # - create conda env (note: vllm has issues with 3.10 so we are using 3.9)
 conda create -n snap_cluster_setup python=3.9
+# conda create -n snap_cluster_setup python=3.11
 
 # - activate your conda env
 conda activate snap_cluster_setup
