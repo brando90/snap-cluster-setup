@@ -136,10 +136,10 @@ setup(
 
         # # ampere
         # 'dspy-ai',
-        # # 'torch==2.1.2+cu118',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
-        # # 'torch==2.1.2',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
-        # # 'torch==2.2.1',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
-        # 'torch==2.2.1',  # 2.2 net supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # # 'torch==2.1.2+cu118',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # # 'torch==2.1.2',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # # 'torch==2.2.1',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
+        # 'torch==2.2.1',  # 2.2 not supported due to vllm see: https://github.com/vllm-project/vllm/issues/2747
         # # 'torchvision',
         # # 'torchaudio',
         # # 'trl',
