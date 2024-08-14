@@ -1,6 +1,11 @@
 # Running Check Final Answer Evaluations for Language Models (LMs)
 
-This code is a small adaptation from the Meta-Math original evaluation. We have verified that it runs within 1-2% accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
+This code is a small adaptation from the Meta-Math original evaluation. 
+We have verified that it runs within 1-2% accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
+<!-- Note mistral ins 13.1% ref: https://mistral.ai/news/announcing-mistral-7b/ us on MATH TODO, lost value sadly -->
+
+We also did a check with Claude 3.5 Sonnet and [the original Anthropic blog](https://www.anthropic.com/news/claude-3-5-sonnet) reports `71.1%` with `0-shots CoT`.  
+Using that setting we got `X` result using this code. 
 
 ## Quickstart
 
@@ -14,6 +19,15 @@ conda activate snap_cluster_setup
 # - Pip install snap-cluster-setup repo in editable mode with pip
 pip install --upgrade pip
 pip install -e ~/snap-cluster-setup
+```
+
+Verify the data has the right number of points (200 August 14 2024):
+```bash
+jq -c '.[]' /~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json | wc -l
+```
+Sample output:
+```bash
+200
 ```
 
 ### Quickstart - Open Source Model Putnam Evaluations
@@ -60,6 +74,7 @@ Tip: use GPT3.5 (or the chepaer version when you read this) to **quickly** and *
 ```bash
 # - GPT 3.5
 python boxed_acc_eval.py --model gpt-3.5-turbo --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static2/test --end 348 --batch_size 348 
+# python boxed_acc_eval.py --model gpt-4o-mini --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static2/test --end 348 --batch_size 348 
 
 # - GPT 4 Turbo
 python boxed_acc_eval.py --model gpt-4-turbo --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static2/test --end 348 --batch_size 348
@@ -69,11 +84,18 @@ python boxed_acc_eval.py --model gpt-4o --path_2_eval_dataset ~/putnam-math/data
 ```
 
 #### Anthropic Claude Evaluations
-TODO
+The following are the commands to run [Anthropic's Claude](https://docs.anthropic.com/en/docs/about-claude/models) evaluations. 
+```bash
+# - Claude 3 Opus
+
+# - Claude 3.5 Sonnet 
+# python boxed_acc_eval.py --model  --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static2/test --end 348 --batch_size 348 --mode dryrun
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static_final --end 348 --batch_size 348 --mode dryrun
+# python boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json --end 348 --batch_size 348 --mode dryrun
+```
 
 #### Gemini Evaluations
-
-
+TODO:
 
 ## Evaluations with the Variations Benchmarks
 
@@ -92,3 +114,10 @@ TODO
 # python boxed_acc_eval.py --model gpt-4-turbo --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 # python boxed_acc_eval.py --model gpt-4o --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 ```
+
+## Other Features
+
+### Saving Mode Responses
+TODO
+
+Motivation: debugging, human evaluations, and automatic proof evaluations e.g., Teacher Forced Accuracy (tfa).

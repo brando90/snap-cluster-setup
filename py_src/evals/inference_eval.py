@@ -1,19 +1,15 @@
 import torch
 from typing import Union, Callable, Optional
-from vllm import LLM, SamplingParams, RequestOutput, CompletionOutput
-from transformers import Pipeline
 from openai import OpenAI
-
-from utils import batch_data
-from prompts_evals import SYSTEM_PROMPT_DEFAULT
-
+import anthropic
 from pathlib import Path
 import sys
 import os
 from tqdm import tqdm
-
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from evals.utils import batch_data
+from evals.prompts_evals import SYSTEM_PROMPT_DEFAULT
 
 # -- Generator (Inference) Classes
 
@@ -25,22 +21,91 @@ class Generator:
         pass
 
 class HFPipelineGenerator(Generator):  
-    def __init__(self, llm: Pipeline, sampling_params: SamplingParams):
+    def __init__(self, llm, sampling_params):
         super().__init__()
-        self.llm = llm
+        from transformers import Pipeline
+        self.llm: Pipeline = llm
         self.sampling_params = sampling_params
 
 class HFDirectModelGenerator(Generator):  
-    def __init__(self, llm: Pipeline, sampling_params: SamplingParams):
+    def __init__(self, llm, sampling_params):
         super().__init__()
-        self.llm = llm
+        from transformers import Pipeline
+        self.llm: Pipeline = llm
         self.sampling_params = sampling_params
+
+def AnthropicGenerator(Generator):
+    def __init__(
+            self, 
+            model: str , 
+            sampling_params,
+            api_key: str = None,
+            system_prompt: str = SYSTEM_PROMPT_DEFAULT,  # You are an expert mathematician. ...
+            prompt_template: Optional[str] = None, 
+            verbose_init: bool = True,
+            ):
+        super().__init__()
+        print(f'{model=}') if verbose_init else None
+        if api_key is None:
+            api_key = os.environ['ANTHROPIC_API_KEY'].strip()
+        self.model = model
+        self.sampling_params = sampling_params
+        client = anthropic.Anthropic(api_key=api_key)
+        self.llm = client
+        self.system_prompt = system_prompt
+        self.prompt_template = prompt_template
+        self.invalid_outputs = []
+
+def before_sleep(retry_state):
+    print(f"(Tenacity) Retry, error that caused it: {retry_state.outcome.exception()}")
+
+def retry_error_callback(retry_state):
+    exception = retry_state.outcome.exception()
+    exception_str = str(exception)
+    if "prompt is too long" in exception_str and "400" in exception_str:
+        raise exception
+    return 'No error that require sus to exist early.'
+
+# After 1min 4k (due to RPM) should reset by wait 1m, much longer than e.g., 256secs = ~4mins doesn't make sense to me.
+@retry(stop=stop_after_attempt(20), wait=wait_exponential(multiplier=2, max=256), 
+       before_sleep=before_sleep, retry_error_callback=retry_error_callback)
+def call_to_anthropic_client_api_with_retry(gen: AnthropicGenerator, prompt: str) -> dict:
+    # max_tokens=8192,  # max_tokens for Claude 3.5 https://docs.anthropic.com/en/docs/about-claude/models#model-comparison
+    # client = anthropic.Anthropic(api_key=gen.api_key)
+    # response = client.messages.create(
+    # response_text: str = gen.llm.messages.create(
+    #     model=gen.sampling_params.model,
+    #     max_tokens=gen.sampling_params.max_tokens,
+    #     # temperature=temperature,  # note the prompt generator doesn't give this as an input
+    #     system=gen.sampling_params.system,
+    #     messages=[
+    #         {"role": "user", "content": [{"type": "text", "text": prompt}]}
+    #     ],
+    #     temperature=gen.sampling_params.temperature,
+    #     top_p=gen.sampling_params.top_p,
+    #     n=gen.sampling_params.n,
+    #     stop=gen.sampling_params.stop[:3],
+    # ).content[0].text
+    response = gen.llm.messages.create(
+        model=gen.sampling_params.model,
+        max_tokens=gen.sampling_params.max_tokens,
+        system=gen.sampling_params.system,
+        messages=[
+            {"role": "user", "content": [{"type": "text", "text": prompt}]}
+        ],
+        temperature=gen.sampling_params.temperature,
+        top_p=gen.sampling_params.top_p,
+        n=gen.sampling_params.n,
+        stop=gen.sampling_params.stop[:3],
+    )
+    # message example: https://docs.anthropic.com/en/api/messages-examples
+    return response
 
 class OpenAIGenerator(Generator):
     def __init__(
                 self, 
                 model: str, 
-                sampling_params: SamplingParams, 
+                sampling_params, 
                 api_key: str = None,
                 base_url: str = None,  # e.g., Mistral-7B-Instrcut-v0.2 on http://120.77.8.29:12345   
                 system_prompt: str = SYSTEM_PROMPT_DEFAULT,  # You are an expert mathematician. ...
@@ -70,37 +135,40 @@ class OpenAIGenerator(Generator):
                 # api_key = open(Path('~/keys/openai_api_brandos_personal_key.txt').expanduser(), 'r').read().strip()
                 # api_key = open(Path('~/keys/claude_api_brandos_personal_key.txt').expanduser(), 'r').read().strip()
                 api_key = open(Path('~/keys/openai_api_key_brandos_koyejolab.txt').expanduser(), 'r').read().strip()
-        print(f'{api_key=}, {base_url=}') if verbose_init else None
+        # print(f'{api_key=}, {base_url=}') if verbose_init else None
+        print(f'{base_url=}') if verbose_init else None
         # set attributes
         self.model = model
         self.sampling_params = sampling_params
         self.api_key = api_key
-        self.llm = OpenAI(api_key=self.api_key, base_url=base_url) 
+        client = OpenAI(api_key=self.api_key, base_url=base_url) 
+        self.llm = client 
         self.system_prompt = system_prompt
         self.prompt_template = prompt_template
         self.invalid_outputs = []
     
 class VllmGenerator(Generator):
-    def __init__(self, llm: LLM, sampling_params: SamplingParams):
+    def __init__(self, llm, sampling_params):
         super().__init__()
         self.llm = llm
         self.sampling_params = sampling_params
         self.invalid_outputs = []
 
 @retry(stop=stop_after_attempt(15), wait=wait_exponential(multiplier=2, max=128))
-def call_to_openai_api_with_retry(gen: OpenAIGenerator, prompt: str) -> dict:
+def call_to_openai_client_api_with_retry(gen: OpenAIGenerator, prompt: str) -> dict:
     response: dict = gen.llm.chat.completions.create(
         model=gen.model,
         messages=[
             {"role": "system", "content": gen.system_prompt},
-            {"role": "user", "content": prompt},
-            {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."}
+            {"role": "user", "content": prompt}
         ],
         temperature=gen.sampling_params.temperature,
         top_p=gen.sampling_params.top_p,
         n=gen.sampling_params.n,
         stop=gen.sampling_params.stop[:3],
+        max_tokens=gen.sampling_params.max_tokens,
         )
+    # chat completion response format: https://platform.openai.com/docs/guides/chat-completions/response-format
     return response
 
 def inference_vllm_prompt_only(
@@ -134,6 +202,7 @@ def inference_vllm_prompt_only(
 
         # - Return completions per prompt
         if isinstance(gen, VllmGenerator):
+            from vllm import LLM, SamplingParams, RequestOutput, CompletionOutput # here otherwise warning when doing api calls in cpu laptop, vllm only works for linux 100% ref: https://github.com/vllm-project/vllm/issues/2747
             # - Generate all request outputs with completions (model solutions) for each (math) prompts
             completions: list[list[CompletionOutput]] = []
             completions_strs: list[list[str]] = []  # one completion list str per (math) prompt
@@ -152,12 +221,14 @@ def inference_vllm_prompt_only(
                     outputs.append(output)
             assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
         elif isinstance(gen, OpenAIGenerator):
+            # ref: https://platform.openai.com/docs/guides/chat-completions/response-format
+            # example: https://platform.openai.com/docs/guides/text-generation
             completions: list[dict] = []
             completions_strs: list[list[str]] = []
             for batch_idx in range(num_batches):
                 batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
                 for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
-                    response: dict = call_to_openai_api_with_retry(gen, prompt)
+                    response: dict = call_to_openai_client_api_with_retry(gen, prompt)
                     completions.append(response)
                     comps_str_for_prompt: list[str] = [completion.message.content for completion in response.choices]  # response.choices[i].message
                     completions_strs.append(comps_str_for_prompt)
@@ -216,6 +287,19 @@ def inference_vllm_prompt_only(
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(completions_per_prompt)
             assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
+        elif isinstance(gen, AnthropicGenerator):
+            # ref: https://docs.anthropic.com/en/api/messages, https://platform.openai.com/docs/guides/chat-completions/response-format
+            # example: https://docs.anthropic.com/en/api/messages-examples
+            completions: list[dict] = []
+            completions_strs: list[list[str]] = []
+            for batch_idx in range(num_batches):
+                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
+                for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                    response: dict = call_to_anthropic_client_api_with_retry(gen, prompt)
+                    completions.append(response)
+                    comps_str_for_prompt: list[str] = [content_res_obj.text for content_res_obj in response.content] # ref: https://docs.anthropic.com/en/api/messages-examples
+                    completions_strs.append(comps_str_for_prompt)
+            outputs = completions
         else:
             raise ValueError(f'Unknown generator type: {gen=}')
 

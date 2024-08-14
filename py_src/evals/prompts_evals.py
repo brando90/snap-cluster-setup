@@ -5,7 +5,6 @@ The reason is if the string is for maths & has latex, .format() will get confuse
 Processing the answer is prompt depedent, so we are pairing the process answer code for each prompt here. 
 """
 from typing import Union
-from vllm import CompletionOutput
 
 # -- Prompt Minerva MATH
 # https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/minerva_math/utils.py#L22
@@ -268,6 +267,15 @@ Problem: {problem}
 Solution: Let's think step by step.""")
 def get_math_problem_prompt_ala_helm_8shot_cot2(data_pt: dict, prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE) -> Union[str, None]:
     # Note: instead of using .format(name=value) we are using the exact string for the placeholder so that the .format function doesn't get confused with curly braces.
+    return prompt_template.replace("{problem}", data_pt['problem'])
+
+MATH_PROMPT_0SHOT_COT_TEMPLATE: str = (
+"""Given a mathematics problem, determine the answer. Simplify your answer as much as possible. Think step by step, then always give the final answer inside a \\boxed{answer}###
+Problem: {problem}
+Solution: Let's think step by step.""")
+def get_math_problem_prompt_ala_0shot_cot(data_pt: dict, prompt_template: str = MATH_PROMPT_0SHOT_COT_TEMPLATE) -> Union[str, None]:
+    # Note: instead of using .format(name=value) we are using the exact string for the placeholder so that the .format function doesn't get confused with curly braces.
+    # inspired from the requirement for Claude 3.5 Sonnet: https://www.anthropic.com/news/claude-3-5-sonnet
     return prompt_template.replace("{problem}", data_pt['problem'])
 
 # -- Official MATH examples from Hendryck's ref: https://github.com/stanford-crfm/helm/blob/main/src/helm/benchmark/scenarios/math_scenario.py#L293

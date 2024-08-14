@@ -7,11 +7,6 @@ import os
 import json
 from typing import Callable, Optional, Union, Tuple, List, Any
 
-from vllm import LLM, SamplingParams, CompletionOutput
-from vllm.outputs import RequestOutput
-
-from transformers import pipeline
-
 import sys
 
 def remove_boxed(string: str) -> Union[str, None]:

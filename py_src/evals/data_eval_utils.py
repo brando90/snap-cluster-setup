@@ -4,9 +4,6 @@ from typing import Iterator, Optional
 import os
 
 import tenacity
-from vllm import SamplingParams
-
-from evals.utils import batch_data
 
 def get_iter_for_eval_data_set(path: Path, 
                                ) -> Iterator[dict]:
