@@ -151,6 +151,7 @@ def main(
     wandb.log({'boxed_acc': results_d['boxed_acc'], 'len(results)': results_d['len(results)'], 'len(results_boxed)': results_d['len(results_boxed)'], 'sum(results_boxed)': results_d['sum(results_boxed)']})
   
     # - End run
+    sampling_params = sampling_params._asdict() if hasattr(sampling_params, '_asdict') else vars(sampling_params)
     wandb.config.update(dict(prompt_gen_func=str(prompt_gen_func), prompt_template=prompt_template, model=str(model), path_2_eval_dataset=path_2_eval_dataset, output_dir=output_dir, sampling_params=vars(sampling_params)))
     print(f'{wandb.config=}')
     run.finish()
