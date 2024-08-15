@@ -7,6 +7,7 @@ import sys
 import os
 from tqdm import tqdm
 from tenacity import retry, stop_after_attempt, wait_exponential
+from collections import namedtuple
 
 from evals.utils import batch_data
 from evals.prompts_evals import SYSTEM_PROMPT_DEFAULT
@@ -34,7 +35,7 @@ class HFDirectModelGenerator(Generator):
         self.llm: Pipeline = llm
         self.sampling_params = sampling_params
 
-def AnthropicGenerator(Generator):
+class AnthropicGenerator(Generator):
     def __init__(
             self, 
             model: str , 
@@ -66,8 +67,8 @@ def retry_error_callback(retry_state):
         raise exception
     return 'No error that require sus to exist early.'
 
-# After 1min 4k (due to RPM) should reset by wait 1m, much longer than e.g., 256secs = ~4mins doesn't make sense to me.
-@retry(stop=stop_after_attempt(20), wait=wait_exponential(multiplier=2, max=256), 
+# After 1min 4k (due to RPM) should reset by wait 1m, much longer than e.g., 512secs = ~8mins doesn't make sense to me.
+@retry(stop=stop_after_attempt(35), wait=wait_exponential(multiplier=2, max=512), 
        before_sleep=before_sleep, retry_error_callback=retry_error_callback)
 def call_to_anthropic_client_api_with_retry(gen: AnthropicGenerator, prompt: str) -> dict:
     # max_tokens=8192,  # max_tokens for Claude 3.5 https://docs.anthropic.com/en/docs/about-claude/models#model-comparison
@@ -86,18 +87,26 @@ def call_to_anthropic_client_api_with_retry(gen: AnthropicGenerator, prompt: str
     #     n=gen.sampling_params.n,
     #     stop=gen.sampling_params.stop[:3],
     # ).content[0].text
-    response = gen.llm.messages.create(
-        model=gen.sampling_params.model,
-        max_tokens=gen.sampling_params.max_tokens,
-        system=gen.sampling_params.system,
-        messages=[
-            {"role": "user", "content": [{"type": "text", "text": prompt}]}
-        ],
-        temperature=gen.sampling_params.temperature,
-        top_p=gen.sampling_params.top_p,
-        n=gen.sampling_params.n,
-        stop=gen.sampling_params.stop[:3],
-    )
+    if not hasattr(gen.sampling_params, 'n'):
+        gen.sampling_params.n = 1
+    content: list[dict] = [] 
+    for _ in range(gen.sampling_params.n):
+        response = gen.llm.messages.create(
+            model=gen.model,
+            max_tokens=gen.sampling_params.max_tokens,
+            system=gen.system_prompt,
+            messages=[
+                {"role": "user", "content": [{"type": "text", "text": prompt}]}
+            ],
+            temperature=gen.sampling_params.temperature,
+            top_p=gen.sampling_params.top_p,
+            # n=gen.sampling_params.n,
+            stop_sequences=gen.sampling_params.stop[:3],
+        )
+        content.append(response.content[0])
+    # response = dict(content=content)
+    Response = namedtuple("Response", ['content'])
+    response = Response(content=content)
     # message example: https://docs.anthropic.com/en/api/messages-examples
     return response
 
@@ -176,7 +185,7 @@ def inference_vllm_prompt_only(
         math_gold_probs_solns: list[dict],
         prompt_template: str, 
         prompt_gen_func: Callable,
-        batch_size: int = 1,
+        batch_size: int = 10,
         start: int = 0,  # meant for quick prototyping evals, default starts from the beginning of the eval data
         end: int = sys.maxsize,  # meant for quick prototyping evals, default grabs all eval data all the way to the end
         batched: bool = True,  # true for vllm, false (?) for hf pipeline
@@ -185,6 +194,7 @@ def inference_vllm_prompt_only(
             Note: in meta-math, ins = instruction = math problem 
             Note: return completions can be multiple strings for a single prompt e.g., useful for maj@4 voting.
         """
+        print(f'{batch_size=}')
         assert batched, f'batched should be True but got: {batched=} always batching for vllm'
 
         # - Form math prompts
@@ -233,6 +243,23 @@ def inference_vllm_prompt_only(
                     comps_str_for_prompt: list[str] = [completion.message.content for completion in response.choices]  # response.choices[i].message
                     completions_strs.append(comps_str_for_prompt)
             outputs = completions
+        elif isinstance(gen, AnthropicGenerator):
+            # ref: https://docs.anthropic.com/en/api/messages, https://platform.openai.com/docs/guides/chat-completions/response-format
+            # example: https://docs.anthropic.com/en/api/messages-examples
+            serial = True
+            if serial:
+                completions: list[dict] = []
+                completions_strs: list[list[str]] = []
+                for batch_idx in range(num_batches):
+                    batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
+                    for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                        response: dict = call_to_anthropic_client_api_with_retry(gen, prompt)
+                        completions.append(response)
+                        comps_str_for_prompt: list[str] = [content_res_obj.text for content_res_obj in response.content] # ref: https://docs.anthropic.com/en/api/messages-examples
+                        completions_strs.append(comps_str_for_prompt)
+                outputs = completions 
+            else:
+                ...
         elif isinstance(gen, HFPipelineGenerator):
             # ref: https://stackoverflow.com/a/78466524/1601580
             # note: you might get warning due to temp, top_p not being zero and sampling is false when doing beam search
@@ -287,19 +314,6 @@ def inference_vllm_prompt_only(
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(completions_per_prompt)
             assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
-        elif isinstance(gen, AnthropicGenerator):
-            # ref: https://docs.anthropic.com/en/api/messages, https://platform.openai.com/docs/guides/chat-completions/response-format
-            # example: https://docs.anthropic.com/en/api/messages-examples
-            completions: list[dict] = []
-            completions_strs: list[list[str]] = []
-            for batch_idx in range(num_batches):
-                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
-                for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
-                    response: dict = call_to_anthropic_client_api_with_retry(gen, prompt)
-                    completions.append(response)
-                    comps_str_for_prompt: list[str] = [content_res_obj.text for content_res_obj in response.content] # ref: https://docs.anthropic.com/en/api/messages-examples
-                    completions_strs.append(comps_str_for_prompt)
-            outputs = completions
         else:
             raise ValueError(f'Unknown generator type: {gen=}')
 

@@ -80,7 +80,7 @@ def main(
     
     # filter out all dicts that don't have a latex box 
     if boxed_acc_probs_only:
-        math_gold_probs_solns = [d for d in math_gold_probs_solns if '\\boxed' in d['solution'] or '\\fbox' in d['solution']] 
+        math_gold_probs_solns = [dict_dpt for dict_dpt in math_gold_probs_solns if '\\boxed' in dict_dpt['solution'] or '\\fbox' in dict_dpt['solution']] 
     print(f'{path_2_eval_dataset=} \n {len(math_gold_probs_solns)=}')
     assert len(math_gold_probs_solns) > 0, f'No math problems found in {path_2_eval_dataset=}'
 
@@ -102,16 +102,16 @@ def main(
     print(f'{dtype=}')
     # sampling_params: SamplingParams = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of)
     from collections import namedtuple
-    SamplingParams = namedtuple('SamplingParamsTuple', ['n', 'max_tokens', 'top_p', 'temperature', 'stop', 'use_beam_search', 'best_of'])
+    SamplingParams = namedtuple('SamplingParams', ['n', 'max_tokens', 'top_p', 'temperature', 'stop', 'use_beam_search', 'best_of'])
     sampling_params = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of)
     print(f'--> {model=} {hf_gen_type=}')
     if 'gpt-4-' in model or 'gpt-3.5-' in model or 'gpt-4o' in model:
         api_key = os.environ.get("OPENAI_KEY").strip()
         gen: OpenAIGenerator = OpenAIGenerator(model, sampling_params, api_key)
-    elif 'claude' in mode: 
+    elif 'claude' in model: 
         api_key = os.environ.get("ANTHROPIC_API_KEY").strip()
-        gen: AnthropicGenerator = AnthropicGenerator(model, sampling_params, api_key)
-    elif 'vllm' in hf_gen_type.lower():
+        gen: AnthropicGenerator = AnthropicGenerator(model, sampling_params, api_key=api_key)
+    elif 'vllm' in str(hf_gen_type).lower():
         from vllm import LLM, SamplingParams, RequestOutput, CompletionOutput # here otherwise warning when doing api calls in cpu laptop, vllm only works for linux 100% ref: https://github.com/vllm-project/vllm/issues/2747
         llm: LLM = LLM(model=model, dtype=dtype)
         gen: VllmGenerator = VllmGenerator(llm, sampling_params)

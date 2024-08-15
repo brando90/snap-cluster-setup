@@ -15,6 +15,9 @@ def get_iter_for_eval_data_set(path: Path,
         raise NotImplementedError
     elif 'Putnam_MATH_original_static2' in str(path):
         return get_iter_multiple_files_with_multiple_data_points(path=path)
+    elif 'Putnam_MATH_original_static_final' in str(path):
+        # ~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json
+        return get_iter_multiple_files_with_multiple_data_points(path=path)
     elif 'Putnam_MATH_variation_static2' in str(path):
         raise NotImplemented
     elif 'MATH' in str(path):

@@ -4,8 +4,18 @@ This code is a small adaptation from the Meta-Math original evaluation.
 We have verified that it runs within 1-2% accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
 <!-- Note mistral ins 13.1% ref: https://mistral.ai/news/announcing-mistral-7b/ us on MATH TODO, lost value sadly -->
 
-We also did a check with Claude 3.5 Sonnet and [the original Anthropic blog](https://www.anthropic.com/news/claude-3-5-sonnet) reports `71.1%` with `0-shots CoT`.  
-Using that setting we got `X` result using this code. 
+We also did a check with Claude 3.5 Sonnet and [the original Anthropic blog](https://www.anthropic.com/news/claude-3-5-sonnet) reports `71.1%` with `0-shot CoT` on Hendryck's MATH eval benchmark. 
+Claude 3 Opus reports `60.1%` with `0-shot Cot` on Hendryck's MATH eval benchmark.. 
+Using our own `0-shot Cot` (note: it's impossible to know exactly their prompt and setting) we got `X` result using our own eval code on Hendryck's MATH eval benchmark. 
+To verify Claude accuracy run:
+```python
+TODO
+...
+```
+Partial output:
+```python
+TODO
+```
 
 ## Quickstart
 

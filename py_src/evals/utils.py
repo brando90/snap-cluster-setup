@@ -496,12 +496,20 @@ def get_dtype_for_vllm(dtype: Optional[str] = None) -> str:
         return 'float32'
     else:
         import torch
-        # first one for training you default to float32
-        # torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float32 # if >= 8 ==> brain float 16 available or set to True if you always want fp32
-        # second one for evals you default for float16
-        torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float16 # if >= 8 ==> brain float 16 available or set to True if you always want fp32
-        # e.g., torch.bfloat16 -> 'bfloat16', torch.float16 -> 'float16'
-        dtype: str = str(torch_dtype).split('torch.')[1]
+        if not torch.cuda.is_available():
+            if torch.backends.mps.is_available():  # Check for Apple Silicon (M1/M2)
+                device = torch.device("mps")  # Use the Metal Performance Shaders (MPS) on Mac M1/M2
+                dtype = torch.float32  # MPS typically uses float32
+            else:
+                device = torch.device("cpu")  # Default to CPU
+                dtype = torch.float32
+        else:
+            if torch.cuda.is_bf16_supported():
+                device = torch.device("cuda:0")  # Use bf16 on supported GPUs
+                dtype = torch.bfloat16
+            else:
+                device = torch.device("cuda:0")  # Use fp16 on other GPUs
+                dtype = torch.float16
         return dtype
 
 def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
