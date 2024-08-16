@@ -140,10 +140,7 @@ class OpenAIGenerator(Generator):
         # assert false if both api_key and url are Truthy -- Do not allow both options!
         assert not (api_key and base_url), f'Only one of api_key and url should be provided but got {api_key=}, {base_url=}'
         if api_key is None and base_url is not None:  # default to gpt model given
-                # api_key = os.environ.get("OPENAI_KEY").strip()
-                # api_key = open(Path('~/keys/openai_api_brandos_personal_key.txt').expanduser(), 'r').read().strip()
-                # api_key = open(Path('~/keys/claude_api_brandos_personal_key.txt').expanduser(), 'r').read().strip()
-                api_key = open(Path('~/keys/openai_api_key_brandos_koyejolab.txt').expanduser(), 'r').read().strip()
+                api_key = os.environ.get("OPENAI_KEY").strip()
         # print(f'{api_key=}, {base_url=}') if verbose_init else None
         print(f'{base_url=}') if verbose_init else None
         # set attributes

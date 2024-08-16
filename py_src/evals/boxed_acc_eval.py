@@ -9,7 +9,7 @@ import fire
 from evals.data_eval_utils import get_iter_for_eval_data_set, save_completions
 from evals.prompts_evals import STOP_TOKENS, extract_answer_from_list_completion_strings_mv
 from evals.prompts_evals import HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE, MATH_PROMPT_0SHOT_COT_TEMPLATE, get_math_problem_prompt_ala_helm_8shot_cot2, get_math_problem_prompt_ala_0shot_cot 
-from evals.utils import extract_model_answers, eval_boxed_accuracy_results, extract_gold_answers, get_dtype_for_vllm, load_model_block_size
+from evals.utils import extract_model_answers, eval_boxed_accuracy_results, extract_gold_answers, get_dtype_for_vllm, load_model
 from evals.inference_eval import VllmGenerator, inference_vllm_prompt_only, OpenAIGenerator, HFPipelineGenerator, HFDirectModelGenerator, AnthropicGenerator
 
 import sys
@@ -36,13 +36,10 @@ def main(
         output_dir: Optional[str] = '~/data/results_{today}/',  # e.g., where to save completions
         completion_filename: str = 'completions.json',
         start: int = 0, 
-        end: int = sys.maxsize, 
-        # end: int = 10,  # do 10 so enough boxed qs are there 
-        # batch_size: int = 3,  
-        # batch_size: int = 10,  
+        end: int = sys.maxsize, # Usually used to know what fraction of benchmark to evaluate on
+        batch_size: int = sys.maxsize, # the size of batch size from eval set to evaluate per eval step, note: eventually evals on everything
         # batch_size: int = 348,  
         # batch_size: int = 5_000,  # MATH test has 5_000 
-        batch_size: int = sys.maxsize, 
         n: int = 1, # num seqs to return for given prompt
         # max_tokens: int = 2048,
         max_tokens: int = 4096,
@@ -50,6 +47,7 @@ def main(
         temperature: float = 0.8,
         # num_beams: int = 5,
         num_beams: Optional[int] = None,
+        max_length: Optional[int] = None, # max input for HF/vllm models
         hf_gen_type: Optional[str] = None,
         # hf_gen_type: Optional[str] = 'pipeline',
         # hf_gen_type: Optional[str] = 'hf_direct_model_gen',i
@@ -73,7 +71,8 @@ def main(
     output_dir = Path(f'~/data/results_{today}/').expanduser() 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # - Get eval data
+    # - Get eval data set
+    print('Get eval data set')
     path_2_eval_dataset: Path = Path(path_2_eval_dataset).expanduser()
     math_gold_probs_solns: list[dict] = list(get_iter_for_eval_data_set(path_2_eval_dataset))
     print(f'{len(math_gold_probs_solns)=}')
@@ -82,7 +81,8 @@ def main(
     
     # filter out all dicts that don't have a latex box 
     if boxed_acc_probs_only:
-        math_gold_probs_solns = [dict_dpt for dict_dpt in math_gold_probs_solns if '\\boxed' in dict_dpt['solution'] or '\\fbox' in dict_dpt['solution']] 
+        math_gold_probs_solns: list[dict] = [dict_dpt for dict_dpt in math_gold_probs_solns if isinstance(dict_dpt, dict)] 
+        math_gold_probs_solns: list[dict] = [dict_dpt for dict_dpt in math_gold_probs_solns if '\\boxed' in dict_dpt['solution'] or '\\fbox' in dict_dpt['solution']] 
     print(f'{path_2_eval_dataset=} \n {len(math_gold_probs_solns)=}')
     assert len(math_gold_probs_solns) > 0, f'No math problems found in {path_2_eval_dataset=}'
 
@@ -103,9 +103,11 @@ def main(
     dtype: str = get_dtype_for_vllm()
     print(f'{dtype=}')
     # sampling_params: SamplingParams = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of)
+    # Note: some sampling params are not present in all inference frameworks so they need to be removed later
     from collections import namedtuple
-    SamplingParams = namedtuple('SamplingParams', ['n', 'max_tokens', 'top_p', 'temperature', 'stop', 'use_beam_search', 'best_of'])
-    sampling_params = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of)
+    SamplingParams = namedtuple('SamplingParams', ['n', 'max_tokens', 'top_p', 'temperature', 'stop', 'use_beam_search', 'best_of', 'max_length', 'num_beams'])
+    sampling_params = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of, max_length=max_length, num_beams=num_beams)
+    print(f'{sampling_params=}')
     print(f'--> {model=} {hf_gen_type=}')
     if 'gpt-4-' in model or 'gpt-3.5-' in model or 'gpt-4o' in model:
         api_key = os.environ.get("OPENAI_KEY").strip()
@@ -115,20 +117,23 @@ def main(
         gen: AnthropicGenerator = AnthropicGenerator(model, sampling_params, api_key=api_key)
     elif 'vllm' in str(hf_gen_type).lower():
         from vllm import LLM, SamplingParams, RequestOutput, CompletionOutput # here otherwise warning when doing api calls in cpu laptop, vllm only works for linux 100% ref: https://github.com/vllm-project/vllm/issues/2747
-        llm: LLM = LLM(model=model, dtype=dtype)
+        llm: LLM = LLM(model=model, dtype=dtype, trust_remote_code=True)
+        # remove any field not in vllm's SamplingParams code e.g., max_length is mostly a HF model concept
+        default_vllm_sp_keys = vars(SamplingParams()).keys()
+        _sampling_params = {key: field for key, field in sampling_params._asdict().items() if key in default_vllm_sp_keys}
+        sampling_params = SamplingParams(**(_sampling_params))
         gen: VllmGenerator = VllmGenerator(llm, sampling_params)
     elif hf_gen_type == 'pipeline':
         print(f'{hf_gen_type=}')
         from transformers import pipeline, Pipeline
-        mdl, tok = load_model_block_size(pretrained_model_name_or_path=model, block_size=sampling_params.max_tokens)
+        mdl, tok = load_model(pretrained_model_name_or_path=model, max_length=sampling_params.max_length)
         llm: Pipeline = pipeline("text-generation", model=mdl, tokenizer=tok)
-        sampling_params.num_beams = num_beams
         gen: HFPipelineGenerator = HFPipelineGenerator(llm, sampling_params)
         print(f'{llm.device=}')
     elif hf_gen_type == 'hf_direct_model_gen':
         print(f'{hf_gen_type=}')
         from transformers import pipeline, Pipeline
-        mdl, tok = load_model_block_size(pretrained_model_name_or_path=model, block_size=sampling_params.max_tokens)
+        mdl, tok = load_model(pretrained_model_name_or_path=model, max_length=sampling_params.max_length)
         llm: Pipeline = pipeline("text-generation", model=mdl, tokenizer=tok)
         gen: HFDirectModelGenerator = HFDirectModelGenerator(llm, sampling_params)
         print(f'{llm.device=}')
@@ -153,8 +158,14 @@ def main(
     wandb.log({'boxed_acc': results_d['boxed_acc'], 'len(results)': results_d['len(results)'], 'len(results_boxed)': results_d['len(results_boxed)'], 'sum(results_boxed)': results_d['sum(results_boxed)']})
   
     # - End run
-    sampling_params = sampling_params._asdict() if hasattr(sampling_params, '_asdict') else vars(sampling_params)
-    wandb.config.update(dict(prompt_gen_func=str(prompt_gen_func), prompt_template=prompt_template, model=str(model), path_2_eval_dataset=path_2_eval_dataset, output_dir=output_dir, sampling_params=vars(sampling_params)))
+    # make sampling_params a dict to save nicely in wandb or last option as a string, ref: https://chatgpt.com/c/aa91ed8e-c792-4721-8987-204a3037b4b3
+    sampling_params = sampling_params._asdict() if hasattr(sampling_params, '_asdict') else sampling_params
+    sampling_params = vars(sampling_params) if hasattr(sampling_params, '__dict__') else sampling_params
+    try:
+        sampling_params: dict = dict(sampling_params) 
+    except:
+        sampling_params: str = str(sampling_params) # if this fails I want to know
+    wandb.config.update(dict(prompt_gen_func=str(prompt_gen_func), prompt_template=prompt_template, model=str(model), path_2_eval_dataset=path_2_eval_dataset, output_dir=output_dir, sampling_params=sampling_params))
     print(f'{wandb.config=}')
     run.finish()
 

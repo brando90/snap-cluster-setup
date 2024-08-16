@@ -107,6 +107,7 @@ setup(
         'twine',
         'dspy-ai',
         'ragatouille',
+        'torch',  # here so it's there for default but if using vllm see bellow or readme.md
         'transformers',
         'accelerate',
         'datasets',
@@ -117,6 +118,8 @@ setup(
 
         # def does not work for mac
         # # -- ref: https://github.com/vllm-project/vllm/issues/2747 
+        # pip install torch==2.2.1
+        # pip install vllm==0.4.1
         # 'torch==2.2.1',
         # 'vllm==0.4.1', 
         # # --

@@ -1,9 +1,33 @@
 # Running Check Final Answer Evaluations for Language Models (LMs)
 
-This code is a small adaptation from the Meta-Math original evaluation. 
-We have verified that it runs within 1-2% accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
+## Sanity Checking Our Eval code with Mistral7B
+This code is a small adaptation from the [Meta-Math](https://meta-math.github.io/) original evaluation. 
+We have verified that it runs within `1-2%` accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
 <!-- Note mistral ins 13.1% ref: https://mistral.ai/news/announcing-mistral-7b/ us on MATH TODO, lost value sadly -->
+Mistral Instruct got **13.1%** on MATH (as reported [here](https://mistral.ai/news/announcing-mistral-7b/)) 
+and we got **X** on MATH. 
+Run the code bellow to reproduce/sanity check.  
+The following run has HPs that worked in an A100 40GB machine: 
+```bash
+# - Ins
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=3
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-Instruct-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
+# - Base
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=4
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
+```
+TODO: edit prompt to look like mistral's (or meta maths), likely closes gap btw two results. 
+https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
+Output:
+```bash
+TODO
+```
 
+## Sanity Checking Our Eval code with Claude 3.5 Sonnet
 We also did a check with Claude 3.5 Sonnet and [the original Anthropic blog](https://www.anthropic.com/news/claude-3-5-sonnet) reports `71.1%` with `0-shot CoT` on Hendryck's MATH eval benchmark. 
 Claude 3 Opus reports `60.1%` with `0-shot Cot` on Hendryck's MATH eval benchmark.. 
 Using our own `0-shot Cot` (note: it's impossible to know exactly their prompt and setting) we got `X` result using our own eval code on Hendryck's MATH eval benchmark. 
@@ -11,12 +35,12 @@ To verify Claude accuracy run:
 ```bash
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --mode dryrun
 ```
-Partial output:
+Output:
 ```bash
 TODO
 ```
 
-## Quickstart
+# Install
 
 Create a venv or conda env for this project, instructions here or use these simplified set of instructions:
 ```bash
@@ -29,6 +53,12 @@ conda activate snap_cluster_setup
 pip install --upgrade pip
 pip install -e ~/snap-cluster-setup
 ```
+If using vLLM (see issues of installations [here](https://github.com/vllm-project/vllm/issues/2747)):
+```bash
+# - If using GPUs (non Propriety models)
+pip install torch==2.2.1
+pip install vllm==0.4.1
+```
 
 Verify the data has the right number of points (200 August 14 2024):
 ```bash
@@ -39,7 +69,7 @@ Sample output:
 200
 ```
 
-### Quickstart - Open Source Model Putnam Evaluations
+# Quickstart: Open Source Model Putnam Evaluations
 The instructions here are for reproducing our Open Source model evaluations based on [this early version of the manuscript](https://openreview.net/forum?id=1720vDqiBK#discussion) 
 and [the results form this table](py_src/evals/eval_images/first_results_putnam_math.png).
 
@@ -73,11 +103,11 @@ python boxed_acc_eval.py --model deepseek-ai/deepseek-math-7b-rl --path_2_eval_d
 
 ```
 
-### Quickstart - Prioprietry Model Putnam Evaluations
+## Quickstart - Proprietry Model Putnam Evaluations
 The instructions here are for reproducing our Prioprietry Source model evaluations based on [this version of the early manuscript](https://openreview.net/forum?id=1720vDqiBK#discussion) 
 and [the results form this table](py_src/evals/eval_images/first_results_putnam_math.png).
 
-#### OpenAI GPT Evaluations
+### OpenAI GPT Evaluations
 The following are the commands to run GPT evaluations. 
 Tip: use GPT3.5 (or the chepaer version when you read this) to **quickly** and **cheaply** verify everything is working for you before running the larger evaluations (~200 data points as of this writing):
 ```bash
@@ -92,7 +122,7 @@ python boxed_acc_eval.py --model gpt-4-turbo --path_2_eval_dataset ~/putnam-math
 python boxed_acc_eval.py --model gpt-4o --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static2/test --end 348 --batch_size 348 
 ```
 
-#### Anthropic Claude Evaluations
+### Anthropic Claude Evaluations
 The following are the commands to run [Anthropic's Claude](https://docs.anthropic.com/en/docs/about-claude/models) evaluations. 
 ```bash
 # - Claude 3 Opus
@@ -102,11 +132,12 @@ The following are the commands to run [Anthropic's Claude](https://docs.anthropi
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static_final --end 348 --batch_size 348 --mode dryrun
 # python boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json --end 348 --batch_size 348 --mode dryrun
 ```
+**Result Claude 3.5 Sonnet:** get's `16/200=8%` right 0-shot CoT mv@4 on `Putnam_MATH_original_static_final` 08/15/2024. 
 
-#### Gemini Evaluations
+### Gemini Evaluations
 TODO:
 
-## Evaluations with the Variations Benchmarks
+# Evaluations with the Variations Benchmarks
 
 ### Generation of Benchmark Datasets with our Python Scripts 
 TODO
@@ -117,16 +148,99 @@ TODO
 # python boxed_acc_eval.py --model deepseek-ai/deepseek-math-7b-base --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 ```
 
-### Prioprietrg Model Evluations on the Variation Benchmarks
+### Proprietrg Model Evluations on the Variation Benchmarks
 ```bash
 # python boxed_acc_eval.py --model gpt-3.5-turbo --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 # python boxed_acc_eval.py --model gpt-4-turbo --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 # python boxed_acc_eval.py --model gpt-4o --path_2_eval_dataset ~/putnam-math/data/Putnam_MATH_variations_static2/test --end 348 --batch_size 348 --mode online 
 ```
 
-## Other Features
+# Running with Many backends -- HF Pipeline and vLLM
+## Running Eval with vLLM - 1.8B model example
+Running on InternLM-2.5-1.8B. 
+The guessed max length is based on [this paragraph](https://huggingface.co/internlm/internlm2_5-1_8b/discussions/2) for public PT checkpoint:
+> ChatGPT (RAG): InternLM2 was initially trained on a context length of **4096** token ... extended contexts efficiently, with the ability to process up to 32k tokens during training 
+The following run has HPs that worked in an A100 40GB machine:
+```bash
+# - Evaluate InternLM-2.5-1.8B from HF ckpt using vLLM backend
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=1
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model internlm/internlm2_5-1_8b --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
+```
+Output:
+```bash
+Processed prompts: 100%|███████████████| 5000/5000 [22:19<00:00,  3.73it/s]
+...
+wandb:          boxed_acc 0.1604
+wandb:       len(results) 5000
+wandb: len(results_boxed) 5000
+wandb: sum(results_boxed) 802
+```
+At the time of this writing out eval code got **16.0%** while the original tech report for InternLM-2.5-1.8B reports **0.049**. 
+Code with vLLM ran in 22 minutes. 
+
+For SFT/CPT (Supervised Fine-Tuning, Continual Pre-trained) checkpoint we recommend you use the max length you used during that training. 
+Replace the path with your path to the ckpt of course:
+The following run has HPs that worked in an A100 40GB machine: 
+```bash
+# - Evaluate InternLM-2.5-1.8B from HF ckpt path using vLLM backend
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=2
+
+# create copy of intermediate ckpt
+cp -r ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061 ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061_copy
+
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061_copy --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --mode dryrun
+```
+
+## Running Eval with vLLM - 6.7B (~7B) model example
+Running on [DeepSeek-Coder-V2-Base](https://huggingface.co/deepseek-ai/DeepSeek-Coder-V2-Base). 
+This was the base model for DeepSeek-MATH-X family, so it's a good model to know the accuracy if you are trying to beat that model family. 
+DeepSeek-Coder-V2-Base has an accuracy of **X** on the MATH data set. 
+The following run has HPs that worked in an A100 40GB machine: 
+```bash
+# - Evaluate DeepSeek-Coder-V2-Base
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=1
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model deepseek-ai/deepseek-coder-7b-base-v1.5 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
+```
+SFT/CPT example: 
+```bash
+# - Evaluate DeepSeek-Coder-V2-Base
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=2
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model ~/runs/run_08082024_deepseek-ai/deepseek-coder-7b-base-v1.5/train/checkpoint-40700_copy --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
+```
+
+## Running Eval with HF Pipeline
+```bash
+# - Evaluate InternLM-2.5-1.8B from HF
+export CUDA_VISIBLE_DEVICES=1
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model internlm/internlm2_5-1_8b --hf_gen_type pipeline --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_length 4096 --batch_size 5_000 --mode dryrun
+```
+Give it your path
+```bash
+# - Evaluate InternLM-2.5-1.8B from HF ckpt path
+export CUDA_VISIBLE_DEVICES=2
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model ~/runs/run_08082024/train/checkpoint-52500 --hf_gen_type pipeline --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_length 4096 -batch_size 5_000 --mode dryrun
+```
 
 ### Saving Mode Responses
 TODO
 
 Motivation: debugging, human evaluations, and automatic proof evaluations e.g., Teacher Forced Accuracy (tfa).
+
+
+### Development Check - Run Eval on 5 MATH examples
+To check if the code is working (e.g., for devopment) run eval with 5 examples with [the small GPT2 (124M) model](https://huggingface.co/openai-community/gpt2) on GPU. 
+The following run has HPs that worked in an A100 40GB machine but params are pretty small so it should work on most reasonable AI research hardware:  
+```bash
+# conda activate snap_cluster_setup
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=3
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model openai-community/gpt2 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5 --end 5 --mode dryrun
+```

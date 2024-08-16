@@ -270,7 +270,7 @@ def get_math_problem_prompt_ala_helm_8shot_cot2(data_pt: dict, prompt_template: 
     return prompt_template.replace("{problem}", data_pt['problem'])
 
 MATH_PROMPT_0SHOT_COT_TEMPLATE: str = (
-"""Given a mathematics problem, determine the answer. Simplify your answer as much as possible. Think step by step, then always give the final answer inside a \\boxed{answer}###
+"""Given a mathematics problem, determine the answer. Simplify your answer as much as possible. Think step by step, then always give the final answer inside a \\boxed{answer}
 Problem: {problem}
 Solution: Let's think step by step.""")
 def get_math_problem_prompt_ala_0shot_cot(data_pt: dict, prompt_template: str = MATH_PROMPT_0SHOT_COT_TEMPLATE) -> Union[str, None]:

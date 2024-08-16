@@ -397,7 +397,7 @@ def is_equiv(str1: Optional[str], str2: Optional[str], verbose: bool = False) ->
     except Exception:
         return str1 == str2
     
-def is_equiv_box_acc(target_str: Optional[str], predicted_str: Optional[str], verbose: bool = True) -> Union[str, bool]:
+def is_equiv_box_acc(target_str: Optional[str], predicted_str: Optional[str], verbose: bool = False) -> Union[str, bool]:
     """
     Check if target answer string is equivalent to predicted string after stripping. 
 
@@ -512,13 +512,10 @@ def get_dtype_for_vllm(dtype: Optional[str] = None) -> str:
                 dtype = torch.float16
         return dtype
 
-def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
-                          verbose: bool = False,
-                          block_size: int = 1024,
-               ):
+def load_model(pretrained_model_name_or_path, verbose: bool = False, max_length: int = 1024):
     import torch
     from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoModelForCausalLM, AutoTokenizer
-    # TODO: improve training by not using block_size suff
+    # TODO: improve training by not using max_length suff
     if pretrained_model_name_or_path == "gpt2":
         tokenizer = GPT2Tokenizer.from_pretrained(pretrained_model_name_or_path, max_length=1024)
         # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
@@ -529,8 +526,8 @@ def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
         # model.resize_token_embeddings(len(tokenizer))  # leaving for reference, not needed since pad = eos for us
         device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
-        block_size: int = tokenizer.model_max_length
-        print(f'{block_size=}')
+        max_length: int = tokenizer.model_max_length
+        print(f'{max_length=}')
     elif 'Llama-2' in pretrained_model_name_or_path or 'Mistral' in pretrained_model_name_or_path:
         # - LLama2, later qlora: https://github.com/artidoro/qlora/blob/7f4e95a68dc076bea9b3a413d2b512eca6d004e5/qlora.py#L347C13-L347C13
         torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float32 # if >= 8 ==> brain float 16 available or set to True if you always want fp32
@@ -541,16 +538,16 @@ def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
             print("Context length:", model.config.context_length)
         else:
             max_length = 4096
-        block_size: int = 4096
-        tokenizer.model_max_length = block_size
-        print(f'{block_size=}')
+        max_length: int = 4096
+        tokenizer.model_max_length = max_length
+        print(f'{max_length=}')
     elif 'Llama-2' in pretrained_model_name_or_path or 'Mistral-7B-Instruct-v0.2' in pretrained_model_name_or_path:
         model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, trust_remote_code=True, torch_dtype=torch_dtype, use_auth_token=True)
         tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", use_fast=False, trust_remote_code=True, use_auth_token=True)
         tokenizer.pad_token = tokenizer.eos_token if tokenizer.pad_token_id is None else tokenizer.pad_token
         # v0.1 vs v.02 context size 32k context window (vs 8k context in v0.1)
-        tokenizer.model_max_length = block_size  # TODO: check if this is correct
-        print(f'{block_size=}')
+        tokenizer.model_max_length = max_length  # TODO: check if this is correct
+        print(f'{max_length=}')
     elif 'gemma' in pretrained_model_name_or_path:
         tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path)
         torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float32 # if >= 8 ==> brain float 16 available or set to True if you always want fp32
@@ -563,20 +560,38 @@ def load_model_block_size(pretrained_model_name_or_path,  # TODO type me
             print("Context length:", model.config.context_length)
             max_length = model.config.context_length
         else:
-            # Table 1. Models are trained on a context length of 8192 tokens. ref: https://storage.googleapis.com/deepmind-media/gemma/gemma-report.pdf
-            # max_length = 8192
             print(f'{max_length=}')
-        block_size: int = max_length
-        print(f'{block_size=}')
+        max_length: int = max_length
+        print(f'{max_length=}')
     else:
-        tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path)
-        if tokenizer.pad_token_id is None:
-            tokenizer.pad_token = tokenizer.eos_token
-            print(f'{tokenizer.pad_token=}')
-        torch_dtype = torch.bfloat16 if torch.cuda.get_device_capability(torch.cuda.current_device())[0] >= 8 else torch.float32 # if >= 8 ==> brain float 16 available or set to True if you always want fp32
-        model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, device_map="auto", torch_dtype=torch_dtype)
-        print(f'{model.device=}')
-        # raise ValueError(f"Model {pretrained_model_name_or_path} not supported.")
+        torch.cuda.empty_cache() # Clear CUDA cache to free up memory
+        torch_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float32 
+        model = AutoModelForCausalLM.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch_dtype, trust_remote_code=True)
+        device = torch.device(f"cuda:{0}" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)
+        # tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", use_auth_token=True)
+        tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path, padding_side="right", trust_remote_code=True)
+        print(f'{tokenizer=}')
+        print(f'{tokenizer.pad_token_id=} {tokenizer.eos_token_id=}')
+        tokenizer.pad_token = tokenizer.eos_token if tokenizer.pad_token_id is None else tokenizer.pad_token
+        print(f'{tokenizer.pad_token_id=} {tokenizer.eos_token_id=}')
+        # get context length for setting max length for training
+        print(f'{model.config=}')
+        if max_length is None:
+            if hasattr(model.config, "context_length"):
+                max_length: int = model.config.context_length 
+                print("Context length:", model.config.context_length)
+            else:
+                max_length: int = 1024
+        else:
+            print(f"Context length not found in model.config, so using your default or hardcoded value. Model is {pretrained_model_name_or_path=}.")
+            # max_length: int = 4  # for debugging
+            max_length: int = max_length  # for debugging
+            # max_length: int = 128_000  # ref: https://huggingface.co/meta-llama/Meta-Llama-3.1-8B
+        model_weight_norm = sum([torch.norm(param, p=2).item() for param in model.parameters()])
+        print(f'{device=} Model device: {next(model.parameters()).device}')
+        print("Number of parameters:", sum(p.numel() for p in model.parameters()))
+        print(f'{model_weight_norm=}')
     if verbose:
         print(model, tokenizer)
     return model, tokenizer
