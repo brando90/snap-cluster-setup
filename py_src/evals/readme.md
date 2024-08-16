@@ -8,12 +8,11 @@ We also did a check with Claude 3.5 Sonnet and [the original Anthropic blog](htt
 Claude 3 Opus reports `60.1%` with `0-shot Cot` on Hendryck's MATH eval benchmark.. 
 Using our own `0-shot Cot` (note: it's impossible to know exactly their prompt and setting) we got `X` result using our own eval code on Hendryck's MATH eval benchmark. 
 To verify Claude accuracy run:
-```python
-TODO
-...
+```bash
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model claude-3-5-sonnet-20240620 --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --mode dryrun
 ```
 Partial output:
-```python
+```bash
 TODO
 ```
 

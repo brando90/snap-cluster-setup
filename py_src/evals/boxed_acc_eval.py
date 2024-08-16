@@ -38,10 +38,12 @@ def main(
         start: int = 0, 
         end: int = sys.maxsize, 
         # end: int = 10,  # do 10 so enough boxed qs are there 
-        # batch_size: int = 3,  # putnam has 348 
-        # batch_size: int = 10,  # putnam has 348 
-        batch_size: int = 348,  # putnam has 348 
-        n: int = 4, # num seqs to return for given prompt
+        # batch_size: int = 3,  
+        # batch_size: int = 10,  
+        # batch_size: int = 348,  
+        # batch_size: int = 5_000,  # MATH test has 5_000 
+        batch_size: int = sys.maxsize, 
+        n: int = 1, # num seqs to return for given prompt
         # max_tokens: int = 2048,
         max_tokens: int = 4096,
         top_p: float = 0.95, 
