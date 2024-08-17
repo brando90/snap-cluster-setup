@@ -27,18 +27,30 @@ Output:
 TODO
 ``` -->
 
-| Model             | MATH Benchmark (Our Eval)                        | MATH Benchmark (Their Eval)                      | Runtime (Our Eval) (Num Examples) |
-|-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
-| Mistral Base v.01 | 3.00% (0-shot CoT, maj@1)                        | n/a                                              | 64.39 mins (1.07 hr) (5,000)      |
-| Mistral Ins v.01  | 5.36% (0-shot CoT, maj@1, wrong ins format)      | 13.1% (4-shot CoT, maj@4)                        | 42.66 mins (0.71 hr) (5,000)      |
-| Mistral Ins v.01  | 7.4% (8-shot CoT, maj@1, right ins format)       | n/a                                              | 2.69 mins (0.04 hr)  (500 random) |
-| Mistral Ins v.01  | y.x% (8-shot CoT, maj@1, right ins format)       | n/a                                              | TODO
+| Model          | MATH Benchmark (Our Eval)                        | MATH Benchmark (Their Eval)                      | Runtime (Our Eval) (Num Examples) |
+|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| Mistral Base   | 3.00% (0-shot CoT, maj@1)                        | n/a                                              | 64.39 mins (1.07 hr) (5000)       |
+| Mistral Ins    | 5.36% (0-shot CoT, maj@1, wrong ins)             | 13.1% (4-shot CoT, maj@4)                        | 42.66 mins (0.71 hr) (5000)       |
+|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| Mistral Ins    | 6.62% (8-shot CoT, maj@1, right ins)             | 13.1% (4-shot CoT, maj@4)                        | 22.66 mins (0.38 hr) (5000)       |
+| Mistral Ins    | 7.4% (8-shot CoT, maj@1, right ins)              | 13.1% (4-shot CoT, maj@4)                        | 2.69 mins (0.04 hr)  (500)        |
+|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| DSC 7B Base    | 0.04% (0-shot CoT, maj@1)                        | n/a                                              | 128.46 mins (2.14 hr) (5000)      |
 
 *Note:* 
 - **maj@1**: Majority voting across 1 sample (single prediction).
 - **maj@4**: Majority voting across 4 samples (four predictions per question, and the most common answer is chosen as the final prediction).
 - **wrong ins**: Indicates that the official formatting for the prompt was not used at inference, which needs to be fixed (TODO).
 - **right ins**: Indicates that the correct instruction format was used.
+- **DSC 7B Base**: [Deepseek-Coder-7B-Base-v1.5](https://huggingface.co/deepseek-ai/deepseek-coder-7b-base-v1.5).
+
+
+*Note:* 
+- **maj@1**: Majority voting across 1 sample (single prediction).
+- **maj@4**: Majority voting across 4 samples (four predictions per question, and the most common answer is chosen as the final prediction).
+- **wrong ins**: Indicates that the official formatting for the prompt was not used at inference, which needs to be fixed (TODO).
+- **right ins**: Indicates that the correct instruction format was used.
+- **DSC 7B Base v1.5**: [Deepseek-Coder-7B-Base-v1.5](https://huggingface.co/deepseek-ai/deepseek-coder-7b-base-v1.5).
 
 <!-- https://chatgpt.com/c/934e88a3-e8df-45cc-8b47-427dd651150f for table -->
 
@@ -49,7 +61,7 @@ export CUDA_VISIBLE_DEVICES=4
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-Instruct-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 1024 --batch_size 500 --end 500 --n 1 --shuffle True --mode dryrun
 
 source ~/.virtualenvs/snap_cluster_setup/bin/activate
-export CUDA_VISIBLE_DEVICES=4
+export CUDA_VISIBLE_DEVICES=5
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-Instruct-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 1024 --batch_size 5000 --end 5000 --n 1 --shuffle True --mode dryrun
 ```
 

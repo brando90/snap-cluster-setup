@@ -277,10 +277,14 @@ def get_math_problem_prompt_ala_0shot_cot(data_pt: dict, prompt_template: str = 
     # Note: instead of using .format(name=value) we are using the exact string for the placeholder so that the .format function doesn't get confused with curly braces.
     # inspired from the requirement for Claude 3.5 Sonnet: https://www.anthropic.com/news/claude-3-5-sonnet
     return prompt_template.replace("{problem}", data_pt['problem'])
+MATH_PROMPT_0SHOT_COT_TEMPLATE_MISTRAL7B_INS_V1: str = (
+"""<s>[INST] Given a mathematics problem, determine the answer. Simplify your answer as much as possible. Think step by step, then always give the final answer inside a \\boxed{answer}
+Problem: {problem} [/INST]</s>
+Solution: Let's think step by step.""")
 
 HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1: str = (
 """<s>[INST] Given a mathematics problem, determine the answer. Simplify your answer as much as possible. Always give the final answer inside a \\boxed{answer}###
-[INST] Problem: Let $r=3^s-s$ and $s=2^n+1$. What is the value of $r$ when $n=2$? [/INST]</s>
+Problem: Let $r=3^s-s$ and $s=2^n+1$. What is the value of $r$ when $n=2$? [/INST]</s>
 Solution: Let's think step by step. First substitute $n=2$ into the expression for $s$ to find $s=2^2+1=5$. Then substitute $s=5$ into the expression for $r$ to find $r=3^5-5=243-5=\\boxed{238}. The final answer is: \\boxed{238}.###
 [INST] Problem: If $x^{2y}= 4$ and $x = 4$, what is the value of $y$? Express your answer as a common fraction. [/INST]
 Solution: Let's think step by step. Plugging $x = 4$ into the first equation, we get $4^{2y} = 4^1 \\Rightarrow 2y = 1 \\Rightarrow y = \\boxed{\\frac{1}{2}}. The final answer is: \\boxed{\\frac{1}{2}}.###
