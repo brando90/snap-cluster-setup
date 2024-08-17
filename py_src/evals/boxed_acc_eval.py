@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 import os
 import json
@@ -8,7 +9,7 @@ import fire
 
 from evals.data_eval_utils import get_iter_for_eval_data_set, save_completions
 from evals.prompts_evals import STOP_TOKENS, extract_answer_from_list_completion_strings_mv
-from evals.prompts_evals import HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE, MATH_PROMPT_0SHOT_COT_TEMPLATE, get_math_problem_prompt_ala_helm_8shot_cot2, get_math_problem_prompt_ala_0shot_cot 
+from evals.prompts_evals import HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE, MATH_PROMPT_0SHOT_COT_TEMPLATE, get_math_problem_prompt_ala_helm_8shot_cot2, get_math_problem_prompt_ala_0shot_cot, HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1
 from evals.utils import extract_model_answers, eval_boxed_accuracy_results, extract_gold_answers, get_dtype_for_vllm, load_model
 from evals.inference_eval import VllmGenerator, inference_vllm_prompt_only, OpenAIGenerator, HFPipelineGenerator, HFDirectModelGenerator, AnthropicGenerator
 
@@ -16,6 +17,43 @@ import sys
 MAX_INT = sys.maxsize
 
 from pdb import set_trace as st
+
+def seed_everything(seed: int):
+    """
+    Seed all necessary libraries to ensure reproducible results.
+
+    Args:
+        seed (int): The seed value to use.
+    """
+    import random
+    import numpy as np
+    import torch
+    from transformers import set_seed as hf_set_seed
+    # Seed the random module
+    random.seed(seed)
+
+    # Seed numpy
+    np.random.seed(seed)
+
+    # Seed PyTorch (both CPU and CUDA if available)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)  # If you use multi-GPU.
+
+    # Set deterministic behavior in torch
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+    # Seed Hugging Face Transformers
+    hf_set_seed(seed)
+
+    # Seed vLLM (if applicable)
+    try:
+        from vllm import set_seed as vllm_set_seed
+        vllm_set_seed(seed)
+    except ImportError:
+        print("vLLM not installed, skipping vLLM seed setting.")
 
 # -- tests
 
@@ -58,9 +96,12 @@ def main(
         best_of: Optional[int] = None,
         mode: str = 'dryrun',  # 'dryrun' or 'online'
         # mode: str = 'online',  # 'dryrun' or 'online'
+        shuffle: bool = False, 
+        seed: int =42, 
         ):
     """ """
-    print('main() starting')
+    print(f'---> main() starting (with {seed=})')
+    seed_everything(seed)
     # - Start wandb run
     CUDA_VISIBLE_DEVICES = os.environ.get('CUDA_VISIBLE_DEVICES')
     current_tmux_session = os.environ.get("TMUX", "").split(",")[-1]
@@ -77,6 +118,7 @@ def main(
     math_gold_probs_solns: list[dict] = list(get_iter_for_eval_data_set(path_2_eval_dataset))
     print(f'{len(math_gold_probs_solns)=}')
     math_gold_probs_solns: list[dict] = math_gold_probs_solns[start:end]
+    random.shuffle(math_gold_probs_solns) if shuffle else None
     print(f'{len(math_gold_probs_solns)=}')
     
     # filter out all dicts that don't have a latex box 
@@ -88,7 +130,8 @@ def main(
 
     # - Get vllm generator
     # prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE
-    prompt_template: str = MATH_PROMPT_0SHOT_COT_TEMPLATE
+    # prompt_template: str = MATH_PROMPT_0SHOT_COT_TEMPLATE
+    prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1
     print(f'{prompt_template=}')
     # prompt_gen_func: Callable = get_math_problem_prompt_ala_helm_8shot_cot2
     prompt_gen_func: Callable = get_math_problem_prompt_ala_0shot_cot

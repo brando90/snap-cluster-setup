@@ -2,9 +2,9 @@
 
 ## Sanity Checking Our Eval code with Mistral7B
 This code is a small adaptation from the [Meta-Math](https://meta-math.github.io/) original evaluation. 
-We have verified that it runs within `1-2%` accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
+We have verified that it runs within `1-2%` (Redo, currently code doesn't run with n=4 so can't reproduce for now) accuracy difference with Mistral7B-base, therefore giving us confidence this code is correct and reliable to use. 
 <!-- Note mistral ins 13.1% ref: https://mistral.ai/news/announcing-mistral-7b/ us on MATH TODO, lost value sadly -->
-Mistral Instruct got **13.1%** on MATH (as reported [here](https://mistral.ai/news/announcing-mistral-7b/)) 
+Mistral Instruct got **13.1%** on MATH, as reported [here](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1), 
 and we got **X** on MATH. 
 Run the code bellow to reproduce/sanity check.  
 The following run has HPs that worked in an A100 40GB machine: 
@@ -20,11 +20,37 @@ source ~/.virtualenvs/snap_cluster_setup/bin/activate
 export CUDA_VISIBLE_DEVICES=4
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5000 --mode dryrun
 ```
-TODO: edit prompt to look like mistral's (or meta maths), likely closes gap btw two results. 
+<!-- TODO: edit prompt to look like mistral's (or meta maths), likely closes gap btw two results. 
 https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
 Output:
 ```bash
 TODO
+``` -->
+
+| Model             | MATH Benchmark (Our Eval)                        | MATH Benchmark (Their Eval)                      | Runtime (Our Eval) (Num Examples) |
+|-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| Mistral Base v.01 | 3.00% (0-shot CoT, maj@1)                        | n/a                                              | 64.39 mins (1.07 hr) (5,000)      |
+| Mistral Ins v.01  | 5.36% (0-shot CoT, maj@1, wrong ins format)      | 13.1% (4-shot CoT, maj@4)                        | 42.66 mins (0.71 hr) (5,000)      |
+| Mistral Ins v.01  | 7.4% (8-shot CoT, maj@1, right ins format)       | n/a                                              | 2.69 mins (0.04 hr)  (500 random) |
+| Mistral Ins v.01  | y.x% (8-shot CoT, maj@1, right ins format)       | n/a                                              | TODO
+
+*Note:* 
+- **maj@1**: Majority voting across 1 sample (single prediction).
+- **maj@4**: Majority voting across 4 samples (four predictions per question, and the most common answer is chosen as the final prediction).
+- **wrong ins**: Indicates that the official formatting for the prompt was not used at inference, which needs to be fixed (TODO).
+- **right ins**: Indicates that the correct instruction format was used.
+
+<!-- https://chatgpt.com/c/934e88a3-e8df-45cc-8b47-427dd651150f for table -->
+
+
+```bash
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=4
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-Instruct-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 1024 --batch_size 500 --end 500 --n 1 --shuffle True --mode dryrun
+
+source ~/.virtualenvs/snap_cluster_setup/bin/activate
+export CUDA_VISIBLE_DEVICES=4
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model mistralai/Mistral-7B-Instruct-v0.1 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 1024 --batch_size 5000 --end 5000 --n 1 --shuffle True --mode dryrun
 ```
 
 ## Sanity Checking Our Eval code with Claude 3.5 Sonnet
