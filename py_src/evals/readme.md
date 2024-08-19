@@ -27,23 +27,17 @@ Output:
 TODO
 ``` -->
 
-| Model          | MATH Benchmark (Our Eval)                        | MATH Benchmark (Their Eval)                      | Runtime (Our Eval) (Num Examples) |
-|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
-| Mistral Base   | 3.00% (0-shot CoT, maj@1)                        | n/a                                              | 64.39 mins (1.07 hr) (5000)       |
-| Mistral Ins    | 5.36% (0-shot CoT, maj@1, wrong ins)             | 13.1% (4-shot CoT, maj@4)                        | 42.66 mins (0.71 hr) (5000)       |
-|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
-| Mistral Ins    | 6.62% (8-shot CoT, maj@1, right ins)             | 13.1% (4-shot CoT, maj@4)                        | 22.66 mins (0.38 hr) (5000)       |
-| Mistral Ins    | 7.4% (8-shot CoT, maj@1, right ins)              | 13.1% (4-shot CoT, maj@4)                        | 2.69 mins (0.04 hr)  (500)        |
-|----------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
-| DSC 7B Base    | 0.04% (0-shot CoT, maj@1)                        | n/a                                              | 128.46 mins (2.14 hr) (5000)      |
-
-*Note:* 
-- **maj@1**: Majority voting across 1 sample (single prediction).
-- **maj@4**: Majority voting across 4 samples (four predictions per question, and the most common answer is chosen as the final prediction).
-- **wrong ins**: Indicates that the official formatting for the prompt was not used at inference, which needs to be fixed (TODO).
-- **right ins**: Indicates that the correct instruction format was used.
-- **DSC 7B Base**: [Deepseek-Coder-7B-Base-v1.5](https://huggingface.co/deepseek-ai/deepseek-coder-7b-base-v1.5).
-
+| Model             | MATH Benchmark (Our Eval)                        | MATH Benchmark (Their Eval)                      | Runtime (Our Eval) (Num Examples) |
+|-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| Mistral Base      | 3.00% (0-shot CoT, maj@1)                        | n/a                                              | 64.39 mins (1.07 hr) (5000)       |
+| Mistral Ins       | 5.36% (0-shot CoT, maj@1, wrong ins)             | 13.1% (4-shot CoT, maj@4)                        | 42.66 mins (0.71 hr) (5000)       |
+|-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+| Mistral Ins       | 6.62% (8-shot CoT, maj@1, right ins)             | 13.1% (4-shot CoT, maj@4)                        | 22.66 mins (0.38 hr) (5000)       |
+| Mistral Ins       | 7.4% (8-shot CoT, maj@1, right ins)              | 13.1% (4-shot CoT, maj@4)                        | 2.69 mins (0.04 hr)  (500)        |
+|-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------|
+<!-- | DSC 7B Base       | 0.04% (0-shot CoT, maj@1)                        | n/a                                              | 128.46 mins (2.14 hr) (5000)      | -->
+<!-- |-------------------|--------------------------------------------------|--------------------------------------------------|-----------------------------------| -->
+<!-- | Claude 3.5 Sonnet | 6.62% (0-shot CoT, maj@1, Mistral Ins Prompt)    | n/a                                              | 22.5 mins (0.37 hr) (5000)        | -->
 
 *Note:* 
 - **maj@1**: Majority voting across 1 sample (single prediction).
@@ -51,6 +45,9 @@ TODO
 - **wrong ins**: Indicates that the official formatting for the prompt was not used at inference, which needs to be fixed (TODO).
 - **right ins**: Indicates that the correct instruction format was used.
 - **DSC 7B Base v1.5**: [Deepseek-Coder-7B-Base-v1.5](https://huggingface.co/deepseek-ai/deepseek-coder-7b-base-v1.5).
+
+
+TODO: perhaps some day if relevant why Claude and DSC had such bad performance with out code. 
 
 <!-- https://chatgpt.com/c/934e88a3-e8df-45cc-8b47-427dd651150f for table -->
 
