@@ -82,7 +82,7 @@ def seed_everything(seed: int, hf_timeout: float = 5):
         from vllm import set_seed as vllm_set_seed
         vllm_set_seed(seed)
     except ImportError:
-        print("vLLM not installed, skipping vLLM seed setting.")
+        print("vLLM not installed or vllm set seed has a bug, skipping vLLM seed setting.")
 
 # -- tests
 
