@@ -91,6 +91,7 @@ pip install -e ~/snap-cluster-setup
 If using vLLM (see issues of installations [here](https://github.com/vllm-project/vllm/issues/2747)):
 ```bash
 # - If using GPUs (non Propriety models)
+pip install --upgrade pip
 pip install torch==2.2.1
 pip install vllm==0.4.1
 ```
@@ -224,9 +225,8 @@ The following run has HPs that worked in an A100 40GB machine:
 source ~/.virtualenvs/snap_cluster_setup/bin/activate
 export CUDA_VISIBLE_DEVICES=2
 
-# create copy of intermediate ckpt
+# create copy of intermediate ckptn since HF deletes very old ones
 cp -r ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061 ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061_copy
-
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model ~/runs/run_08092024_internlm/internlm2-1_8b/train/checkpoint-60061_copy --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --mode dryrun
 ```
 
@@ -278,4 +278,47 @@ The following run has HPs that worked in an A100 40GB machine but params are pre
 source ~/.virtualenvs/snap_cluster_setup/bin/activate
 export CUDA_VISIBLE_DEVICES=3
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model openai-community/gpt2 --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 4096 --batch_size 5 --end 5 --mode dryrun
+```
+
+### Flash Attn vLLM
+
+```bash
+# my current vllm setup without flash
+# pip install --upgrade pip
+# pip install torch==2.2.1
+# pip install vllm==0.4.1
+
+# flash attn https://amzn-aws.slack.com/archives/C06Q26TNN8G/p1724182667464149
+# flash-attn>=2.5.8
+# pip install flash-attn
+# known setup to work with flash
+# vllm                              0.5.4
+# vllm-flash-attn                   2.6.1
+# flash-attn                        2.6.3
+# torch                             2.4.0
+# Python 3.10.8 
+
+# try to install flash attn in a new py env
+python3.11 -m venv ~/.virtualenvs/flash_attn_test
+source ~/.virtualenvs/flash_attn_test/bin/activate
+pip install --upgrade pip
+pip install -e ~/snap-cluster-setup
+
+pip list | grep vllm
+pip list | grep torch
+pip list | grep flash-attn
+pip list | grep vllm-flash-attn
+
+# # didn't work
+# pip install torch==2.2.1
+# pip install vllm==0.4.1
+# MAX_JOBS=4 pip install flash-attn --no-build-isolation --force
+
+# this installed flash but vllm didn't say in it's output it was using it
+pip install torch==2.4.0
+pip install vllm==0.5.4
+pip install flash-attn==2.6.3
+pip install vllm-flash-attn==2.6.1
+
+python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model internlm/internlm2_5-1_8b --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 2048 --batch_size 100 --end 100 -n 1 --shuffle True --mode dryrun 2>&1 | tee $LOG_FILE && echo "Log file created at: $LOG_FILE"
 ```

@@ -18,7 +18,7 @@ MAX_INT = sys.maxsize
 
 from pdb import set_trace as st
 
-def seed_everything(seed: int):
+def seed_everything(seed: int, hf_timeout: float = 5):
     """
     Seed all necessary libraries to ensure reproducible results.
 
@@ -46,7 +46,36 @@ def seed_everything(seed: int):
     torch.backends.cudnn.benchmark = False
 
     # Seed Hugging Face Transformers
-    hf_set_seed(seed)
+    if torch.cuda.is_available():
+        hf_set_seed(seed) # this gives a halting issue, so we are going to just not seed it
+    else:
+        print('Warning: HF is currently only dermisitic/seeded in gpu')
+    # # ref: https://chatgpt.com/c/a928d535-f9cb-4115-8d81-3dba18b09227
+    # def set_hf_seed():
+    #     import traceback
+    #     try:
+    #         # Attempt to set the seed using hf_set_seed, 
+    #         # and if an exception occurs, print a warning, 
+    #         # the exception message, and the traceback.
+    #         hf_set_seed(seed)
+    #     except Exception as e:
+    #         print(f"Warning: Failed to set seed {seed}.")
+    #         print("Exception:", e)
+    #         print("Traceback:")
+    #         traceback.print_exc()
+    # # Run hf_set_seed in a separate thread to allow for a timeout, 
+    # # and if the thread doesn't complete within the specified time, 
+    # # issue a timeout warning.
+    # import threading
+    # thread = threading.Thread(target=set_hf_seed)
+    # thread.start()
+    # # # Wait for the specified timeout
+    # # thread.join(hf_timeout)
+    # if thread.is_alive():
+    #     print(f"Warning: hf_set_seed({seed}) timed out after {hf_timeout} seconds.")
+    #     # Optionally, you could terminate the thread here, though this is generally not recommended
+    #     # because it might leave resources in an inconsistent state.
+    #     # Signal the thread to stop
 
     # Seed vLLM (if applicable)
     try:
@@ -58,10 +87,11 @@ def seed_everything(seed: int):
 # -- tests
 
 def main(
-        path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final',
+        # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static2/test',
         # path_2_eval_dataset: str = '~/gold-ai-olympiad/data/MATH/test',
+        path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final_21_08_2024/Putnam_MATH_boxed_problems_full.json',
         # model: str = 'mistralai/Mistral-7B-v0.1',
         # model: str = 'mistralai/Mistral-7B-Instruct-v0.1',
         # model: str = 'deepseek-ai/deepseek-math-7b-instruct',
@@ -129,10 +159,10 @@ def main(
     assert len(math_gold_probs_solns) > 0, f'No math problems found in {path_2_eval_dataset=}'
 
     # - Get vllm generator
-    # prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE
+    prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE
     # prompt_template: str = MATH_PROMPT_0SHOT_COT_TEMPLATE
-    prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1
-    print(f'{prompt_template=}')
+    # prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1
+    print(f'--> {prompt_template=}')
     # prompt_gen_func: Callable = get_math_problem_prompt_ala_helm_8shot_cot2
     prompt_gen_func: Callable = get_math_problem_prompt_ala_0shot_cot
     print(f'{prompt_gen_func=}')

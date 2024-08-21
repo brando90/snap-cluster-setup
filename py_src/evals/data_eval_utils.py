@@ -9,7 +9,11 @@ def get_iter_for_eval_data_set(path: Path,
                                ) -> Iterator[dict]:
     """ Get an iterator for the evaluation data set. """
     path: Path = path.expanduser()
-    if 'GSM8K' in str(path):
+    if path.is_file() and path.suffix == '.json':
+        with open(path, 'r') as file:
+            data: list[dict] = json.load(file)
+            return iter(data)
+    elif 'GSM8K' in str(path):
         raise NotImplementedError
     elif 'OlympiadBench_Dataset' in str(path):
         raise NotImplementedError
