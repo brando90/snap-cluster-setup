@@ -92,7 +92,7 @@ def main(
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static2/test',
         # path_2_eval_dataset: str = '~/gold-ai-olympiad/data/MATH/test',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final_21_08_2024/Putnam_MATH_boxed_problems_full.json',
-        path_2_eval_dataset: str = '~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024',
+        path_2_eval_dataset: str = '~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024_v2',
         # model: str = 'mistralai/Mistral-7B-v0.1',
         # model: str = 'mistralai/Mistral-7B-Instruct-v0.1',
         # model: str = 'deepseek-ai/deepseek-math-7b-instruct',
