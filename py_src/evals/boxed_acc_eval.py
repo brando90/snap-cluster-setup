@@ -91,7 +91,8 @@ def main(
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static2/test',
         # path_2_eval_dataset: str = '~/gold-ai-olympiad/data/MATH/test',
-        path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final_21_08_2024/Putnam_MATH_boxed_problems_full.json',
+        # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final_21_08_2024/Putnam_MATH_boxed_problems_full.json',
+        path_2_eval_dataset: str = '~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024',
         # model: str = 'mistralai/Mistral-7B-v0.1',
         # model: str = 'mistralai/Mistral-7B-Instruct-v0.1',
         # model: str = 'deepseek-ai/deepseek-math-7b-instruct',
@@ -154,7 +155,9 @@ def main(
     # filter out all dicts that don't have a latex box 
     if boxed_acc_probs_only:
         math_gold_probs_solns: list[dict] = [dict_dpt for dict_dpt in math_gold_probs_solns if isinstance(dict_dpt, dict)] 
+        print(f'{len(math_gold_probs_solns)=}')
         math_gold_probs_solns: list[dict] = [dict_dpt for dict_dpt in math_gold_probs_solns if '\\boxed' in dict_dpt['solution'] or '\\fbox' in dict_dpt['solution']] 
+        print(f'{len(math_gold_probs_solns)=}')
     print(f'{path_2_eval_dataset=} \n {len(math_gold_probs_solns)=}')
     assert len(math_gold_probs_solns) > 0, f'No math problems found in {path_2_eval_dataset=}'
 

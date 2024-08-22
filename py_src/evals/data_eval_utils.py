@@ -16,7 +16,7 @@ def get_iter_for_eval_data_set(path: Path,
     elif 'GSM8K' in str(path):
         raise NotImplementedError
     elif 'OlympiadBench_Dataset' in str(path):
-        raise NotImplementedError
+        return get_iter_multiple_files_with_multiple_data_points(path=path)
     elif 'Putnam_MATH_original_static2' in str(path):
         return get_iter_multiple_files_with_multiple_data_points(path=path)
     elif 'Putnam_MATH_original_static_final' in str(path):
@@ -112,6 +112,25 @@ def dataset_in_folder_jsonfiles_list_dicts_2_jsonlines_file(
         ) -> list[dict]:
     """ Converts a data set as dirs to json files with lists of json dicts to a single jsonlines file and returns the flattened list of dicts too. """
     return putnam_2_jsonlines(path_2_src_dataset=path_2_src_dataset, output_dir=output_dir)
+
+def olympiad_bench_2_hendrycks_math_format(path='~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024'):
+    path = Path(path).expanduser()
+    for dirpath, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            file_path: Path = Path(dirpath, filename).expanduser()
+            with open(file_path, 'r', encoding='utf-8') as file:
+                data: list[dict] = json.load(file)
+                for data_pt in data:
+                    from copy import copy
+                    # data['original_solution'] = copy(data['solution'])
+                    data_pt['original_solution'] = data_pt['solution']
+                    data_pt['solution'] = ' '.join(data_pt['original_solution'])
+                    assert data_pt['original_solution'] is not data_pt['solution'], 'Same strings! References are the same!'
+            # now that we have the new data we need to create a new version of the data set
+            file_path_new: Path = Path(f'{dirpath}_v2', filename).expanduser()
+            Path(f'{dirpath}_v2').mkdir(exist_ok=True, parents=True)
+            with open(file_path_new, 'w', encoding='utf-8') as file:
+                json.dump(data, file, indent=4)
 
 # -- Folder Folder Rec -> Jsonlines file
 
@@ -221,5 +240,6 @@ if __name__ == '__main__':
     # _test_batch_data()
     # _test_create_putnam_jsonlines_file()
     # main_math_jsonlines_file()
+    olympiad_bench_2_hendrycks_math_format()
     print(f"Done!\a Time: {time.time()-start:.2f} sec, {(time.time()-start)/60:.2f} min, {(time.time()-start)/3600:.2f} hr\a")
     

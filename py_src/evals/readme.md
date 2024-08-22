@@ -322,3 +322,26 @@ pip install vllm-flash-attn==2.6.1
 
 python ~/snap-cluster-setup/py_src/evals/boxed_acc_eval.py --model internlm/internlm2_5-1_8b --hf_gen_type vllm --path_2_eval_dataset ~/snap-cluster-setup/data/MATH/test --max_tokens 2048 --batch_size 100 --end 100 -n 1 --shuffle True --mode dryrun 2>&1 | tee $LOG_FILE && echo "Log file created at: $LOG_FILE"
 ```
+
+### Verifying OlympiadBenchm Data
+
+```bash
+# Navigate to the directory containing the JSON files
+cd /Users/miranebr/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024
+# Initialize a total counter
+total_count=0
+# Count the number of dictionaries in each JSON file in the directory and add to the total
+for file in *.json; do
+    count=$(jq '. | length' "$file")
+    echo "File: $file - Count: $count"
+    total_count=$((total_count + count))
+done
+# Output the total count
+echo "Total count of dictionaries across all JSON files: $total_count"
+```
+Ouput
+```bash
+File: OE_MM_maths_en_COMP_modified.json - Count: 150
+File: OE_TO_maths_en_COMP_modified.json - Count: 675
+Total count of dictionaries across all JSON files: 825
+```
