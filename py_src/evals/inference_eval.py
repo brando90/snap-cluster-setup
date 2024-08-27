@@ -1,5 +1,5 @@
 import torch
-from typing import Union, Callable, Optional
+from typing import Union, Callable, Optional, Any
 from openai import OpenAI
 import anthropic
 from pathlib import Path
@@ -160,6 +160,73 @@ class VllmGenerator(Generator):
         self.sampling_params = sampling_params
         self.invalid_outputs = []
 
+class EndPointGenerator(Generator):
+    def __init__(
+        self,
+        model: str, 
+        sampling_params,
+        system_prompt: str = SYSTEM_PROMPT_DEFAULT,
+        ):
+        super().__init__()
+        self.model = model
+        self.sampling_params = sampling_params
+        self.system_prompt = system_prompt
+
+def generate_with_end_point(
+        gen: EndPointGenerator, 
+        model: str, 
+        prompt: str, 
+        url: Optional[str] = 'f"http://{name}:8001/infer"',
+        system_prompt: str = SYSTEM_PROMPT_DEFAULT, 
+        max_tokens: int = 4096, 
+        top_p: float = 0.9,
+        temperature: float = 0.7,
+        top_k: int = 50,
+        n: int = 1,
+    ) -> list[dict]:
+    """ Call end point gen. """
+    import requests
+    responses: list[Any] = []
+    assert n == 1, f'For end point for now just n=1 supported but got {n=}'
+    for i in range(n):
+        # print(f'{i=}')
+        # prompt_sent: str = f'{system_prompt}.\n{prompt}.'
+        prompt_sent: str = f'{prompt}'
+        name: str = model
+        url: str = url.replace('name', name)
+        # print(f'{url=}')
+        response = requests.post(
+            url=url,
+            json=dict(
+                # prompt=create_gen_example(text),
+                prompt=prompt_sent,
+                max_new_tokens=max_tokens,
+                top_p=top_p,
+                temperature=temperature,
+                top_k=top_k,
+            )
+        )
+        # text: str = response.json()["response"]
+        response_dict: dict = response.json()
+        responses.append(response_dict)
+    return responses
+
+@retry(stop=stop_after_attempt(15), wait=wait_exponential(multiplier=2, max=128))
+def call_to_openai_api_with_retry(gen: OpenAIGenerator, prompt: str) -> dict:
+    response: dict = gen.llm.chat.completions.create(
+        model=gen.model,
+        messages=[
+            {"role": "system", "content": gen.system_prompt},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=gen.sampling_params.temperature,
+        top_p=gen.sampling_params.top_p,
+        n=gen.sampling_params.n,
+        stop=gen.sampling_params.stop[:3],
+        max_tokens=gen.sampling_params.max_tokens,
+        )
+    return response
+
 @retry(stop=stop_after_attempt(15), wait=wait_exponential(multiplier=2, max=128))
 def call_to_openai_client_api_with_retry(gen: OpenAIGenerator, prompt: str) -> dict:
     response: dict = gen.llm.chat.completions.create(
@@ -311,6 +378,34 @@ def inference_vllm_prompt_only(
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(completions_per_prompt)
             assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
+        elif isinstance(gen, EndPointGenerator):
+            # from threading import ThreadPoolExecutor
+            # batches_prompts: list[list[str]] = []
+            # #
+            # for batch_prompts in baches_prompts:
+            #     with ThreadPoolExecutor(8) as executor:
+            #         reqs = {}
+            # - In
+            batches_prompts: list[list[str]] = all_batched_math_prompts_problems
+            # - Out
+            outputs: list[list[dict]] = [] # one request to endpoint per prompt (this case same as bellow)
+            completions: list[list[dict]] = [] # one list of completions dicts (n) per prompt
+            completions_strs: list[list[str]] = []  # one completion list str (n) per (math) prompt
+            # for batch_prompts in tqdm(batches_prompts, total=len(batches_prompts)):
+            for batch_prompts in batches_prompts:
+                prompt: str
+                for prompt in tqdm(batch_prompts, total=len(batch_prompts)):
+                    system_prompt=''
+                    name, max_tokens = gen.model, gen.sampling_params.max_tokens
+                    top_p, temperature = gen.sampling_params.top_p, gen.sampling_params.temperature
+                    n = gen.sampling_params.n
+                    top_k = 50 # other inferences don't use this so it would have to be incorporated...TODO careful not all mdl have this
+                    responses: list[dict] = generate_with_end_point(gen, name, prompt, system_prompt, max_tokens, top_p, temperature, top_k, n)
+                    responses_text: list[str] = [res['response'] for res in responses]
+                    #
+                    outputs.append(responses)
+                    completions.append(responses)
+                    completions_strs.append(responses_text)
         else:
             raise ValueError(f'Unknown generator type: {gen=}')
 

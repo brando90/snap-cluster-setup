@@ -108,6 +108,7 @@ setup(
         'dspy-ai',
         'ragatouille',
         'torch',  # here so it's there for default but if using vllm see bellow or readme.md
+        'trl',
         'transformers',
         'accelerate',
         'datasets',

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Iterator, Optional, Union, Any
 import os
 
 import tenacity
@@ -61,6 +61,8 @@ def get_iter_multiple_files_with_multiple_data_points(path: Path = Path('~/putna
                         yield data_pt
 
 def save_completions(path: Path, filename: str, completions: list[list[str]], model_answers: list[str], math_gold_probs_solns: list[dict], math_gold_answers: list[str]):
+    # TODO: put an entry that says if model got it right or not
+    print(f'-->saving completions for at {path=}')
     path: Path = path.expanduser()
     assert len(completions) == len(model_answers) == len(math_gold_probs_solns) == len(math_gold_answers), f'Length of completions, model_answers, math_gold_probs_solns, math_gold_answers should be equal but got: \n{len(completions)=}, {len(model_answers)=}, {len(math_gold_probs_solns)=}, {len(math_gold_answers)=} respectively.'
     results_vs_answers: list[dict] = []
@@ -76,6 +78,7 @@ def save_completions(path: Path, filename: str, completions: list[list[str]], mo
     # save results as a list of dicts to a json file
     with open(path / filename, 'w', encoding='utf-8') as file:
         json.dump(results_vs_answers, file, indent=4)
+    print(f'-->Done saving completions for at {path=}')
 
 def putnam_2_jsonlines(
         path_2_src_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static2/', 
@@ -131,6 +134,23 @@ def olympiad_bench_2_hendrycks_math_format(path='~/putnam-math/data/OlympiadBenc
             Path(f'{dirpath}_v2').mkdir(exist_ok=True, parents=True)
             with open(file_path_new, 'w', encoding='utf-8') as file:
                 json.dump(data, file, indent=4)
+
+def get_model_answer_correct(path: str) -> None:
+    from evals.utils import is_equiv_box_acc
+    # load data
+    path = Path(path).expanduser()
+    with open(path, 'r', encoding='utf-8') as file:
+        data: list[dict] = json.load(file)
+    for data_completion in data:
+        model_answer, gold_answer = data_completion['model_answer'], data_completion['math_gold_answer']
+        correct: Union[str, bool] = is_equiv_box_acc(target_str=gold_answer, predicted_str=model_answer)  # False, True, 'Both_None'
+        if correct == 'Both_None':
+            raise ValueError('Fatal error, both None after we should have removed that in eval run')
+        data_completion['correct'] = correct # store if it's correct, overwrite correct if it doesn't exit, fine to mutate in this case
+    # save new data with correct per dict
+    path_2_data_with_correct: Path = Path(path.parent / 'completions_with_correct.json') 
+    with open(path_2_data_with_correct, 'w', encoding='utf-8') as file:
+        json.dump(data, file, indent=4)
 
 # -- Folder Folder Rec -> Jsonlines file
 
@@ -240,6 +260,7 @@ if __name__ == '__main__':
     # _test_batch_data()
     # _test_create_putnam_jsonlines_file()
     # main_math_jsonlines_file()
-    olympiad_bench_2_hendrycks_math_format()
+    # olympiad_bench_2_hendrycks_math_format()
+    get_model_answer_correct()
     print(f"Done!\a Time: {time.time()-start:.2f} sec, {(time.time()-start)/60:.2f} min, {(time.time()-start)/3600:.2f} hr\a")
     

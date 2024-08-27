@@ -1,3 +1,4 @@
+# conda activate snap_cluster_setup
 import random
 from pathlib import Path
 import os
@@ -11,12 +12,19 @@ from evals.data_eval_utils import get_iter_for_eval_data_set, save_completions
 from evals.prompts_evals import STOP_TOKENS, extract_answer_from_list_completion_strings_mv
 from evals.prompts_evals import HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE, MATH_PROMPT_0SHOT_COT_TEMPLATE, get_math_problem_prompt_ala_helm_8shot_cot2, get_math_problem_prompt_ala_0shot_cot, HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE_MISTRAL7B_INS_V1, MATH_PROMPT_0SHOT_COT_TEMPLATE_MISTRAL7B_INS_V1
 from evals.utils import extract_model_answers, eval_boxed_accuracy_results, extract_gold_answers, get_dtype_for_vllm, load_model
-from evals.inference_eval import VllmGenerator, inference_vllm_prompt_only, OpenAIGenerator, HFPipelineGenerator, HFDirectModelGenerator, AnthropicGenerator
+from evals.inference_eval import VllmGenerator, inference_vllm_prompt_only, OpenAIGenerator, HFPipelineGenerator, HFDirectModelGenerator, AnthropicGenerator, EndPointGenerator
 
 import sys
 MAX_INT = sys.maxsize
 
 from pdb import set_trace as st
+
+def print_crucial_run_info(path_2_eval_dataset, model):
+    print()
+    print(f'----> {path_2_eval_dataset=}')
+    print(f'----> {model=}')
+    print(f'----> {os.environ.get("CUDA_VISIBLE_DEVICES", None)=}')
+    print()
 
 def seed_everything(seed: int, hf_timeout: float = 5):
     """
@@ -91,8 +99,11 @@ def main(
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final/Putnam_MATH_boxed_problems.json',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static2/test',
         # path_2_eval_dataset: str = '~/gold-ai-olympiad/data/MATH/test',
+        # path_2_eval_dataset: str = '~/snap-cluster-setup/data/MATH/test',
         # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_original_static_final_21_08_2024/Putnam_MATH_boxed_problems_full.json',
-        path_2_eval_dataset: str = '~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024_v2',
+        # path_2_eval_dataset: str = '~/putnam-math/data/OlympiadBench_Dataset/data_math_boxed_21_08_2024_v2',
+        path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_variations_static_constant/test.json',
+        # path_2_eval_dataset: str = '~/putnam-math/data/Putnam_MATH_variations_static_constant/original.json',
         # model: str = 'mistralai/Mistral-7B-v0.1',
         # model: str = 'mistralai/Mistral-7B-Instruct-v0.1',
         # model: str = 'deepseek-ai/deepseek-math-7b-instruct',
@@ -102,13 +113,14 @@ def main(
         # model: str = 'gpt-3.5-turbo',
         # model: str = 'gpt-4-turbo',
         model: str = 'claude-3-5-sonnet-20240620',
+        # https://docs.anthropic.com/en/api/claude-on-amazon-bedrock#api-model-names
         output_dir: Optional[str] = '~/data/results_{today}/',  # e.g., where to save completions
         completion_filename: str = 'completions.json',
         start: int = 0, 
         end: int = sys.maxsize, # Usually used to know what fraction of benchmark to evaluate on
         batch_size: int = sys.maxsize, # the size of batch size from eval set to evaluate per eval step, note: eventually evals on everything
-        # batch_size: int = 348,  
         # batch_size: int = 5_000,  # MATH test has 5_000 
+        # batch_size: int = 348,  
         n: int = 1, # num seqs to return for given prompt
         # max_tokens: int = 2048,
         max_tokens: int = 4096,
@@ -117,9 +129,11 @@ def main(
         # num_beams: int = 5,
         num_beams: Optional[int] = None,
         max_length: Optional[int] = None, # max input for HF/vllm models
-        hf_gen_type: Optional[str] = None,
-        # hf_gen_type: Optional[str] = 'pipeline',
-        # hf_gen_type: Optional[str] = 'hf_direct_model_gen',i
+        # gen_type: Optional[str] = None,
+        # gen_type: Optional[str] = 'vllm',
+        gen_type: Optional[str] = 'end_point',
+        # gen_type: Optional[str] = 'pipeline',
+        # gen_type: Optional[str] = 'hf_direct_model_gen',i
         verbose_eval: bool = True,
         # boxed_acc_probs_only: bool = False,
         boxed_acc_probs_only: bool = True,
@@ -131,8 +145,11 @@ def main(
         seed: int =42, 
         ):
     """ """
+    # print(f'{os.environ["CKPT_COPY"]=}')
+    assert isinstance(path_2_eval_dataset, str), f'Err: {path_2_eval_dataset=} wrong type should be str but is {type(path_2_eval_dataset)=}.'
     print(f'---> main() starting (with {seed=})')
     seed_everything(seed)
+    print_crucial_run_info(path_2_eval_dataset, model)
     # - Start wandb run
     CUDA_VISIBLE_DEVICES = os.environ.get('CUDA_VISIBLE_DEVICES')
     current_tmux_session = os.environ.get("TMUX", "").split(",")[-1]
@@ -142,6 +159,7 @@ def main(
     print(f'{run.url=}')
     output_dir = Path(f'~/data/results_{today}/').expanduser() 
     output_dir.mkdir(parents=True, exist_ok=True)
+    print(f'{output_dir=}')
 
     # - Get eval data set
     print('Get eval data set')
@@ -184,14 +202,14 @@ def main(
     SamplingParams = namedtuple('SamplingParams', ['n', 'max_tokens', 'top_p', 'temperature', 'stop', 'use_beam_search', 'best_of', 'max_length', 'num_beams'])
     sampling_params = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of, max_length=max_length, num_beams=num_beams)
     print(f'{sampling_params=}')
-    print(f'--> {model=} {hf_gen_type=}')
+    print(f'--> {model=} {gen_type=}')
     if 'gpt-4-' in model or 'gpt-3.5-' in model or 'gpt-4o' in model:
         api_key = os.environ.get("OPENAI_KEY").strip()
         gen: OpenAIGenerator = OpenAIGenerator(model, sampling_params, api_key)
     elif 'claude' in model: 
         api_key = os.environ.get("ANTHROPIC_API_KEY").strip()
         gen: AnthropicGenerator = AnthropicGenerator(model, sampling_params, api_key=api_key)
-    elif 'vllm' in str(hf_gen_type).lower():
+    elif 'vllm' in str(gen_type).lower():
         from vllm import LLM, SamplingParams, RequestOutput, CompletionOutput # here otherwise warning when doing api calls in cpu laptop, vllm only works for linux 100% ref: https://github.com/vllm-project/vllm/issues/2747
         llm: LLM = LLM(model=model, dtype=dtype, trust_remote_code=True)
         # remove any field not in vllm's SamplingParams code e.g., max_length is mostly a HF model concept
@@ -199,23 +217,26 @@ def main(
         _sampling_params = {key: field for key, field in sampling_params._asdict().items() if key in default_vllm_sp_keys}
         sampling_params = SamplingParams(**(_sampling_params))
         gen: VllmGenerator = VllmGenerator(llm, sampling_params)
-    elif hf_gen_type == 'pipeline':
-        print(f'{hf_gen_type=}')
+    elif gen_type == 'pipeline':
+        print(f'{gen_type=}')
         from transformers import pipeline, Pipeline
         mdl, tok = load_model(pretrained_model_name_or_path=model, max_length=sampling_params.max_length)
         llm: Pipeline = pipeline("text-generation", model=mdl, tokenizer=tok)
         gen: HFPipelineGenerator = HFPipelineGenerator(llm, sampling_params)
         print(f'{llm.device=}')
-    elif hf_gen_type == 'hf_direct_model_gen':
-        print(f'{hf_gen_type=}')
+    elif gen_type == 'hf_direct_model_gen':
+        print(f'{gen_type=}')
         from transformers import pipeline, Pipeline
         mdl, tok = load_model(pretrained_model_name_or_path=model, max_length=sampling_params.max_length)
         llm: Pipeline = pipeline("text-generation", model=mdl, tokenizer=tok)
         gen: HFDirectModelGenerator = HFDirectModelGenerator(llm, sampling_params)
         print(f'{llm.device=}')
-        assert ValueError(f'Don\'t use {hf_gen_type=} for now, odd bug, see: https://discuss.huggingface.co/t/how-to-generate-multiple-text-completions-per-prompt-like-vllm-using-huggingface-transformers-pipeline-without-triggering-an-error/86297/4')
+        assert ValueError(f'Don\'t use {gen_type=} for now, odd bug, see: https://discuss.huggingface.co/t/how-to-generate-multiple-text-completions-per-prompt-like-vllm-using-huggingface-transformers-pipeline-without-triggering-an-error/86297/4')
+    elif gen_type == 'end_point':
+        print(f'{gen_type=}')
+        gen: EndPointGenerator = EndPointGenerator(model=model, sampling_params=sampling_params)
     else:
-        raise ValueError(f'Not support {hf_gen_type=}')
+        raise ValueError(f'Not support {gen_type=}')
     print(f'sampling_params:\n{sampling_params}\n{sampling_params=}')
 
     # - Gen completions - completions are list of lists because completions can be multiple for a single prompt, for single response completions inside are length 1
@@ -227,6 +248,7 @@ def main(
     assert len(model_answers) == len(math_gold_answers), f'Length of model_answers and math_gold_answers should be equal but got: {len(model_answers)=}, {len(math_gold_answers)=}'
 
     # - Evaluate
+    print_crucial_run_info(path_2_eval_dataset, model)
     save_completions(output_dir, completion_filename, completions_strs, model_answers, math_gold_probs_solns, math_gold_answers,)
     wandb.save(output_dir / completion_filename)
     results_d: dict = eval_boxed_accuracy_results(math_gold_answers, model_answers, verbose_eval=verbose_eval)
@@ -244,6 +266,7 @@ def main(
     wandb.config.update(dict(prompt_gen_func=str(prompt_gen_func), prompt_template=prompt_template, model=str(model), path_2_eval_dataset=path_2_eval_dataset, output_dir=output_dir, sampling_params=sampling_params))
     print(f'{wandb.config=}')
     run.finish()
+    print_crucial_run_info(path_2_eval_dataset, model)
 
 if __name__ == '__main__':
     import fire
