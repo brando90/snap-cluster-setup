@@ -102,7 +102,7 @@ setup(
         # 'statsmodels==0.12.2'
         # 'statsmodels==0.13.5'
         # - later check why we are not installing it...
-        # 'seaborn'
+        'seaborn'
         # 'nltk'
         'twine',
         'dspy-ai',
