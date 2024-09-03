@@ -488,7 +488,7 @@ def collect_invalid_outputs(math_prompts: list[str],  gold_answers: list[str], c
 
 # -- Misc
 
-def get_dtype_for_vllm(dtype: Optional[str] = None) -> str:
+def get_dtype_for_vllm(dtype: Optional[str] = None):
     """ Return half precision since it's inference either bfloat16 or float16, or defualt to user input. """
     if dtype == 'auto':
         return 'auto'  # defaults to config file according to llm.py

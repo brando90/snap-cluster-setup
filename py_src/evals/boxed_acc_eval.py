@@ -194,7 +194,7 @@ def main(
     stop: list[str] = STOP_TOKENS
     # push to config before loading model to avoid any common llm issues
     wandb.config.update(dict(prompt_template=prompt_template, prompt_gen_func=str(prompt_gen_func), model=model, path_2_eval_dataset=path_2_eval_dataset, output_dir=output_dir, stop_tokens=stop, extract_answer_func=extract_answer_func))
-    dtype: str = get_dtype_for_vllm()
+    dtype  = get_dtype_for_vllm()
     print(f'{dtype=}')
     # sampling_params: SamplingParams = SamplingParams(n=n, max_tokens=max_tokens, top_p=top_p, temperature=temperature, stop=stop, use_beam_search=use_beam_search, best_of=best_of)
     # Note: some sampling params are not present in all inference frameworks so they need to be removed later

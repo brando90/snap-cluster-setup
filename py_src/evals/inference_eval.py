@@ -246,15 +246,17 @@ def call_to_openai_client_api_with_retry(gen: OpenAIGenerator, prompt: str) -> d
 
 def inference_vllm_prompt_only(
         gen : Generator,
-        math_gold_probs_solns: list[dict],
-        prompt_template: str, 
-        prompt_gen_func: Callable,
+        raw_data_pt_for_prompt: list[dict], # e.g., if you want to solve nl maths this contains dict with problems {'prob':prob}, or for AF {'english': english} or {'informalization': informalization}
+        prompt_template: str, # Prompt template to generate prompts from e.g., 'Solve math {$PROB}', 'Autoformalize {$ENGLISH}' etc. 
+        prompt_gen_func: Callable, # needed because the prompt_template has the prompt with unique placeholders {$PLACEHOLDER_NAME} to put the names. 
         batch_size: int = 10,
         start: int = 0,  # meant for quick prototyping evals, default starts from the beginning of the eval data
         end: int = sys.maxsize,  # meant for quick prototyping evals, default grabs all eval data all the way to the end
         batched: bool = True,  # true for vllm, false (?) for hf pipeline
         ) -> dict:
-        """ Do inference according to only prompt you give e.g., Minerva + 4 shot.
+        """ Do inference/gen according to prompt with data e.g., Minerva + 4 shot:
+                data = {'prob': prob}
+                prompt: str = prompt_gen_func(prompt_template, data['prob'])
             Note: in meta-math, ins = instruction = math problem 
             Note: return completions can be multiple strings for a single prompt e.g., useful for maj@4 voting.
         """
@@ -262,16 +264,16 @@ def inference_vllm_prompt_only(
         assert batched, f'batched should be True but got: {batched=} always batching for vllm'
 
         # - Form math prompts
-        math_prompts_problems: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in math_gold_probs_solns]
+        prompts: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in math_gold_probs_solns]
         
         # - Get subset of eval data for quick eval prototyping
-        math_prompts_problems = math_prompts_problems[start:end]
+        prompts = prompts[start:end]
 
         # - Batch prompts
         if batched:
             assert batch_size > 0, f'batch_size should be greater than 0 but got: {batch_size=}'
-            all_batched_math_prompts_problems: list[list[str]] = batch_data(math_prompts_problems, batch_size=batch_size)
-            num_batches: int = len(all_batched_math_prompts_problems)
+            all_batched_prompts: list[list[str]] = batch_data(prompts, batch_size=batch_size)
+            num_batches: int = len(all_batched_prompts)
             print(f'{num_batches=}')
 
         # - Return completions per prompt
@@ -282,8 +284,8 @@ def inference_vllm_prompt_only(
             completions_strs: list[list[str]] = []  # one completion list str per (math) prompt
             outputs: list[RequestOutput] = [] 
             for batch_idx in range(num_batches):
-                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
-                batch_outputs: list[RequestOutput] = gen.llm.generate(batch_math_prompts_problems, gen.sampling_params)
+                batch_prompts: list[str] = all_batched_prompts[batch_idx]
+                batch_outputs: list[RequestOutput] = gen.llm.generate(batch_prompts, gen.sampling_params)
                 # for each output per prompt in batch of responses (let's flatten the batch)
                 output: RequestOutput
                 for output in batch_outputs:  
@@ -293,15 +295,15 @@ def inference_vllm_prompt_only(
                     completions.append(completions_per_prompt)
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(output)
-            assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
+            assert len(outputs) == len(prompts), f'Length of outputs and prompts should be equal but got: {len(outputs)=}, {len(prompts)=}'
         elif isinstance(gen, OpenAIGenerator):
             # ref: https://platform.openai.com/docs/guides/chat-completions/response-format
             # example: https://platform.openai.com/docs/guides/text-generation
             completions: list[dict] = []
             completions_strs: list[list[str]] = []
             for batch_idx in range(num_batches):
-                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
-                for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                batch_prompts: list[str] = all_batched_prompts[batch_idx]
+                for prompt in tqdm(batch_prompts, total=len(batch_prompts)):
                     response: dict = call_to_openai_client_api_with_retry(gen, prompt)
                     completions.append(response)
                     comps_str_for_prompt: list[str] = [completion.message.content for completion in response.choices]  # response.choices[i].message
@@ -315,8 +317,8 @@ def inference_vllm_prompt_only(
                 completions: list[dict] = []
                 completions_strs: list[list[str]] = []
                 for batch_idx in range(num_batches):
-                    batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
-                    for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                    batch_prompts: list[str] = all_batched_prompts[batch_idx]
+                    for prompt in tqdm(batch_prompts, total=len(batch_prompts)):
                         response: dict = call_to_anthropic_client_api_with_retry(gen, prompt)
                         completions.append(response)
                         comps_str_for_prompt: list[str] = [content_res_obj.text for content_res_obj in response.content] # ref: https://docs.anthropic.com/en/api/messages-examples
@@ -339,9 +341,9 @@ def inference_vllm_prompt_only(
             completions_strs: list[list[str]] = []  # list when completions is a list (of strs)
             outputs: list = []  # list of outputs, 1 output per llm req
             for batch_idx in range(num_batches):
-                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
+                batch_prompts: list[str] = all_batched_prompts[batch_idx]
                 # for each output per prompt in batch of responses (let's flatten the batch)
-                for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                for prompt in tqdm(batch_prompts, total=len(batch_prompts)):
                     # output = pipe("This is a cool example!", do_sample=False, top_p=0.95, temperature=0.8, max_length=50, num_return_sequences=4, num_beams=5)
                     output: list[dict] = gen.llm(prompt, do_sample=do_sample, top_p=top_p, temperature=temperature, max_length=max_length, num_return_sequences=n, num_beams=num_beams, truncation=truncation)
                     completions_per_prompt: list[dict] = output
@@ -350,7 +352,7 @@ def inference_vllm_prompt_only(
                     completions.append(completions_per_prompt)
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(completions_per_prompt)
-            assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
+            assert len(outputs) == len(prompts), f'Length of outputs and prompts should be equal but got: {len(outputs)=}, {len(prompts)=}'
         elif isinstance(gen, HFDirectModelGenerator):
             assert ValueError(f'Don\'t use HFDirectModelGenerator= for now, odd bug, see: https://discuss.huggingface.co/t/how-to-generate-multiple-text-completions-per-prompt-like-vllm-using-huggingface-transformers-pipeline-without-triggering-an-error/86297/4')
             import torch
@@ -365,9 +367,9 @@ def inference_vllm_prompt_only(
             completions_strs: list[list[str]] = []  # list when completions is a list (of strs)
             outputs: list = []  # list of outputs, 1 output per llm req
             for batch_idx in range(num_batches):
-                batch_math_prompts_problems: list[str] = all_batched_math_prompts_problems[batch_idx]
+                batch_prompts: list[str] = all_batched_prompts[batch_idx]
                 # for each output per prompt in batch of responses (let's flatten the batch)
-                for prompt in tqdm(batch_math_prompts_problems, total=len(batch_math_prompts_problems)):
+                for prompt in tqdm(batch_prompts, total=len(batch_prompts)):
                     input_ids = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0).to(device)
                     # attention_mask = encoded_inputs['attention_mask']  # not needed since we are encoding one seq at a time, ref: https://chatgpt.com/g/g-KV0CvoH8Y-python-excellent-comments-doc-strings-types/c/cb817065-2891-4a82-bf7d-1458baa3fe36
                     completions_per_prompt: list[int] = model.generate(input_ids=input_ids, num_beams=num_beams, num_return_sequences=n, max_length=max_tokens)
@@ -377,7 +379,7 @@ def inference_vllm_prompt_only(
                     completions.append(completions_per_prompt)
                     completions_strs.append(completions_strs_per_prompt)
                     outputs.append(completions_per_prompt)
-            assert len(outputs) == len(math_prompts_problems), f'Length of outputs and math_prompts_problems should be equal but got: {len(outputs)=}, {len(math_prompts_problems)=}'
+            assert len(outputs) == len(prompts), f'Length of outputs and prompts should be equal but got: {len(outputs)=}, {len(prompts)=}'
         elif isinstance(gen, EndPointGenerator):
             # from threading import ThreadPoolExecutor
             # batches_prompts: list[list[str]] = []
@@ -386,7 +388,7 @@ def inference_vllm_prompt_only(
             #     with ThreadPoolExecutor(8) as executor:
             #         reqs = {}
             # - In
-            batches_prompts: list[list[str]] = all_batched_math_prompts_problems
+            batches_prompts: list[list[str]] = all_batched_prompts
             # - Out
             outputs: list[list[dict]] = [] # one request to endpoint per prompt (this case same as bellow)
             completions: list[list[dict]] = [] # one list of completions dicts (n) per prompt
@@ -410,8 +412,8 @@ def inference_vllm_prompt_only(
             raise ValueError(f'Unknown generator type: {gen=}')
 
         # - Return completions (list comp) per prompt
-        assert len(completions) == len(math_prompts_problems), f'Length of completions and math_prompts_problems should be equal but got: {len(completions)=}, {len(math_prompts_problems)=}'
-        assert len(completions_strs) == len(math_prompts_problems), f'Length of completions_strs and math_prompts_problems should be equal but got: {len(completions_strs)=}, {len(math_prompts_problems)=}'
+        assert len(completions) == len(prompts), f'Length of completions and prompts should be equal but got: {len(completions)=}, {len(prompts)=}'
+        assert len(completions_strs) == len(prompts), f'Length of completions_strs and prompts should be equal but got: {len(completions_strs)=}, {len(prompts)=}'
         assert len(completions_strs) == len(completions), f'Length of completions_strs and completions should be equal but got: {len(completions_strs)=}, {len(completions)=}'
         result: dict = dict(completions=completions, completions_strs=completions_strs, outputs=outputs)
         return result
@@ -557,11 +559,11 @@ def main(
     # - Get vllm generator
     prompt_template: str = HELM_MATH_PROMPT_8SHOT_COT2_TEMPLATE
     prompt_gen_func: Callable = get_math_problem_prompt_ala_helm_8shot_cot2
-    math_prompts_problems: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in math_gold_probs_solns]
+    prompts: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in math_gold_probs_solns]
     math_guessed_outputs: list[str] = [f"Solution: Let's think step by step. " + gold_data_prob_soln['solution'] for gold_data_prob_soln in math_gold_probs_solns]
 
     # - Estimate cost of inference
-    result = estimate_openai_api_inference_cost(prompts=math_prompts_problems, outputs=math_guessed_outputs, model=model, verbose=True)
+    result = estimate_openai_api_inference_cost(prompts=prompts, outputs=math_guessed_outputs, model=model, verbose=True)
     print(f'--> Inference cost: {result=}')
 
 if __name__ == '__main__':
