@@ -244,7 +244,7 @@ def call_to_openai_client_api_with_retry(gen: OpenAIGenerator, prompt: str) -> d
     # chat completion response format: https://platform.openai.com/docs/guides/chat-completions/response-format
     return response
 
-def inference_vllm_prompt_only(
+def inference_vllm_prompt_only( 
         gen : Generator,
         raw_data_pt_for_prompt: list[dict], # e.g., if you want to solve nl maths this contains dict with problems {'prob':prob}, or for AF {'english': english} or {'informalization': informalization}
         prompt_template: str, # Prompt template to generate prompts from e.g., 'Solve math {$PROB}', 'Autoformalize {$ENGLISH}' etc. 
