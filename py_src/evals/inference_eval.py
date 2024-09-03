@@ -264,7 +264,7 @@ def inference_vllm_prompt_only(
         assert batched, f'batched should be True but got: {batched=} always batching for vllm'
 
         # - Form math prompts
-        prompts: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in math_gold_probs_solns]
+        prompts: list[str] = [prompt_gen_func(gold_data_prob_soln, prompt_template) for gold_data_prob_soln in raw_data_pt_for_prompt]
         
         # - Get subset of eval data for quick eval prototyping
         prompts = prompts[start:end]
