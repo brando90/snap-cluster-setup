@@ -81,7 +81,7 @@ setup(
     install_requires=[
         'fire',
         'dill',
-        'networkx>=2.5',
+        # 'networkx>=2.5',
         'scipy',
         'scikit-learn',
         'lark-parser',
@@ -102,20 +102,24 @@ setup(
         # 'statsmodels==0.12.2'
         # 'statsmodels==0.13.5'
         # - later check why we are not installing it...
-        'seaborn'
+        'seaborn',
         # 'nltk'
         'twine',
         'dspy-ai',
         'ragatouille',
         'torch',  # here so it's there for default but if using vllm see bellow or readme.md
+        # 'torchvision',
+        # 'torchaudio',
         'trl',
         'transformers',
+        'peft',
         'accelerate',
         'datasets',
         'bitsandbytes',
         'evaluate',
         'einops',
-        'sentencepiece',
+        'sentencepiece', # needed llama2 tokenizer
+        # 'zstandard', # needed for eval of all the pile
 
         # def does not work for mac
         # # -- ref: https://github.com/vllm-project/vllm/issues/2747 
