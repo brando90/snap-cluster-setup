@@ -1,9 +1,7 @@
 """
-python -c "print()"
-
 refs:
-    - setup tools: https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-or-find-packages
-    - https://stackoverflow.com/questions/70295885/how-does-one-install-pytorch-and-related-tools-from-within-the-setup-py-install
+    - The document explains setuptools package discovery for correct python package creation: https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-or-find-packages
+        - note:  setuptools: is a Python library designed to facilitate the packaging, distribution, and installation of Python projects
 """
 from setuptools import setup
 from setuptools import find_packages

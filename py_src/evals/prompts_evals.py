@@ -61,7 +61,7 @@ def extract_answer_minerva_prompt(completion: str) -> Union[None, str]:
             $$-\frac{3}{2}a=b\Rightarrow\frac{a}{b}=\boxed{-\frac{2}{3}}.$$ -> "-\frac{2}{3}"
             $$hello world$$ -> None  # no boxed answer
     """
-    from evals.utils import last_boxed_only_string, remove_boxed
+    from uutils.evals.utils import last_boxed_only_string, remove_boxed
     boxed_answer: str = last_boxed_only_string(completion)
     extracted_answer: str = remove_boxed(boxed_answer)
     extracted_answer = extracted_answer.strip() if extracted_answer is not None else None
