@@ -113,6 +113,9 @@ if [[ ":$PATH:" != *":$VENV_PATH/bin:"* ]]; then
     export PATH="$VENV_PATH/bin:$PATH"
 fi
 
+# activates the conda base env (for robustness run it twice, before & after conda init)
+source $HOME/miniconda/bin/activate
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('$HOME/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -131,7 +134,7 @@ unset __conda_setup
 # very similar to the conda init code above, will leave it out since snap seems to be working e.g., it can find conda command just fine with the above code, note above code **does** have to be at the end
 # export PATH="$HOME/miniconda/bin:$PATH"
 
-# activates the conda base env
+# activates the conda base env (for robustness run it twice, before & after conda init)
 source $HOME/miniconda/bin/activate
 
 # activate snap_cluster_setup default conda env
