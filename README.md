@@ -18,20 +18,20 @@ Other useful resources:
 ### First request CSID 
 First create a CSID here and  please make your CSID the same as your Stanford SUNET id. 
 Request it here:  https://webdb.cs.stanford.edu/csid and 
-If you are a CS197 (only!) then:
+If you are a CS199 (only!) then:
 1. (most likely) If you are not in CS197 with me put Sanmi Koyejo as your CSID sponor/supervisor and e-mail them you are planning to collaborate with me in research.
-2. If your are a CS197 student put Michael Bernstein as your CSID sponsor/supervisor and e-mail you are doing cs197 with me.
+2. If your are a CS199 student put Michael Bernstein as your CSID sponsor/supervisor and e-mail you are doing cs190 with me.
 Note: this is different from SNAP cluster sponso (which you email il-action@stanford.edu), but CSID is needed first. 
 
 ### Second get acces to SNAP
 
 To get access to snap write an e-mail with this subject:
 
-> Access Request SNAP Cluster Working With Brando Miranda CS197 for <full_name> <CSID>  <SUNET>
+> Access Request SNAP Cluster Working With Brando Miranda CS199 for <full_name> <CSID>  <SUNET>
 
 For example: 
 
-> Access Request SNAP Cluster Working With Brando Miranda CS197 for Brando Miranda brando9 brando9$ 
+> Access Request SNAP Cluster Working With Brando Miranda CS199 for Brando Miranda brando9 brando9$ 
 
 and sent it to
 - Eric Pineda: eric.pineda@stanford.edu
